@@ -1,4 +1,3 @@
-
 CREATE TYPE Gender AS ENUM ('male', 'female', 'undefined');
 CREATE TYPE MediaClass AS ENUM ('photo', 'video');
 
@@ -69,21 +68,21 @@ CREATE TABLE posts_bookmarks (
 
 CREATE TABLE users_follows (
   id BIGSERIAL PRIMARY KEY,
-	follower_id VARCHAR REFERENCES users (id),
-	followed_id VARCHAR REFERENCES users (id),
+  follower_id VARCHAR REFERENCES users (id),
+  followed_id VARCHAR REFERENCES users (id),
   created_at TIMESTAMP NOT NULL
 );
 
 CREATE TABLE users_reports (
   id BIGSERIAL PRIMARY KEY,
-	reporter_id VARCHAR REFERENCES users (id),
-	reported_id VARCHAR REFERENCES users (id),
+  reporter_id VARCHAR REFERENCES users (id),
+  reported_id VARCHAR REFERENCES users (id),
   created_at TIMESTAMP NOT NULL
 );
 
 CREATE TABLE users_blocks (
   id BIGSERIAL PRIMARY KEY,
-	blocker_id VARCHAR REFERENCES users (id),
-	blocked_id VARCHAR REFERENCES users (id),
+  blocker_id VARCHAR REFERENCES users (id),
+  blocked_id VARCHAR REFERENCES users (id),
   created_at TIMESTAMP NOT NULL
 );
