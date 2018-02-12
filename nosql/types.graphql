@@ -1,0 +1,108 @@
+# DISCLAIMER: Choosing GraphQL's type system for representing the NoSQL schema is arbitrary and 
+# was ONLY used to showcase how NoSQL documents and attributes will be modeled
+
+################################## CHAT ################################## 
+
+type Message {
+    id: ID!, 
+    text: String!, 
+    user_id: ID!, 
+    created_at: Timestamp!, 
+    deleted_at: TIMESTAMP!,
+    blocked_at: Timestamp!, 
+    likers_ids: String[], 
+    media_url: String, 
+}
+
+type Thread {
+    id: ID!,
+    creator_id: ID!,
+    users_ids String[]!,
+    name: String,
+    created_at: TIMESTAMP!,
+    deleted_at: TIMESTAMP!,
+    blocked_at: TIMESTAMP!,
+    messages: Message[],
+}
+
+################################## NOTIFICATIONS ################################## 
+
+type PostActivityType {
+    type: "mentioning" | "liking" | "tagging" | "commenting",
+    post_id: ID!,
+}
+
+type UserActivityType {
+    type: "following",
+    user_id: String!
+}
+
+union ActivityType = PostActivityType | UserActivityType
+
+type Notification {    
+    id: ID!,
+    type: ActivityType,
+    receiver_id: ID,
+    sender_id: ID,
+    created_at: Timestamp!, 
+    blocked_at: Timestamp!, 
+}
+
+################################## ACTIVITIES ################################## 
+
+type Activity {    
+    id: ID!,
+    type: ActivityType,
+    receiver_id: ID,
+    sender_id: ID,
+    created_at: Timestamp!, 
+    blocked_at: Timestamp, 
+}
+
+################################## HASHTAGS ################################## 
+
+type Hashtag {
+    text: String!,
+    followers_ids: ID[],
+    posts_ids: ID[],
+    created_at: Timestamp!, 
+    updated_at: Timestamp, 
+    blocked_at: Timestamp, 
+}
+
+################################## COMMENTS ################################## 
+
+union CommentDepth = 0 | 1
+
+type Comment {
+    id: ID,
+    text: String!,
+    depth: CommentDepth,
+    user_id: String!,
+    post_id: String,
+    comments: Comment[],
+    created_at: Timestamp!, 
+    updated_at: Timestamp!, 
+    deleted_at: Timestamp,
+    blocked_at: Timestamp, 
+}
+
+################################## STORIES ################################## 
+
+type Story {
+    id: ID!,
+    user_id: String!,
+    is_featured: boolean!,
+    media_id: String!,
+    reports: {
+        user_id: String!,
+        reason: String!,
+    }[],
+    created_at: Timestamp!, 
+    deleted_at: Timestamp, 
+    expired_at: Timestamp,
+    blocked_at: Timestamp, 
+}
+
+# Users can report posts
+# Post tags should have location {x,y} type
