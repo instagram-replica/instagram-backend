@@ -11,7 +11,7 @@ type Message {
     deleted_at: TIMESTAMP!,
     blocked_at: Timestamp!, 
     likers_ids: String[], 
-    media_url: String, 
+    media_id: ID, 
 }
 
 type Thread {
@@ -42,8 +42,8 @@ union ActivityType = PostActivityType | UserActivityType
 type Notification {    
     id: ID!,
     type: ActivityType,
-    receiver_id: ID,
-    sender_id: ID,
+    receiver_id: ID!,
+    sender_id: ID!,
     created_at: Timestamp!, 
     blocked_at: Timestamp!, 
 }
@@ -53,8 +53,8 @@ type Notification {
 type Activity {    
     id: ID!,
     type: ActivityType,
-    receiver_id: ID,
-    sender_id: ID,
+    receiver_id: ID!,
+    sender_id: ID!,
     created_at: Timestamp!, 
     blocked_at: Timestamp, 
 }
@@ -78,8 +78,8 @@ type Comment {
     id: ID,
     text: String!,
     depth: CommentDepth,
-    user_id: String!,
-    post_id: String,
+    user_id: ID!,
+    post_id: ID,
     comments: Comment[],
     created_at: Timestamp!, 
     updated_at: Timestamp!, 
@@ -91,13 +91,14 @@ type Comment {
 
 type Story {
     id: ID!,
-    user_id: String!,
+    user_id: ID!,
     is_featured: boolean!,
-    media_id: String!,
+    media_id: ID!,
     reports: {
         user_id: String!,
         reason: String!,
     }[],
+    seen_by_users_ids: ID[],
     created_at: Timestamp!, 
     deleted_at: Timestamp, 
     expired_at: Timestamp,
