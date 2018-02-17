@@ -6,12 +6,12 @@ import java.util.stream.Collectors;
 import static persistence.sql.users.Validation.isValidUser;
 import static persistence.sql.users.Validation.isValidUserId;
 
-public class Controller {
+public class Main {
     public static List<User> getAllUsers() {
         List<Model> results = Model.findAll();
         return results
                 .stream()
-                .map(Controller::mapModelToUser)
+                .map(Main::mapModelToUser)
                 .collect(Collectors.toList());
     }
 
