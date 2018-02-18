@@ -1,4 +1,4 @@
-package servers.activities;
+package services.activities;
 
 
 import shared.JSONHandler;

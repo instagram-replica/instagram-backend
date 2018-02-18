@@ -1,4 +1,4 @@
-package servers.stories;
+package services.stories;
 
 import org.json.JSONObject;
 

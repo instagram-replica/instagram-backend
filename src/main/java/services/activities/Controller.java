@@ -1,4 +1,4 @@
-package servers.chats;
+package services.activities;
 
 import org.json.JSONObject;
 
@@ -12,7 +12,9 @@ public class Controller extends shared.Controller {
     @Override
     public JSONObject execute(JSONObject jsonObject) {
         JSONObject newJsonObj = new JSONObject();
-        newJsonObj.put("application", "chats");
+        newJsonObj.put("application", "activities");
+        System.out.println(jsonObject);
         return newJsonObj;
     }
+
 }

@@ -1,4 +1,4 @@
-package servers.stories;
+package services.posts;
 
 
 import shared.JSONHandler;

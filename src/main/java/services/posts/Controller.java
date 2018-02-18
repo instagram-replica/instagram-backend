@@ -1,4 +1,4 @@
-package servers.posts;
+package services.posts;
 
 import org.json.JSONObject;
 
