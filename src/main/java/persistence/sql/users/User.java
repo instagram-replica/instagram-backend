@@ -14,11 +14,15 @@ public class User {
     private String phoneNumber;
     private String profilePictureUrl;
     private String websiteUrl;
+    private String numberOfFollowings;
+    private String numberOfFollowers;
+    private String numberOfPosts;
     private Date verifiedAt;
     private Date createdAt;
     private Date updatedAt;
     private Date blockedAt;
     private Date deletedAt;
+    private Date dateOfBirth;
 
     public String getId() {
         return id;
@@ -108,6 +112,30 @@ public class User {
         this.websiteUrl = websiteUrl;
     }
 
+    public String getNumberOfFollowings() {
+        return numberOfFollowings;
+    }
+
+    public void setNumberOfFollowings(String numberOfFollowings) {
+        this.numberOfFollowings = numberOfFollowings;
+    }
+
+    public String getNumberOfFollowers() {
+        return numberOfFollowers;
+    }
+
+    public void setNumberOfFollowers(String numberOfFollowers) {
+        this.numberOfFollowers = numberOfFollowers;
+    }
+
+    public String getNumberOfPosts() {
+        return numberOfPosts;
+    }
+
+    public void setNumberOfPosts(String numberOfPosts) {
+        this.numberOfPosts = numberOfPosts;
+    }
+
     public Date getVerifiedAt() {
         return verifiedAt;
     }
@@ -146,6 +174,14 @@ public class User {
 
     public void setDeletedAt(Date deletedAt) {
         this.deletedAt = deletedAt;
+    }
+
+    public Date getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+    public void setDateOfBirth(Date dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
     }
 
     @Override
