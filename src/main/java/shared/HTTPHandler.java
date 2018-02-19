@@ -35,21 +35,20 @@ public class HTTPHandler extends SimpleChannelInboundHandler<Object> {
             if (HttpHeaders.is100ContinueExpected(request)) {
             send100Continue(ctx);
             }
-            ctx.fireChannelRead(request);
 
         }
-//        if (msg instanceof HttpContent) {
-//            HttpContent httpContent = (HttpContent) msg;
-//            System.out.println(httpContent.toString());
-//            ByteBuf content = httpContent.content();
-////            setRequestBody(content.toString(CharsetUtil.UTF_8));
-////            ctx.fireChannelRead(request);
-//        }
-//        if (msg instanceof LastHttpContent) {
-////            LastHttpContent trailer = (LastHttpContent) msg;
-//            HttpObject trailer = (HttpObject) msg;
-////            writeresponse(trailer, ctx);
-//        }
+        if (msg instanceof HttpContent) {
+            HttpContent httpContent = (HttpContent) msg;
+            System.out.println(httpContent.toString());
+            ByteBuf content = httpContent.content();
+//            setRequestBody(content.toString(CharsetUtil.UTF_8));
+            ctx.fireChannelRead(request);
+        }
+        if (msg instanceof LastHttpContent) {
+//            LastHttpContent trailer = (LastHttpContent) msg;
+            HttpObject trailer = (HttpObject) msg;
+//            writeresponse(trailer, ctx);
+        }
     }
 
 
