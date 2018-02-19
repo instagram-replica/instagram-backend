@@ -7,7 +7,7 @@ public abstract class Controller {
 
     }
 
-    public abstract JSONObject execute(JSONObject jsonObject);
+    public abstract JSONObject execute(JSONObject jsonObject, String userId);
 
 //    public JSONObject send(JSONObject data){
 //

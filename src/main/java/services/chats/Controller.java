@@ -10,7 +10,7 @@ public class Controller extends shared.Controller {
     }
 
     @Override
-    public JSONObject execute(JSONObject jsonObject) {
+    public JSONObject execute(JSONObject jsonObject, String userId) {
         JSONObject newJsonObj = new JSONObject();
         newJsonObj.put("application", "chats");
         return newJsonObj;
