@@ -13,9 +13,7 @@ public class UserActions {
         JSONObject inner = new JSONObject();
         inner.put("success", "true");
         inner.put("error","null");
-
         jObject.put("response", inner);
-
 
         return jObject;
     }
@@ -25,13 +23,11 @@ public class UserActions {
         JSONObject inner = new JSONObject();
         inner.put("success", "true");
         inner.put("error","null");
-
         jObject.put("response", inner);
-
 
         return jObject;
     }
-    public static JSONObject DeleteUser(JSONObject paramsObject)
+    public static JSONObject DeleteUser(JSONObject paramsObject, String loggerInUser)
     {
         JSONObject jObject = new JSONObject();
         JSONObject inner = new JSONObject();
@@ -41,14 +37,12 @@ public class UserActions {
         User deletedUser  = Main.deleteUser(userId);
         inner.put("id",userId);
         jObject.put("user", inner);
-        if(deletedUser.getDeletedAt()!=null)
-        {
+        if(deletedUser.getDeletedAt()!=null){
             jObject.put("error","null");
         }
-        else {
+        else{
             jObject.put("error","user not deleted");
         }
         return jObject;
-
     }
 }

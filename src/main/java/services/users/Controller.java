@@ -2,6 +2,7 @@ package services.users;
 
 import org.json.JSONObject;
 
+
 public class Controller extends shared.Controller {
 
 
@@ -17,8 +18,10 @@ public class Controller extends shared.Controller {
         JSONObject paramsObject = jsonObject.getJSONObject("params");
         switch (methodName){
             case "signUp": return Authentication.SignUp(paramsObject, userId);
+            case "getUserInfo" : return Authentication.GetUserInfo(paramsObject, userId);
             case "createFollow": return UserActions.CreateFollow(paramsObject, userId);
             case "createUnfollow": return UserActions.CreateUnfollow(paramsObject, userId);
+            case "deleteUser": return UserActions.DeleteUser(paramsObject, userId);
         }
 
         newJsonObj.put("application", "users");
