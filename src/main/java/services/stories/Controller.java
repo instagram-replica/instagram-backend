@@ -18,7 +18,32 @@ public class Controller extends shared.Controller {
 
 //        System.out.println(methodName);
 
-        newJsonObj.put("application", "feed/stories");
+        switch(methodName){
+            case "createStory":createStory();break;
+            case "deleteStory":deleteStory();break;
+            case "getMyStory":getMyStory();break;
+            case "getMyStories":getStories();break;
+            case "getDiscoverStories":getDiscoverStories();break;
+        }
+
+        newJsonObj.put("application", methodName);
         return newJsonObj;
     }
+
+
+    public static void createStory(){
+    }
+
+    public static void deleteStory(){
+    }
+
+    public static void getMyStory(){
+    }
+
+    public static void getStories(){
+    }
+
+    public static void getDiscoverStories(){
+    }
+
 }
