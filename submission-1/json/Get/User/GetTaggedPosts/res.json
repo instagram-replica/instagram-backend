@@ -1,0 +1,12 @@
+{
+  "method": "getTaggedPosts",
+  "posts": [
+    {
+      "postId": 12,
+      "thumbnail": "https://...",
+      "createAt": "2012-04-23T18:25:43.511Z",
+      "updatedAt": "2012-04-23T18:25:43.511Z",
+      "deletedAt": "2012-04-23T18:25:43.511Z"
+    }
+  ]
+}

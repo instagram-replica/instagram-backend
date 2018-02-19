@@ -1,0 +1,12 @@
+{
+  "method": "createMessage",
+  "response": {
+    "data": {
+      "newMessage": {
+        "id" : 12,
+        "text": "yoooo"
+      }
+    },
+    "error": null
+  }
+}

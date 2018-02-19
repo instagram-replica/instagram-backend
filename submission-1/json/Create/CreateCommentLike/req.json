@@ -1,0 +1,7 @@
+{
+    "method": "createCommentLike",
+    "params" : 
+    {
+    	"commentId": 12
+    }
+}

@@ -1,0 +1,55 @@
+{
+  "method": "createPost",
+  "post": [
+    {
+      "caption": "caption",
+      "location": {
+        "longitiude": "122.3.12.33",
+        "latitude": "122.3.12.33"
+      },
+      "media": [
+        {
+          "id": 123,
+          "type": "img",
+          "blob": "...",
+          "tags": [
+            {
+              "taggedUsers": [
+                {
+                  "username": "AhmedMagdy",
+                  "location": {
+                    "x": 20,
+                    "y": 10
+                  }
+                },
+                {
+                  "username": "Sawahel",
+                  "location": {
+                    "x": 20,
+                    "y": 10
+                  }
+                },
+                {
+                  "username": "Messiry",
+                  "location": {
+                    "x": 20,
+                    "y": 10
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 111,
+          "type": "video",
+          "blob": "..."
+        }
+      ],
+
+      "createAt": "2012-04-23T18:25:43.511Z",
+      "updatedAt": "2012-04-23T18:25:43.511Z",
+      "deletedAt": "2012-04-23T18:25:43.511Z"
+    }
+  ]
+}

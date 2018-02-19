@@ -1,0 +1,7 @@
+{
+  "method": "createUnfollow",
+  "response": {
+    "success": true,
+    "error": null
+  }
+}

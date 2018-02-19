@@ -1,0 +1,14 @@
+{
+  "method": "getCommentsReplies",
+  "Replies": [
+    {
+      "id": 1,
+      "username":"omartag",
+      "avatar":"https://..",
+      "text":"hello world",
+      "createAt": "2012-04-23T18:25:43.511Z",
+      "deletedAt": "2012-04-23T18:25:43.511Z",
+      "updatedAt": "2012-04-23T18:25:43.511Z"
+    }
+  ]
+}

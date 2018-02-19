@@ -1,0 +1,8 @@
+{
+    "method": "createComment",
+    "params" : 
+    {
+    	"postId": 12,
+    	"text": "mozzaa awii :*"	
+    }
+}

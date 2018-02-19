@@ -1,0 +1,13 @@
+{
+  "method": "createComment",
+  "response": {
+    "data": {
+      "newComment": {
+        "id" : 567,
+        "postId" : 1232,
+        "text": "yoooo"
+      }
+    },
+    "error": null
+  }
+}

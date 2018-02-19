@@ -1,0 +1,20 @@
+{
+  "method": "getStories",
+  "Stories": [
+    {
+      "id": 1,
+      "userId": 12,
+      "username": "omartag",
+      "avatar": "https:///...",
+      "seen": false,
+
+      "media": {
+        "id": 123,
+        "type": "img",
+        "url": "https://..."
+      },
+      "createAt": "2012-04-23T18:25:43.511Z",
+      "deletedAt": "2012-04-23T18:25:43.511Z"
+    }
+  ]
+}
