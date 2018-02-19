@@ -19,7 +19,7 @@ public class JSONHandler extends SimpleChannelInboundHandler {
 
         JSONObject input = Helpers.getJSONFromByteBuf(ctx, o);
 
-        JSONObject output = controller.execute(input);
+        JSONObject output = controller.execute(input, "fakejsonid");
 
         Helpers.sendJSON(ctx, output);
     }
