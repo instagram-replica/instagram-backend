@@ -13,10 +13,10 @@ public class Controller extends shared.Controller {
     public JSONObject execute(JSONObject jsonObject, String userId) {
         JSONObject newJsonObj = new JSONObject();
 
-        String methodName = jsonObject.getString("method");
+//        String methodName = jsonObject.getString("method");
 //        JSONObject paramsObject = jsonObject.getJSONObject("params");
 
-        System.out.println(methodName);
+//        System.out.println(methodName);
 
         newJsonObj.put("application", "feed/stories");
         return newJsonObj;
