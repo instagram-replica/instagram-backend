@@ -1,0 +1,6 @@
+{
+    "method":"deleteComment",
+    "params":{
+        "commentId":12
+    }
+}

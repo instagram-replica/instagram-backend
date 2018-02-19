@@ -1,0 +1,7 @@
+{
+  "method": "signUp",
+  "response": {
+    "sessionId": 12
+  },
+  "error": null
+}

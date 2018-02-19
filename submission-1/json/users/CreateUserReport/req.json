@@ -1,0 +1,8 @@
+{
+    "method": "createUserReport",
+    "params" : 
+    {
+    	"userId": 3312,
+    	"report": "spammer"	
+    }
+}

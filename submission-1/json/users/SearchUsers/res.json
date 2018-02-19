@@ -1,0 +1,12 @@
+{
+  "method": "searchUsers",
+  "users": [
+    {
+      "id": 1,
+      "username": "omartag",
+      "avatar": "https://..."
+    }
+
+  ],
+  "error":null
+}

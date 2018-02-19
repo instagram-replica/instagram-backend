@@ -1,0 +1,8 @@
+{
+    "method": "createMessage",
+    "params" : 
+    {
+    	"threadId": 12,
+    	"text": "ezzayek ya mozzaa :*"	
+    }
+}

@@ -1,0 +1,7 @@
+{
+  "method": "createUserReport",
+  "response": {
+    "success": true,
+    "error": null
+  }
+}

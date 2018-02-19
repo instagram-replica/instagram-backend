@@ -1,0 +1,6 @@
+{
+    "method":"getComments",
+    "params":{
+        "postId":1
+    }
+}

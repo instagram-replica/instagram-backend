@@ -1,0 +1,10 @@
+{
+    "method":"getHashtagPosts",
+    "posts":[
+        {
+            "id":12,
+            "thumbnail":"https://..."
+        }
+    ],
+    "error":null
+}

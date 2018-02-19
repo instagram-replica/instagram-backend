@@ -1,0 +1,7 @@
+{
+  "method": "deleteStory",
+  "story":{
+    "id":1
+  },
+  "error":null
+}

@@ -1,0 +1,7 @@
+{
+  "method": "getDiscoverFeed",
+  "params": {
+    "pageSize": 5,
+    "pageIndex": 1
+  }
+}

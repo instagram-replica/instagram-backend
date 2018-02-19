@@ -1,0 +1,8 @@
+{
+    "method": "createCommentReply",
+    "params" : 
+    {
+    	"commentId": 12,
+    	"text": "merci ya habebty :*"	
+    }
+}
