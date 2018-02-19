@@ -31,17 +31,14 @@ public class Authentication {
             session.put("sessionId", 12);
             JSONObject response = new JSONObject();
             response.put("response", session);
-            return new JSONObject().put("error", "null");
+            return response;
         }
-        else return null;
+        else return new JSONObject().put("error", "null");
     }
 
     public static JSONObject GetUserInfo(JSONObject jsonObject, String userID){
-
         JSONObject userData = new JSONObject();
-
         User requestedUser = Main.getUserById(jsonObject.getString("userId"));
-
         JSONObject userProfile = new JSONObject();
 
         userProfile.put("userId",userID);
@@ -78,6 +75,4 @@ public class Authentication {
 
            return userData;
     }
-
-
 }
