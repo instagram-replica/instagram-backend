@@ -1,0 +1,13 @@
+{
+  "method": "createCommentReply",
+  "response": {
+    "data": {
+      "newReply": {
+        "id" : 567,
+        "parentCommentId" : 12,
+        "text": "yoooo!"
+      }
+    },
+    "error": null
+  }
+}

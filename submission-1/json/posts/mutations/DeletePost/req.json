@@ -1,0 +1,6 @@
+{
+    "method":"deletePost",
+    "params":{
+        "postId":12
+    }
+}

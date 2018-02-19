@@ -1,0 +1,13 @@
+{
+	"method" : "signUp",
+	"params": {
+		"username" : "sawahel",
+		"fullName" : "Ahmed Sawahel",
+		"passwordHash" : "!@#!@$C!",
+		"email" : "sawahel@magdy.com",
+		"gender" : "male",
+		"dateOfBirth" : "27/11/1994",
+		"phone" : "+20 100 977 5576",
+		"avatar" : "https://..."
+	}
+}

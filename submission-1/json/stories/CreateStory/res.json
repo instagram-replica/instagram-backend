@@ -1,0 +1,7 @@
+{
+  "method": "createStory",
+  "response": {
+    "storyId": 12,
+    "error": null
+  }
+}

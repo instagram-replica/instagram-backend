@@ -1,0 +1,8 @@
+{
+  "method": "createCommentLike",
+  "response": {
+    "commentID" : 12,
+    "numberOfLikes" : 4,
+    "error": null
+  }
+}

@@ -1,0 +1,7 @@
+{
+	"method" : "signIn",
+	"params": {
+		"username" : "sawahel",
+		"passwordHash" : "!@#!@$C!"
+	}
+}

@@ -1,0 +1,8 @@
+{
+    "method":"updateComment",
+    "params":{
+        
+        "commentId":12,
+        "text":"Eshta ana b7b keda"
+    }
+}

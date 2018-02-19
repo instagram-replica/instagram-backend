@@ -1,0 +1,7 @@
+{
+    "method": "createUnfollow",
+    "params" : 
+    {
+    	"userId": 12
+    }
+}

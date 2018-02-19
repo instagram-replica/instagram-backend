@@ -1,0 +1,7 @@
+{
+  "method": "createPostLike",
+  "response": {
+    "postID": 12,
+    "error": null
+  }
+}
