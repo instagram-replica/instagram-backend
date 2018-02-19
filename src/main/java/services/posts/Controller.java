@@ -16,6 +16,9 @@ public class Controller extends shared.Controller {
         JSONObject paramsObject = jsonObject.getJSONObject("params");
         switch (methodName){
             case "getPosts": return Team1.getPosts(paramsObject, userId);
+            case "getPost": return Team2.getPost(paramsObject, userId);
+            case "getTaggedPosts": return Team2.getTaggedPosts(paramsObject, userId);
+            case "createPostLike": return Team2.createPostLike(paramsObject, userId, methodName);
         }
         System.out.println(methodName);
         System.out.println(paramsObject.toString());
