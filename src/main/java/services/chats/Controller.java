@@ -12,6 +12,13 @@ public class Controller extends shared.Controller {
     @Override
     public JSONObject execute(JSONObject jsonObject) {
         JSONObject newJsonObj = new JSONObject();
+        if(jsonObject.getString("name").equals("Ants")) {
+            try {
+                Thread.sleep(100000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
         newJsonObj.put("application", "chats");
         return newJsonObj;
     }
