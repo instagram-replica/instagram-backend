@@ -31,18 +31,16 @@ public class HTTPHandler extends SimpleChannelInboundHandler<Object> {
 
         if (msg instanceof HttpRequest) {
             HttpRequest request = this.request = (HttpRequest) msg;
-
             if (HttpHeaders.is100ContinueExpected(request)) {
-            send100Continue(ctx);
+                send100Continue(ctx);
             }
 
         }
         if (msg instanceof HttpContent) {
             HttpContent httpContent = (HttpContent) msg;
-            System.out.println(httpContent.toString());
             ByteBuf content = httpContent.content();
 //            setRequestBody(content.toString(CharsetUtil.UTF_8));
-            ctx.fireChannelRead(request);
+            ctx.fireChannelRead(content.copy());
         }
         if (msg instanceof LastHttpContent) {
 //            LastHttpContent trailer = (LastHttpContent) msg;
