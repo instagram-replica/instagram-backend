@@ -6,14 +6,39 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 
+import org.json.JSONObject;
+import persistence.sql.users.*;
+
 public class Authentication {
 
-    public static JSONObject getUserInfo(JSONObject jsonObject, String userID){
+    public static JSONObject SignUp(JSONObject params, String userId){
+        User newUser = new User();
+        newUser.setUsername(params.getString("userName"));
+        newUser.setFullName(params.getString("fullName"));
+        newUser.setPasswordHash(params.getString("passwordHash"));
+        newUser.setEmail(params.getString("email"));
+        newUser.setPhoneNumber(params.getString("phone"));
 
+        JSONObject response = new JSONObject();
+        response.put("sessionId", 12);
+        return response;
+    }
+
+    public static JSONObject SignIn(JSONObject params, String userId){
+        User user = Main.getUserById(params.getString("username"));
+        if(user.getPasswordHash().equals(params.getString("password"))){
+            JSONObject session = new JSONObject();
+            session.put("sessionId", 12);
+            JSONObject response = new JSONObject();
+            response.put("response", session);
+            return response;
+        }
+        else return new JSONObject().put("error", "null");
+    }
+
+    public static JSONObject GetUserInfo(JSONObject jsonObject, String userID){
         JSONObject userData = new JSONObject();
-
         User requestedUser = Main.getUserById(jsonObject.getString("userId"));
-
         JSONObject userProfile = new JSONObject();
 
         userProfile.put("userId",userID);
@@ -50,10 +75,4 @@ public class Authentication {
 
            return userData;
     }
-
-
-
-
-
-
 }
