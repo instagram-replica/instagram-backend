@@ -1,46 +1,23 @@
 package persistence.nosql;
 
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
-import com.arangodb.ArangoCollection;
-import com.arangodb.ArangoCursor;
 import com.arangodb.ArangoDB;
 import com.arangodb.ArangoDBException;
 import com.arangodb.entity.BaseDocument;
 import com.arangodb.entity.CollectionEntity;
-import com.arangodb.model.AqlQueryOptions;
-import com.arangodb.model.CollectionCreateOptions;
-import com.arangodb.util.MapBuilder;
-import com.arangodb.velocypack.VPackSlice;
-import com.arangodb.velocypack.exception.VPackException;
-import com.sun.deploy.util.Base64Wrapper;
-import org.javalite.activejdbc.Base;
-import org.javalite.http.Post;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-import persistence.nosql.Datatypes.*;
-import persistence.nosql.Datatypes.Thread;
 
 public class ArangoInterfaceMethods {
 
-    protected static ArangoDB arangoDB = new ArangoDB.Builder().build();;
+    private static ArangoDB arangoDB = new ArangoDB.Builder().build();
     static String dbName =  "InstagramAQL";
 
-    //static final String messagesCollectionName = "Messages";
-    static final String threadsCollectionName = "Threads";
-    //static final String postActivitiesCollectionName = "PostActivities";
-    //static final String userActivitiesCollectionName = "UserActivities";
-    static final String notificationsCollectionName = "Notifications";
-    static final String activitiesCollectionName = "Activities";
-//    static final String hashtagsCollectionName = "Hashtags";
-    //static final String commentsCollectionName = "Comments";
-    static final String storiesCollectionName = "Stories";
-    static final String postsCollectionName = "Posts";
-    static final String bookmarksCollectionName = "Bookmarks";
+    private static final String threadsCollectionName = "Threads";
+    private static final String notificationsCollectionName = "Notifications";
+    private static final String activitiesCollectionName = "Activities";
+    private static final String storiesCollectionName = "Stories";
+    private static final String postsCollectionName = "Posts";
+    private static final String bookmarksCollectionName = "Bookmarks";
 
 
 
@@ -57,29 +34,15 @@ public class ArangoInterfaceMethods {
         }
 
         try {
-//            CollectionEntity messagesCollection = arangoDB.db(dbName).createCollection(messagesCollectionName);
-//            System.out.println("Collection created: " + messagesCollection.getName());
 
             CollectionEntity threadsCollection = arangoDB.db(dbName).createCollection(threadsCollectionName);
             System.out.println("Collection created: " + threadsCollection.getName());
-
-//            CollectionEntity postActivitiesCollection = arangoDB.db(dbName).createCollection(postActivitiesCollectionName);
-//            System.out.println("Collection created: " + postActivitiesCollection.getName());
-
-//            CollectionEntity userActivitiesCollection = arangoDB.db(dbName).createCollection(userActivitiesCollectionName);
-//            System.out.println("Collection created: " + userActivitiesCollection.getName());
 
             CollectionEntity notificationsCollection = arangoDB.db(dbName).createCollection(notificationsCollectionName);
             System.out.println("Collection created: " + notificationsCollection.getName());
 
             CollectionEntity ActivitiesCollection = arangoDB.db(dbName).createCollection(activitiesCollectionName);
             System.out.println("Collection created: " + ActivitiesCollection.getName());
-
-//            CollectionEntity hashtagsCollection = arangoDB.db(dbName).createCollection(hashtagsCollectionName);
-//            System.out.println("Collection created: " + hashtagsCollection.getName());
-
-//            CollectionEntity commentsCollection = arangoDB.db(dbName).createCollection(commentsCollectionName);
-//            System.out.println("Collection created: " + commentsCollection.getName());
 
             CollectionEntity storiesCollection = arangoDB.db(dbName).createCollection(storiesCollectionName);
             System.out.println("Collection created: " + storiesCollection.getName());
@@ -90,38 +53,6 @@ public class ArangoInterfaceMethods {
             CollectionEntity bookmarksCollection = arangoDB.db(dbName).createCollection(bookmarksCollectionName);
             System.out.println("Collection created: " + bookmarksCollection.getName());
 
-//            Message x = new Message("Hello",UUID.randomUUID(),UUID.randomUUID());
-//            UUID tst = x.getId();
-//            String msgID  = utilities.Main.generateUUID();
-//            JSONObject messageObj = new JSONObject();
-//            messageObj.put("id", msgID);
-//            messageObj.put("user_id",utilities.Main.generateUUID());
-//            messageObj.put("text","Hello");
-//            messageObj.put("created_at", new Timestamp(System.currentTimeMillis()));
-//            messageObj.put("deleted_at",new Timestamp(System.currentTimeMillis()));
-//            messageObj.put("blocked_at",new Timestamp(System.currentTimeMillis()));
-//            messageObj.put("liker_ids",new ArrayList<String>());
-//            messageObj.put("media_id",utilities.Main.generateUUID());
-//
-//            JSONObject updatedMessageObj = new JSONObject();
-//            updatedMessageObj.put("id", msgID);
-//            updatedMessageObj.put("user_id",utilities.Main.generateUUID());
-//            updatedMessageObj.put("text","MISOOOOo");
-//            updatedMessageObj.put("created_at", new Timestamp(System.currentTimeMillis()));
-//            updatedMessageObj.put("deleted_at",new Timestamp(System.currentTimeMillis()));
-//            updatedMessageObj.put("blocked_at",new Timestamp(System.currentTimeMillis()));
-//            updatedMessageObj.put("liker_ids",new ArrayList<String>());
-//            updatedMessageObj.put("media_id",utilities.Main.generateUUID());
-//
-//
-//            insertMessage(messageObj);
-//            getMessage(msgID);
-//            updateMessage(msgID, updatedMessageObj);
-//            getMessage(msgID);
-//            deleteMessage(msgID);
-//            getMessage(msgID);
-
-
         } catch (ArangoDBException e) {
             System.err.println("Failed to create collections: " + e.getMessage());
         }
@@ -130,84 +61,6 @@ public class ArangoInterfaceMethods {
 
 
     }
-
-
-
-    //MESSAGE CRUD
-//    public static void insertMessage(JSONObject messageJSON){
-//
-//        try {
-//            BaseDocument myObject = new BaseDocument();
-//            myObject.setKey(messageJSON.get("id").toString());
-//            myObject.addAttribute("text", messageJSON.get("text").toString());
-//            myObject.addAttribute("user_id", messageJSON.get("user_id").toString());
-//            myObject.addAttribute("created_at", messageJSON.get("created_at").toString());
-//            myObject.addAttribute("deleted_at", messageJSON.get("deleted_at").toString());
-//            myObject.addAttribute("blocked_at", messageJSON.get("blocked_at").toString());
-//            myObject.addAttribute("liker_ids", messageJSON.get("liker_ids").toString());
-//            myObject.addAttribute("media_id", messageJSON.get("media_id").toString());
-//            arangoDB.db(dbName).collection(messagesCollectionName).insertDocument(myObject);
-//            System.out.println("Message inserted");
-//        } catch (ArangoDBException e) {
-//            System.err.println("Failed to insert message. " + e.getMessage());
-//        } catch (JSONException e){
-//            System.err.println("JSON Message Incorrect format. " + e.getMessage());
-//        }
-//
-//    }
-//
-//    public static JSONObject getMessage(String id){
-//
-//        try {
-//            BaseDocument messageDoc = arangoDB.db(dbName).collection(messagesCollectionName).getDocument( id,
-//                    BaseDocument.class);
-//            if(messageDoc == null){
-//                throw new ArangoDBException("Message with ID: " + id+" Not Found");
-//            }
-//            JSONObject messageJSON = new JSONObject(messageDoc);
-//            System.out.println(messageJSON);
-//            return new JSONObject(messageJSON);
-//        } catch (ArangoDBException e) {
-//            System.err.println("Failed to get Message: " + e.getMessage());
-//            return null;
-//        }
-//
-//
-//    }
-//
-//    public static void updateMessage(String id,JSONObject messageJSON){
-//        try {
-//            BaseDocument myObject = new BaseDocument();
-//            myObject.setKey(messageJSON.get("id").toString());
-//            myObject.addAttribute("text", messageJSON.get("text").toString());
-//            myObject.addAttribute("user_id", messageJSON.get("user_id").toString());
-//            myObject.addAttribute("created_at", messageJSON.get("created_at").toString());
-//            myObject.addAttribute("deleted_at", messageJSON.get("deleted_at").toString());
-//            myObject.addAttribute("blocked_at", messageJSON.get("blocked_at").toString());
-//            myObject.addAttribute("liker_ids", messageJSON.get("liker_ids").toString());
-//            myObject.addAttribute("media_id", messageJSON.get("media_id").toString());
-//            arangoDB.db(dbName).collection(messagesCollectionName).updateDocument(id, myObject);
-//            System.out.println("Message Updated");
-//        } catch (ArangoDBException e) {
-//            System.err.println("Failed to Update message. " + e.getMessage());
-//        } catch (JSONException e){
-//            System.err.println("JSON Message Incorrect format. " + e.getMessage());
-//        }
-//
-//    }
-//
-//    public static void deleteMessage(String id){
-//        try {
-//            arangoDB.db(dbName).collection(messagesCollectionName).deleteDocument(id);
-//            System.out.println("Message Deleted: "+id);
-//        } catch (ArangoDBException e){
-//            System.err.println("MessageID does not exist:  "+id+",  "+e.getMessage());
-//        }
-//    }
-
-
-
-
 
 
 
@@ -280,25 +133,6 @@ public class ArangoInterfaceMethods {
             System.err.println("Thread ID does not exist:  "+id+",  "+e.getMessage());
         }
     }
-
-
-//    //ACTIVITYTYPE CRUD
-//    public static void insertActivityType(JSONObject activityTypeJSON){
-//
-//    }
-//
-//    public static Post getActivityType(UUID id){
-//
-//        return null;
-//    }
-//
-//    public static void updateActivityType(UUID id,ActivityType activityType){
-//
-//    }
-//
-//    public static void deleteActivityType(UUID id){
-//
-//    }
 
 
     //NOTIFICATION CRUD
@@ -430,44 +264,6 @@ public class ArangoInterfaceMethods {
             System.err.println("Activity ID does not exist:  "+id+",  "+e.getMessage());
         }
     }
-
-
-//
-//    //HASHTAG CRUD
-//    public static void insertHashtag(Hashtag hashtag){
-//
-//    }
-//
-//    public static Hashtag getHashtag(String text){
-//        return null;
-//    }
-//
-//    public static void updateHashtag(String text,Hashtag hashtag){
-//
-//    }
-//
-//    public static void deleteHashtag(String text){
-//
-//    }
-//
-//
-//    //COMMENT CRUD
-//    public static void insertComment(Comment comment){
-//
-//    }
-//
-//    public static Comment getComment(UUID id){
-//        return null;
-//    }
-//
-//    public static void updateComment(UUID id,Comment comment){
-//
-//    }
-//
-//    public static void deleteComment(UUID id){
-//
-//    }
-//
 
 
     //STORY CRUD
@@ -624,7 +420,7 @@ public class ArangoInterfaceMethods {
         try {
             BaseDocument myObject = new BaseDocument();
             myObject.setKey(bookmarkJSON.get("user_id").toString());
-            myObject.addAttribute("id", bookmarkJSON.get("id").toString());
+            myObject.addAttribute("user_id", bookmarkJSON.get("user_id").toString());
             myObject.addAttribute("posts_ids", bookmarkJSON.get("posts_ids").toString());
             arangoDB.db(dbName).collection(bookmarksCollectionName).insertDocument(myObject);
             System.out.println("Bookmark inserted");
@@ -642,8 +438,9 @@ public class ArangoInterfaceMethods {
             if(bookmarkDoc == null){
                 throw new ArangoDBException("Bookmark with ID: " + id+" Not Found");
             }
+            System.out.println("YY: "+bookmarkDoc.getProperties());
             JSONObject bookmarkJSON  = new JSONObject(bookmarkDoc.getProperties());
-            System.out.println("OUT:  "+new JSONObject(bookmarkJSON));
+            System.out.println("XX: "+bookmarkJSON);
             return reformatJSON(bookmarkJSON);
         } catch (ArangoDBException e) {
             System.err.println("Failed to get Bookmark: " + e.getMessage());
@@ -655,7 +452,7 @@ public class ArangoInterfaceMethods {
         try {
             BaseDocument myObject = new BaseDocument();
             myObject.setKey(bookmarkJSON.get("user_id").toString());
-            myObject.addAttribute("id", bookmarkJSON.get("id").toString());
+            myObject.addAttribute("user_id", bookmarkJSON.get("user_id").toString());
             myObject.addAttribute("posts_ids", bookmarkJSON.get("posts_ids").toString());
             arangoDB.db(dbName).collection(bookmarksCollectionName).updateDocument(id, myObject);
             System.out.println("Bookmark Updated");
@@ -676,15 +473,16 @@ public class ArangoInterfaceMethods {
     }
 
 
-    public static JSONObject reformatJSON(JSONObject json){
-        System.out.println("____________________ "+ json.toString());
+    private static JSONObject reformatJSON(JSONObject json){
         String openingArray = "\"\\[";
-        String closedArray = "\\]\"";
+        String closedArray = "]\"";
+        String backslash = "\\\\";
         String jsonString = json.toString();
-        jsonString = jsonString.replaceAll(openingArray,"[").replaceAll(closedArray, "]");
-        JSONObject newSimpleJSON = new JSONObject(jsonString);
-        System.out.println("____________________ "+ newSimpleJSON.toString());
-        return newSimpleJSON;
+        jsonString = jsonString.replaceAll(openingArray,"\\[")
+                                .replaceAll(closedArray, "\\]")
+                                .replaceAll(backslash,"");
+
+        return new JSONObject(jsonString);
 
 
 

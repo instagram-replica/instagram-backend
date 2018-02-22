@@ -2,7 +2,6 @@ package persistence.nosql;
 
 import com.arangodb.ArangoDB;
 import com.arangodb.ArangoDBException;
-import com.arangodb.entity.BaseDocument;
 import com.arangodb.entity.CollectionEntity;
 import org.json.JSONObject;
 import org.junit.*;
@@ -10,23 +9,21 @@ import org.junit.*;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.UUID;
-
-import static org.junit.Assert.*;
+import java.util.Objects;
 
 public class ArangoInterfaceTest {
 
-    protected static ArangoDB arangoDB;
-    static String dbName =  "InstagramTestAQL";
+    private static ArangoDB arangoDB;
+    private static String dbName =  "InstagramTestAQL";
 
-    static final String threadsCollectionName = "Threads";
-    static final String notificationsCollectionName = "Notifications";
-    static final String activitiesCollectionName = "Activities";
-    static final String storiesCollectionName = "Stories";
-    static final String postsCollectionName = "Posts";
-    static final String bookmarksCollectionName = "Bookmarks";
+    private static final String threadsCollectionName = "Threads";
+    private static final String notificationsCollectionName = "Notifications";
+    private static final String activitiesCollectionName = "Activities";
+    private static final String storiesCollectionName = "Stories";
+    private static final String postsCollectionName = "Posts";
+    private static final String bookmarksCollectionName = "Bookmarks";
     @BeforeClass
-    public static void setUp() throws Exception {
+    public static void setUp() {
 
         ArangoInterfaceMethods.dbName = ArangoInterfaceTest.dbName;
         dbName =  "InstagramTestAQL";
@@ -44,7 +41,6 @@ public class ArangoInterfaceTest {
         }
 
         try {
-            System.out.println("TESTDB:  "+dbName);
             CollectionEntity threadsCollection = arangoDB.db(dbName).createCollection(threadsCollectionName);
             System.out.println("Collection created: " + threadsCollection.getName());
 
@@ -70,7 +66,7 @@ public class ArangoInterfaceTest {
     }
 
     @AfterClass
-    public static void tearDown() throws Exception {
+    public static void tearDown() {
         arangoDB.shutdown();
     }
 
@@ -90,7 +86,7 @@ public class ArangoInterfaceTest {
 
         ArangoInterfaceMethods.insertThread(obj);
         JSONObject readObj = ArangoInterfaceMethods.getThread(id);
-        Iterator iterator =readObj.keys();
+        Iterator iterator = Objects.requireNonNull(readObj).keys();
         while(iterator.hasNext()){
             String key = iterator.next().toString();
             String value = readObj.get(key).toString();
@@ -126,7 +122,7 @@ public class ArangoInterfaceTest {
         ArangoInterfaceMethods.insertThread(obj);
         ArangoInterfaceMethods.updateThread(id,updatedObj);
         JSONObject jsonThread = ArangoInterfaceMethods.getThread(id);
-        Assert.assertEquals(jsonThread.get("name"),"Mohamed");
+        Assert.assertEquals(Objects.requireNonNull(jsonThread).get("name"),"Mohamed");
 
         ArangoInterfaceMethods.deleteThread(id);
         Assert.assertEquals(ArangoInterfaceMethods.getThread(id),null);
@@ -147,7 +143,7 @@ public class ArangoInterfaceTest {
 
         ArangoInterfaceMethods.insertNotification(obj);
         JSONObject readObj = ArangoInterfaceMethods.getNotification(id);
-        Iterator iterator =readObj.keys();
+        Iterator iterator = Objects.requireNonNull(readObj).keys();
         while(iterator.hasNext()){
             String key = iterator.next().toString();
             String value = readObj.get(key).toString();
@@ -181,7 +177,7 @@ public class ArangoInterfaceTest {
         JSONObject jsonNotification = ArangoInterfaceMethods.getNotification(id);
 
         Assert.assertEquals(
-                jsonNotification.get("activity_type"),
+                Objects.requireNonNull(jsonNotification).get("activity_type"),
                 "{ type: tag, user_id: 2343-2342 }");
 
         ArangoInterfaceMethods.deleteNotification(id);
@@ -202,7 +198,7 @@ public class ArangoInterfaceTest {
 
         ArangoInterfaceMethods.insertActivity(obj);
         JSONObject readObj = ArangoInterfaceMethods.getActivity(id);
-        Iterator iterator =readObj.keys();
+        Iterator iterator = Objects.requireNonNull(readObj).keys();
         while(iterator.hasNext()){
             String key = iterator.next().toString();
             String value = readObj.get(key).toString();
@@ -236,7 +232,7 @@ public class ArangoInterfaceTest {
         JSONObject jsonNotification = ArangoInterfaceMethods.getActivity(id);
 
         Assert.assertEquals(
-                jsonNotification.get("activity_type"),
+                Objects.requireNonNull(jsonNotification).get("activity_type"),
                 "{ type: tag, user_id: 2343-2342 }");
 
         ArangoInterfaceMethods.deleteActivity(id);
@@ -261,10 +257,9 @@ public class ArangoInterfaceTest {
         obj.put("expired_at",new Timestamp(System.currentTimeMillis()));
         obj.put("blocked_at",new Timestamp(System.currentTimeMillis()));
 
-
         ArangoInterfaceMethods.insertStory(obj);
         JSONObject readObj = ArangoInterfaceMethods.getStory(id);
-        Iterator iterator =readObj.keys();
+        Iterator iterator = Objects.requireNonNull(readObj).keys();
         while(iterator.hasNext()){
             String key = iterator.next().toString();
             String value = readObj.get(key).toString();
@@ -306,13 +301,42 @@ public class ArangoInterfaceTest {
         JSONObject jsonNotification = ArangoInterfaceMethods.getStory(id);
 
         Assert.assertEquals(
-                jsonNotification.get("is_featured"),
+                Objects.requireNonNull(jsonNotification).get("is_featured"),
                 "true");
 
         ArangoInterfaceMethods.deleteStory(id);
         Assert.assertEquals(ArangoInterfaceMethods.getStory(id),null);
 
     }
+    @Test
+    public void insertAndGetPost() {
+
+        String id  = utilities.Main.generateUUID();
+        JSONObject obj = new JSONObject();
+        obj.put("id", id);
+        obj.put("user_id",utilities.Main.generateUUID());
+        obj.put("caption","Taken By MiSO EL Gen");
+        obj.put("media", new ArrayList<String>());
+        obj.put("likes", new ArrayList<String>());
+        obj.put("tags",new ArrayList<String>());
+        obj.put("location","{ name: EspressoLab, coordinates:{long: 1.0.01.01, lat: 2.1.0.10} }");
+        obj.put("created_at",new Timestamp(System.currentTimeMillis()));
+        obj.put("updated_at",new Timestamp(System.currentTimeMillis()));
+        obj.put("blocked_at",new Timestamp(System.currentTimeMillis()));
+        obj.put("deleted_at",new Timestamp(System.currentTimeMillis()));
+
+        ArangoInterfaceMethods.insertPost(obj);
+        JSONObject readObj = ArangoInterfaceMethods.getPost(id);
+        Iterator iterator = Objects.requireNonNull(readObj).keys();
+        while(iterator.hasNext()){
+            String key = iterator.next().toString();
+            String value = readObj.get(key).toString();
+            Assert.assertEquals(value,obj.get(key).toString());
+
+        }
+    }
+
+
 
     @Test
     public void updateAndDeletePost() {
@@ -331,75 +355,86 @@ public class ArangoInterfaceTest {
         obj.put("blocked_at",new Timestamp(System.currentTimeMillis()));
         obj.put("deleted_at",new Timestamp(System.currentTimeMillis()));
 
+        JSONObject updatedObj = new JSONObject();
+        updatedObj.put("id", id);
+        updatedObj.put("user_id",utilities.Main.generateUUID());
+        updatedObj.put("caption","Friends");
+        updatedObj.put("media", new ArrayList<String>());
+        updatedObj.put("likes", new ArrayList<String>());
+        updatedObj.put("tags",new ArrayList<String>());
+        updatedObj.put("location","{ name: EspressoLab, coordinates:{long: 1.0.01.01, lat: 2.1.0.10} }");
+        updatedObj.put("created_at",new Timestamp(System.currentTimeMillis()));
+        updatedObj.put("updated_at",new Timestamp(System.currentTimeMillis()));
+        updatedObj.put("blocked_at",new Timestamp(System.currentTimeMillis()));
+        updatedObj.put("deleted_at",new Timestamp(System.currentTimeMillis()));
+
 
         ArangoInterfaceMethods.insertPost(obj);
-        JSONObject readObj = ArangoInterfaceMethods.getPost(id);
-        Iterator iterator =readObj.keys();
+        ArangoInterfaceMethods.updatePost(id,updatedObj);
+        JSONObject jsonNotification = ArangoInterfaceMethods.getPost(id);
+
+        Assert.assertEquals(
+                Objects.requireNonNull(jsonNotification).get("caption"),
+                "Friends");
+
+        ArangoInterfaceMethods.deletePost(id);
+        Assert.assertEquals(ArangoInterfaceMethods.getStory(id),null);
+    }
+
+    @Test
+    public void insertAndGetBookmark() {
+
+        String id  = utilities.Main.generateUUID();
+        JSONObject obj = new JSONObject();
+        obj.put("user_id", id);
+        obj.put("posts_ids",new ArrayList<String>());
+
+        ArangoInterfaceMethods.insertBookmark(obj);
+        JSONObject readObj = ArangoInterfaceMethods.getBookmark(id);
+        Iterator iterator = Objects.requireNonNull(readObj).keys();
         while(iterator.hasNext()){
             String key = iterator.next().toString();
             String value = readObj.get(key).toString();
             Assert.assertEquals(value,obj.get(key).toString());
 
         }
+
+
     }
 
     @Test
-    public void getActivity() {
+    public void updateAndDeleteBookmark() {
+
+        String id  = utilities.Main.generateUUID();
+        JSONObject obj = new JSONObject();
+        obj.put("user_id", id);
+        obj.put("posts_ids",new ArrayList<String>());
+
+        JSONObject updatedObj = new JSONObject();
+        ArrayList<String> post_ids = new ArrayList<>();
+        post_ids.add(utilities.Main.generateUUID());
+        post_ids.add(utilities.Main.generateUUID());
+
+
+        updatedObj.put("user_id", id);
+        updatedObj.put("posts_ids", post_ids);
+
+
+
+        ArangoInterfaceMethods.insertBookmark(obj);
+        ArangoInterfaceMethods.updateBookmark(id,updatedObj);
+        JSONObject jsonBookmark = ArangoInterfaceMethods.getBookmark(id);
+
+        Assert.assertEquals(
+                Objects.requireNonNull(jsonBookmark).get("posts_ids").toString(),
+                updatedObj.get("posts_ids").toString());
+
+
+        ArangoInterfaceMethods.deleteBookmark(id);
+        Assert.assertEquals(ArangoInterfaceMethods.getBookmark(id),null);
+
+
     }
 
-    @Test
-    public void updateActivity() {
-    }
 
-    @Test
-    public void deleteActivity() {
-    }
-
-    @Test
-    public void insertStory() {
-    }
-
-    @Test
-    public void getStory() {
-    }
-
-    @Test
-    public void updateStory() {
-    }
-
-    @Test
-    public void deleteStory() {
-    }
-
-    @Test
-    public void insertPost() {
-    }
-
-    @Test
-    public void getPost() {
-    }
-
-    @Test
-    public void updatePost() {
-    }
-
-    @Test
-    public void deletePost() {
-    }
-
-    @Test
-    public void insertBookmark() {
-    }
-
-    @Test
-    public void getBookmark() {
-    }
-
-    @Test
-    public void updateBookmark() {
-    }
-
-    @Test
-    public void deleteBookmark() {
-    }
 }
