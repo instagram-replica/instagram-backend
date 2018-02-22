@@ -373,7 +373,7 @@ public class ArangoInterfaceMethods {
             BaseDocument myObject = new BaseDocument();
             myObject.setKey(activityJSON.get("id").toString());
             myObject.addAttribute("id", activityJSON.get("id").toString());
-            myObject.addAttribute("type", activityJSON.get("type").toString());
+            myObject.addAttribute("activity_type", activityJSON.get("activity_type").toString());
             myObject.addAttribute("receiver_id", activityJSON.get("receiver_id").toString());
             myObject.addAttribute("sender_id", activityJSON.get("sender_id").toString());
             myObject.addAttribute("created_at", activityJSON.get("created_at").toString());
@@ -394,9 +394,9 @@ public class ArangoInterfaceMethods {
             if(activityDoc == null){
                 throw new ArangoDBException("Activity with ID: " + id+" Not Found");
             }
-            JSONObject activityJSON = new JSONObject(activityDoc);
-            System.out.println(activityJSON);
-            return activityJSON;
+            JSONObject activityJSON  = new JSONObject(activityDoc.getProperties());
+            System.out.println("OUT:  "+new JSONObject(activityJSON));
+            return reformatJSON(activityJSON);
         } catch (ArangoDBException e) {
             System.err.println("Failed to get Activity: " + e.getMessage());
             return null;
@@ -408,7 +408,7 @@ public class ArangoInterfaceMethods {
             BaseDocument myObject = new BaseDocument();
             myObject.setKey(activityJSON.get("id").toString());
             myObject.addAttribute("id", activityJSON.get("id").toString());
-            myObject.addAttribute("type", activityJSON.get("type").toString());
+            myObject.addAttribute("activity_type", activityJSON.get("activity_type").toString());
             myObject.addAttribute("receiver_id", activityJSON.get("receiver_id").toString());
             myObject.addAttribute("sender_id", activityJSON.get("sender_id").toString());
             myObject.addAttribute("created_at", activityJSON.get("created_at").toString());
@@ -501,9 +501,9 @@ public class ArangoInterfaceMethods {
             if(storyDoc == null){
                 throw new ArangoDBException("Story with ID: " + id+" Not Found");
             }
-            JSONObject StoryJSON = new JSONObject(storyDoc);
-            System.out.println(StoryJSON);
-            return StoryJSON;
+            JSONObject storyJSON  = new JSONObject(storyDoc.getProperties());
+            System.out.println("OUT:  "+new JSONObject(storyJSON));
+            return reformatJSON(storyJSON);
         } catch (ArangoDBException e) {
             System.err.println("Failed to get Story: " + e.getMessage());
             return null;
@@ -575,9 +575,9 @@ public class ArangoInterfaceMethods {
             if(postDoc == null){
                 throw new ArangoDBException("Post with ID: " + id+" Not Found");
             }
-            JSONObject PostJSON = new JSONObject(postDoc.getProperties());
-            System.out.println(PostJSON);
-            return PostJSON;
+            JSONObject postJSON  = new JSONObject(postDoc.getProperties());
+            System.out.println("OUT:  "+new JSONObject(postJSON));
+            return reformatJSON(postJSON);
         } catch (ArangoDBException e) {
             System.err.println("Failed to get Post: " + e.getMessage());
             return null;
@@ -642,9 +642,9 @@ public class ArangoInterfaceMethods {
             if(bookmarkDoc == null){
                 throw new ArangoDBException("Bookmark with ID: " + id+" Not Found");
             }
-            JSONObject bookmarkJSON = new JSONObject(bookmarkDoc);
-            System.out.println(bookmarkJSON);
-            return bookmarkJSON;
+            JSONObject bookmarkJSON  = new JSONObject(bookmarkDoc.getProperties());
+            System.out.println("OUT:  "+new JSONObject(bookmarkJSON));
+            return reformatJSON(bookmarkJSON);
         } catch (ArangoDBException e) {
             System.err.println("Failed to get Bookmark: " + e.getMessage());
             return null;
@@ -677,13 +677,13 @@ public class ArangoInterfaceMethods {
 
 
     public static JSONObject reformatJSON(JSONObject json){
+        System.out.println("____________________ "+ json.toString());
         String openingArray = "\"\\[";
         String closedArray = "\\]\"";
         String jsonString = json.toString();
-        System.out.println(jsonString);
         jsonString = jsonString.replaceAll(openingArray,"[").replaceAll(closedArray, "]");
-        System.out.println(jsonString);
         JSONObject newSimpleJSON = new JSONObject(jsonString);
+        System.out.println("____________________ "+ newSimpleJSON.toString());
         return newSimpleJSON;
 
 

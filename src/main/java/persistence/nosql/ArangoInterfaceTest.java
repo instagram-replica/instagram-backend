@@ -2,12 +2,14 @@ package persistence.nosql;
 
 import com.arangodb.ArangoDB;
 import com.arangodb.ArangoDBException;
+import com.arangodb.entity.BaseDocument;
 import com.arangodb.entity.CollectionEntity;
 import org.json.JSONObject;
 import org.junit.*;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.UUID;
 
 import static org.junit.Assert.*;
@@ -88,7 +90,13 @@ public class ArangoInterfaceTest {
 
         ArangoInterfaceMethods.insertThread(obj);
         JSONObject readObj = ArangoInterfaceMethods.getThread(id);
-        Assert.assertEquals(obj.toString(),readObj.toString());
+        Iterator iterator =readObj.keys();
+        while(iterator.hasNext()){
+            String key = iterator.next().toString();
+            String value = readObj.get(key).toString();
+            Assert.assertEquals(value,obj.get(key).toString());
+
+        }
     }
 
     @Test
@@ -139,7 +147,13 @@ public class ArangoInterfaceTest {
 
         ArangoInterfaceMethods.insertNotification(obj);
         JSONObject readObj = ArangoInterfaceMethods.getNotification(id);
-        Assert.assertEquals(obj.toString(),readObj.toString());
+        Iterator iterator =readObj.keys();
+        while(iterator.hasNext()){
+            String key = iterator.next().toString();
+            String value = readObj.get(key).toString();
+            Assert.assertEquals(value,obj.get(key).toString());
+
+        }
     }
 
     @Test
@@ -171,27 +185,162 @@ public class ArangoInterfaceTest {
                 "{ type: tag, user_id: 2343-2342 }");
 
         ArangoInterfaceMethods.deleteNotification(id);
-        Assert.assertEquals(ArangoInterfaceMethods.getThread(id),null);
+        Assert.assertEquals(ArangoInterfaceMethods.getNotification(id),null);
     }
 
     @Test
-    public void insertNotification() {
+    public void insertAndGetActivity() {
+        String id  = utilities.Main.generateUUID();
+        JSONObject obj = new JSONObject();
+        obj.put("id", id);
+        obj.put("activity_type","{ type: follow, user_id: 2343-2342");
+        obj.put("receiver_id", utilities.Main.generateUUID());
+        obj.put("sender_id", utilities.Main.generateUUID());
+        obj.put("created_at", new Timestamp(System.currentTimeMillis()));
+        obj.put("blocked_at",new Timestamp(System.currentTimeMillis()));
+
+
+        ArangoInterfaceMethods.insertActivity(obj);
+        JSONObject readObj = ArangoInterfaceMethods.getActivity(id);
+        Iterator iterator =readObj.keys();
+        while(iterator.hasNext()){
+            String key = iterator.next().toString();
+            String value = readObj.get(key).toString();
+            Assert.assertEquals(value,obj.get(key).toString());
+
+        }
     }
 
     @Test
-    public void getNotification() {
+    public void updateAndDeleteActivity() {
+        String id  = utilities.Main.generateUUID();
+        JSONObject obj = new JSONObject();
+        obj.put("id", id);
+        obj.put("activity_type","{ type: follow, user_id: 2343-2342 }");
+        obj.put("receiver_id", utilities.Main.generateUUID());
+        obj.put("sender_id", utilities.Main.generateUUID());
+        obj.put("created_at", new Timestamp(System.currentTimeMillis()));
+        obj.put("blocked_at",new Timestamp(System.currentTimeMillis()));
+
+        JSONObject updatedObj = new JSONObject();
+        updatedObj.put("id", id);
+        updatedObj.put("activity_type","{ type: tag, user_id: 2343-2342 }");
+        updatedObj.put("receiver_id", utilities.Main.generateUUID());
+        updatedObj.put("sender_id", utilities.Main.generateUUID());
+        updatedObj.put("created_at", new Timestamp(System.currentTimeMillis()));
+        updatedObj.put("blocked_at",new Timestamp(System.currentTimeMillis()));
+
+
+        ArangoInterfaceMethods.insertActivity(obj);
+        ArangoInterfaceMethods.updateActivity(id,updatedObj);
+        JSONObject jsonNotification = ArangoInterfaceMethods.getActivity(id);
+
+        Assert.assertEquals(
+                jsonNotification.get("activity_type"),
+                "{ type: tag, user_id: 2343-2342 }");
+
+        ArangoInterfaceMethods.deleteActivity(id);
+        Assert.assertEquals(ArangoInterfaceMethods.getActivity(id),null);
+
+
     }
 
     @Test
-    public void updateNotification() {
+    public void insertAndGetStory() {
+
+        String id  = utilities.Main.generateUUID();
+        JSONObject obj = new JSONObject();
+        obj.put("id", id);
+        obj.put("user_id",utilities.Main.generateUUID());
+        obj.put("is_featured",false);
+        obj.put("media_id", utilities.Main.generateUUID());
+        obj.put("reports", new ArrayList<String>());
+        obj.put("seen_by_users_ids",new ArrayList<String>());
+        obj.put("created_at",new Timestamp(System.currentTimeMillis()));
+        obj.put("deleted_at",new Timestamp(System.currentTimeMillis()));
+        obj.put("expired_at",new Timestamp(System.currentTimeMillis()));
+        obj.put("blocked_at",new Timestamp(System.currentTimeMillis()));
+
+
+        ArangoInterfaceMethods.insertStory(obj);
+        JSONObject readObj = ArangoInterfaceMethods.getStory(id);
+        Iterator iterator =readObj.keys();
+        while(iterator.hasNext()){
+            String key = iterator.next().toString();
+            String value = readObj.get(key).toString();
+            Assert.assertEquals(value,obj.get(key).toString());
+
+        }
     }
 
     @Test
-    public void deleteNotification() {
+    public void updateAndDeleteStory() {
+        String id  = utilities.Main.generateUUID();
+        JSONObject obj = new JSONObject();
+        obj.put("id", id);
+        obj.put("user_id",utilities.Main.generateUUID());
+        obj.put("is_featured",false);
+        obj.put("media_id", utilities.Main.generateUUID());
+        obj.put("reports", new ArrayList<String>());
+        obj.put("seen_by_users_ids",new ArrayList<String>());
+        obj.put("created_at",new Timestamp(System.currentTimeMillis()));
+        obj.put("deleted_at",new Timestamp(System.currentTimeMillis()));
+        obj.put("expired_at",new Timestamp(System.currentTimeMillis()));
+        obj.put("blocked_at",new Timestamp(System.currentTimeMillis()));
+
+        JSONObject updatedObj = new JSONObject();
+        updatedObj.put("id", id);
+        updatedObj.put("user_id",utilities.Main.generateUUID());
+        updatedObj.put("is_featured",true);
+        updatedObj.put("media_id", utilities.Main.generateUUID());
+        updatedObj.put("reports", new ArrayList<String>());
+        updatedObj.put("seen_by_users_ids",new ArrayList<String>());
+        updatedObj.put("created_at",new Timestamp(System.currentTimeMillis()));
+        updatedObj.put("deleted_at",new Timestamp(System.currentTimeMillis()));
+        updatedObj.put("expired_at",new Timestamp(System.currentTimeMillis()));
+        updatedObj.put("blocked_at",new Timestamp(System.currentTimeMillis()));
+
+
+        ArangoInterfaceMethods.insertStory(obj);
+        ArangoInterfaceMethods.updateStory(id,updatedObj);
+        JSONObject jsonNotification = ArangoInterfaceMethods.getStory(id);
+
+        Assert.assertEquals(
+                jsonNotification.get("is_featured"),
+                "true");
+
+        ArangoInterfaceMethods.deleteStory(id);
+        Assert.assertEquals(ArangoInterfaceMethods.getStory(id),null);
+
     }
 
     @Test
-    public void insertActivity() {
+    public void updateAndDeletePost() {
+
+        String id  = utilities.Main.generateUUID();
+        JSONObject obj = new JSONObject();
+        obj.put("id", id);
+        obj.put("user_id",utilities.Main.generateUUID());
+        obj.put("caption","Taken By MiSO EL Gen");
+        obj.put("media", new ArrayList<String>());
+        obj.put("likes", new ArrayList<String>());
+        obj.put("tags",new ArrayList<String>());
+        obj.put("location","{ name: EspressoLab, coordinates:{long: 1.0.01.01, lat: 2.1.0.10} }");
+        obj.put("created_at",new Timestamp(System.currentTimeMillis()));
+        obj.put("updated_at",new Timestamp(System.currentTimeMillis()));
+        obj.put("blocked_at",new Timestamp(System.currentTimeMillis()));
+        obj.put("deleted_at",new Timestamp(System.currentTimeMillis()));
+
+
+        ArangoInterfaceMethods.insertPost(obj);
+        JSONObject readObj = ArangoInterfaceMethods.getPost(id);
+        Iterator iterator =readObj.keys();
+        while(iterator.hasNext()){
+            String key = iterator.next().toString();
+            String value = readObj.get(key).toString();
+            Assert.assertEquals(value,obj.get(key).toString());
+
+        }
     }
 
     @Test
