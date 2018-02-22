@@ -7,6 +7,7 @@ import com.arangodb.entity.CollectionEntity;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+
 public class ArangoInterfaceMethods {
 
     private static ArangoDB arangoDB = new ArangoDB.Builder().build();
@@ -22,52 +23,87 @@ public class ArangoInterfaceMethods {
 
 
     public static void main(String[]args) {
+        initializeDB();
+    }
+
+
+    public static void initializeDB(){
         try {
-            if(arangoDB.getDatabases().contains(dbName)){
-                arangoDB.db(dbName).drop();
+            if(!arangoDB.getDatabases().contains(dbName)){
+                arangoDB.createDatabase(dbName);
+                System.out.println("Database created: " + dbName);
+                CollectionEntity threadsCollection = arangoDB.db(dbName).createCollection(threadsCollectionName);
+                System.out.println("Collection created: " + threadsCollection.getName());
+
+                CollectionEntity notificationsCollection = arangoDB.db(dbName).createCollection(notificationsCollectionName);
+                System.out.println("Collection created: " + notificationsCollection.getName());
+
+                CollectionEntity ActivitiesCollection = arangoDB.db(dbName).createCollection(activitiesCollectionName);
+                System.out.println("Collection created: " + ActivitiesCollection.getName());
+
+                CollectionEntity storiesCollection = arangoDB.db(dbName).createCollection(storiesCollectionName);
+                System.out.println("Collection created: " + storiesCollection.getName());
+
+                CollectionEntity postsCollection = arangoDB.db(dbName).createCollection(postsCollectionName);
+                System.out.println("Collection created: " + postsCollection.getName());
+
+                CollectionEntity bookmarksCollection = arangoDB.db(dbName).createCollection(bookmarksCollectionName);
+                System.out.println("Collection created: " + bookmarksCollection.getName());
             }
-            arangoDB.createDatabase(dbName);
-            System.out.println("Database created: " + dbName);
 
         } catch (ArangoDBException e) {
-            System.err.println("Failed to create database: " + dbName + "; " + e.getMessage());
+            System.err.println("Failed to create database and collections: " + dbName + "; " + e.getMessage());
         }
-
-        try {
-
-            CollectionEntity threadsCollection = arangoDB.db(dbName).createCollection(threadsCollectionName);
-            System.out.println("Collection created: " + threadsCollection.getName());
-
-            CollectionEntity notificationsCollection = arangoDB.db(dbName).createCollection(notificationsCollectionName);
-            System.out.println("Collection created: " + notificationsCollection.getName());
-
-            CollectionEntity ActivitiesCollection = arangoDB.db(dbName).createCollection(activitiesCollectionName);
-            System.out.println("Collection created: " + ActivitiesCollection.getName());
-
-            CollectionEntity storiesCollection = arangoDB.db(dbName).createCollection(storiesCollectionName);
-            System.out.println("Collection created: " + storiesCollection.getName());
-
-            CollectionEntity postsCollection = arangoDB.db(dbName).createCollection(postsCollectionName);
-            System.out.println("Collection created: " + postsCollection.getName());
-
-            CollectionEntity bookmarksCollection = arangoDB.db(dbName).createCollection(bookmarksCollectionName);
-            System.out.println("Collection created: " + bookmarksCollection.getName());
-
-        } catch (ArangoDBException e) {
-            System.err.println("Failed to create collections: " + e.getMessage());
-        }
-
-
 
 
     }
 
+    public static void closeConnection(){
+        arangoDB.shutdown();
+    }
 
+//    public static boolean validateThreadJSON(JSONObject threadJSON){
+//        try{
+//            UUID id =  UUID.fromString(threadJSON.get("id").toString());
+//        }
+//        catch (Exception e){
+//            System.err.print("ID is not of valid, " + e.getMessage());
+//            return false;
+//        }
+//
+//        try{
+//            UUID creator_id =  UUID.fromString(threadJSON.get("creator_id").toString());
+//        }
+//        catch (Exception e){
+//            System.err.print("creator_id is not of valid, " + e.getMessage());
+//            return false;
+//        }
+//
+//        try{
+//            JSONArray jsonArray = threadJSON.getJSONArray("users_ids");
+//
+//        }
+//        catch (Exception e){
+//            System.err.print("users_ids is not of valid array, " + e.getMessage());
+//            return false;
+//        }
+//
+//        try{
+//            UUID id =  UUID.fromString(threadJSON.get("id").toString());
+//        }
+//        catch (Exception e){
+//            System.err.print("ID is not of valid, " + e.getMessage());
+//            return false;
+//        }
+//        return false;
+//    }
 
     //Thread CRUD
     public static void insertThread(JSONObject threadJSON){
 
         try {
+
+
             BaseDocument myObject = new BaseDocument();
             myObject.setKey(threadJSON.get("id").toString());
             myObject.addAttribute("id", threadJSON.get("id").toString());
