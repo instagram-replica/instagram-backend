@@ -13,6 +13,9 @@ public class Controller extends shared.Controller {
         JSONObject newJsonObj = new JSONObject();
         newJsonObj.put("application", "activities");
         String methodName = jsonObject.getString("method");
+        
+        //interface insert method, change params of json object to match different activity
+        //types
         switch (methodName) {
 		case "createPost":
 			NotificationActions.handlePostNotification(jsonObject, userId);
