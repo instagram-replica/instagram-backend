@@ -1,17 +1,19 @@
 package services.chats;
 
-
-import shared.JSONHandler;
-import shared.Ports;
+import java.io.IOException;
 
 public class Server {
     public static void main(String[] args) {
 
-        shared.Server server = new shared.Server("localhost", Ports.CHATS);
+        try {
+            Controller controller = new Controller();
 
-        Controller controller = new Controller();
+            shared.MQServer.Server server = new shared.MQServer.Server("chats");
 
-        server.run(new JSONHandler(controller));
+            server.run(controller);
 
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
