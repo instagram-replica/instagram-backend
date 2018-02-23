@@ -90,4 +90,15 @@ public class UserActions {
         return jObject;
     }
 
+    public static JSONObject CreateBlockUser(JSONObject paramsObject, String loggedInUserId)
+    {
+        JSONObject jObject = new JSONObject();
+        int userIdToBeBlocked = paramsObject.getInt("userId");
+
+        //@stub how to block a user?
+        jObject.put("success","false");
+        jObject.put("error","cant block user");
+        return jObject;
+    }
+
 }
