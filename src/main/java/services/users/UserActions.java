@@ -62,7 +62,7 @@ public class UserActions {
         String phone = paramsObject.getString("phone");
         String gender = paramsObject.getString("gender");
 
-        User user = new User();
+        User user = Main.getUserById(loggedInUserId); //or session id
         user.setFullName(name);
         user.setUsername(username);
         user.setWebsiteUrl(website);
@@ -72,11 +72,21 @@ public class UserActions {
         user.setGender(Gender.valueOf(gender));
         jObject.put("data", paramsObject);
         user = Main.updateUser(loggedInUserId,user);
-        jObject.put("error","null");
-        //must validate if update was successful
-//        if(user.getUpdatedAt().before(Date.valueOf()))
 
-//        jObject.put("error",error);
+        //must validate if update was successful
+        if(user.getFullName().equals(name) &&user.getUsername().equals(username)
+                &&user.getWebsiteUrl().equals(website)
+                &&user.getBio().equals(bio)
+                &&user.getEmail().equals(email)
+                &&user.getPhoneNumber().equals(phone)
+                &&user.getGender().equals(gender))
+        {
+            //no error
+            jObject.put("error","null");
+
+        }
+
+        jObject.put("error","update profile was not successful");
         return jObject;
     }
 
