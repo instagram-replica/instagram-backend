@@ -4,16 +4,10 @@ import com.arangodb.ArangoDB;
 import com.arangodb.ArangoDBException;
 import com.arangodb.entity.BaseDocument;
 import com.arangodb.entity.CollectionEntity;
-import com.arangodb.entity.EdgeDefinition;
-import com.arangodb.entity.GraphEntity;
-import com.arangodb.model.GraphCreateOptions;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 public class ArangoInterfaceMethods {
 
@@ -520,12 +514,33 @@ public class ArangoInterfaceMethods {
 
 
     //COMMENTS CRUD
-    public static void insertCommentonPost(String postID, JSONObject comment){
+    public static void insertCommentOnPost(String postID, JSONObject comment){
         JSONObject post = getPost(postID);
         ((JSONArray) post.get("comments")).put(comment);
         updatePost(postID,post);
     }
 
+    public static JSONArray getCommentsOnPost(String postID){
+        try {
+            BaseDocument postDoc = arangoDB.db(dbName).collection(postsCollectionName).getDocument(postID,
+                    BaseDocument.class);
+            if(postDoc == null){
+                throw new ArangoDBException("Post with ID: " + postID +" Not Found");
+            }
+            JSONObject postJSON  = new JSONObject(postDoc.getProperties());
+            return (JSONArray) reformatJSON(postJSON).get("comments");
+        } catch (ArangoDBException e) {
+            System.err.println("Failed to get Post: " + e.getMessage());
+            return null;
+        }
+    }
+
+    //MESSAGES CRUD
+    public static void insertMessageOnThread(String threadID, JSONObject message){
+        JSONObject post = getThread(threadID);
+        ((JSONArray) post.get("messages")).put(message);
+        updatePost(threadID,post);
+    }
 
 
     private static JSONObject reformatJSON(JSONObject json){

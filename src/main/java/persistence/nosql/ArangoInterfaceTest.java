@@ -462,7 +462,7 @@ public class ArangoInterfaceTest {
         JSONObject comment = new JSONObject();
         comment.put("content","Hello");
 
-        ArangoInterfaceMethods.insertCommentonPost(id,comment);
+        ArangoInterfaceMethods.insertCommentOnPost(id,comment);
 
         JSONObject fetchedPost = ArangoInterfaceMethods.getPost(id);
         System.out.println("POSSST:  "+fetchedPost);
