@@ -14,10 +14,10 @@ public class Team2 {
     public static JSONObject getPost(JSONObject paramsObject, String loggedInUserId, String methodName){
         String postId = paramsObject.getString("postId");
         JSONObject post = ArangoInterfaceMethods.getPost(postId);
-        JSONObject jsonValue = new JSONObject();
-        jsonValue.put("method", methodName);
-        jsonValue.put("post", post);
-        return jsonValue;
+        JSONObject response = new JSONObject();
+        response.put("method", methodName);
+        response.put("post", post);
+        return response;
     }
 
     public static JSONObject getPosts(JSONObject paramsObject, String loggedInUserId, String methodName){
@@ -25,10 +25,34 @@ public class Team2 {
         int pageIndex = paramsObject.getInt("pageIndex");
         String ownerId = paramsObject.getString("userId");
         JSONArray posts = ArangoInterfaceMethods.getPosts(ownerId);
-        JSONObject jsonValue = new JSONObject();
-        jsonValue.put("method", methodName );
-        jsonValue.put("posts", posts);
-        return jsonValue;
+        JSONObject response = new JSONObject();
+        response.put("method", methodName );
+        response.put("posts", posts);
+        return response;
+    }
+
+    public static JSONObject deletePost (JSONObject paramsObject, String loggedInUserId, String methodName){
+        String postId = paramsObject.getString("postId");
+        ArangoInterfaceMethods.deletePost(postId);
+        JSONObject post = new JSONObject();
+        JSONObject response = new JSONObject();
+        response.put("method", methodName);
+        post.put("id",postId );
+        response.put("post", post);
+        response.put("error", "null");
+        return response;
+
+    }
+
+    public static JSONObject createPost(JSONObject paramsObject, String loggedInUserId, String methodName){
+        String postId = ArangoInterfaceMethods.insertPost(paramsObject);
+        JSONObject response = new JSONObject();
+        JSONObject res = new JSONObject();
+        res.put("postId", postId);
+        res.put("error", "null");
+        response.put("method", methodName);
+        response.put("response", res);
+        return response;
     }
 //    public static JSONObject getTaggedPosts(JSONObject paramsObject, String loggedInUserId){
 //        int pageSize = paramsObject.getInt("pageSize");
@@ -52,17 +76,14 @@ public class Team2 {
     public static JSONObject createPostLike(JSONObject paramsObject, String loggedInUserId, String methodName){
         String postId = paramsObject.getString("postId");
         ArangoInterfaceMethods.likePost(postId, loggedInUserId);
-        JSONObject jsonValue = new JSONObject();
+        JSONObject res = new JSONObject();
         JSONObject response = new JSONObject();
-        jsonValue.put("method", methodName );
-        response.put("postID",  postId );
-        response.put("error", "null");
-        jsonValue.put("response", response);
-        return jsonValue;
+        response.put("method", methodName );
+        res.put("postID",  postId );
+        res.put("error", "null");
+        response.put("response", res);
+        return response;
 
     }
-
-
-
 }
 

@@ -418,11 +418,12 @@ public class ArangoInterfaceMethods {
 
 
     //POSTS CRUD
-    public static void insertPost(JSONObject postJSON){
+    public static String insertPost(JSONObject postJSON){
         try {
             BaseDocument myObject = new BaseDocument();
-            myObject.setKey(postJSON.get("id").toString());
-            myObject.addAttribute("id", postJSON.get("id").toString());
+            String postId  = utilities.Main.generateUUID();
+            myObject.setKey(postId);
+            myObject.addAttribute("id", postId);
             myObject.addAttribute("user_id", postJSON.get("user_id").toString());
             myObject.addAttribute("caption", postJSON.get("caption").toString());
             myObject.addAttribute("media", postJSON.get("media").toString());
@@ -435,10 +436,13 @@ public class ArangoInterfaceMethods {
             myObject.addAttribute("deleted_at", postJSON.get("deleted_at").toString());
             arangoDB.db(dbName).collection(postsCollectionName).insertDocument(myObject);
             System.out.println("Post inserted");
+            return postId;
         } catch (ArangoDBException e) {
             System.err.println("Failed to insert Post. " + e.getMessage());
+            return "";
         } catch (JSONException e){
             System.err.println("JSON Post Incorrect format. " + e.getMessage());
+            return "";
         }
     }
 
