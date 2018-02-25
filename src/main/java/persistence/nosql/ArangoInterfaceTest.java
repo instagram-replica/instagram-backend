@@ -3,6 +3,7 @@ package persistence.nosql;
 import com.arangodb.ArangoDB;
 import com.arangodb.ArangoDBException;
 import com.arangodb.entity.CollectionEntity;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.*;
 
@@ -320,6 +321,7 @@ public class ArangoInterfaceTest {
         obj.put("likes", new ArrayList<String>());
         obj.put("tags",new ArrayList<String>());
         obj.put("location","{ name: EspressoLab, coordinates:{long: 1.0.01.01, lat: 2.1.0.10} }");
+        obj.put("comments", new ArrayList<String>());
         obj.put("created_at",new Timestamp(System.currentTimeMillis()));
         obj.put("updated_at",new Timestamp(System.currentTimeMillis()));
         obj.put("blocked_at",new Timestamp(System.currentTimeMillis()));
@@ -350,6 +352,7 @@ public class ArangoInterfaceTest {
         obj.put("likes", new ArrayList<String>());
         obj.put("tags",new ArrayList<String>());
         obj.put("location","{ name: EspressoLab, coordinates:{long: 1.0.01.01, lat: 2.1.0.10} }");
+        obj.put("comments", new ArrayList<String>());
         obj.put("created_at",new Timestamp(System.currentTimeMillis()));
         obj.put("updated_at",new Timestamp(System.currentTimeMillis()));
         obj.put("blocked_at",new Timestamp(System.currentTimeMillis()));
@@ -363,6 +366,7 @@ public class ArangoInterfaceTest {
         updatedObj.put("likes", new ArrayList<String>());
         updatedObj.put("tags",new ArrayList<String>());
         updatedObj.put("location","{ name: EspressoLab, coordinates:{long: 1.0.01.01, lat: 2.1.0.10} }");
+        updatedObj.put("comments", new ArrayList<String>());
         updatedObj.put("created_at",new Timestamp(System.currentTimeMillis()));
         updatedObj.put("updated_at",new Timestamp(System.currentTimeMillis()));
         updatedObj.put("blocked_at",new Timestamp(System.currentTimeMillis()));
@@ -399,7 +403,6 @@ public class ArangoInterfaceTest {
 
         }
 
-
     }
 
     @Test
@@ -434,6 +437,39 @@ public class ArangoInterfaceTest {
         Assert.assertEquals(ArangoInterfaceMethods.getBookmark(id),null);
 
 
+    }
+
+
+    @Test
+    public void insertCommentInPost(){
+
+        String id  = utilities.Main.generateUUID();
+        JSONObject obj = new JSONObject();
+        obj.put("id", id);
+        obj.put("user_id",utilities.Main.generateUUID());
+        obj.put("caption","Taken By MiSO EL Gen");
+        obj.put("media", new ArrayList<String>());
+        obj.put("likes", new ArrayList<String>());
+        obj.put("tags",new ArrayList<String>());
+        obj.put("location","{ name: EspressoLab, coordinates:{long: 1.0.01.01, lat: 2.1.0.10} }");
+        obj.put("comments", new ArrayList<String>());
+        obj.put("created_at",new Timestamp(System.currentTimeMillis()));
+        obj.put("updated_at",new Timestamp(System.currentTimeMillis()));
+        obj.put("blocked_at",new Timestamp(System.currentTimeMillis()));
+        obj.put("deleted_at",new Timestamp(System.currentTimeMillis()));
+
+        ArangoInterfaceMethods.insertPost(obj);
+        JSONObject comment = new JSONObject();
+        comment.put("content","Hello");
+
+        ArangoInterfaceMethods.insertCommentonPost(id,comment);
+
+        JSONObject fetchedPost = ArangoInterfaceMethods.getPost(id);
+        System.out.println("POSSST:  "+fetchedPost);
+
+//        JSONArray comments = (JSONArray)fetchedPost.get("comments"));
+
+        Assert.assertTrue(fetchedPost.get("comments").toString().contains(comment.toString()));
     }
 
 
