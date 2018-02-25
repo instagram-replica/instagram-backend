@@ -162,6 +162,8 @@ public class Main {
         user.setUpdatedAt(model.getDate("updated_at"));
         user.setBlockedAt(model.getDate("blocked_at"));
         user.setDeletedAt(model.getDate("deleted_at"));
+        user.setNumberOfFollowers(""+GetFollowersCount(user.getId()));
+        user.setNumberOfFollowings(""+GetFollowingsCount(user.getId()));
 
         String gender = model.getString("username");
 
