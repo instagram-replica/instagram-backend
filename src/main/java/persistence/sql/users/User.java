@@ -1,6 +1,7 @@
 package persistence.sql.users;
 
 import java.util.Date;
+import java.util.List;
 
 public class User {
     private String id;
@@ -183,6 +184,10 @@ public class User {
     public void setDateOfBirth(Date dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
     }
+
+    public List getFollowers(){ return Main.getFollowers(this.getId()); }
+
+    public List getFollowings(){ return Main.getFollowings(this.getId()); }
 
     @Override
     public String toString() {

@@ -12,9 +12,15 @@ public class UserActions {
     public static JSONObject CreateFollow(JSONObject paramsObject, String loggedInUserId) {
         JSONObject jObject = new JSONObject();
         String toBeFollowedUserId = paramsObject.getString("userId");
+        boolean followDone = Main.createFollow(loggedInUserId,toBeFollowedUserId);
         JSONObject inner = new JSONObject();
-        inner.put("success", "true");
-        inner.put("error","null");
+        if(followDone){
+            inner.put("success", "true");
+            inner.put("error","null");
+        }else{
+            inner.put("success", "false");
+            inner.put("error","0");
+        }
         jObject.put("response", inner);
 
         return jObject;
@@ -22,9 +28,16 @@ public class UserActions {
     public static JSONObject CreateUnfollow(JSONObject paramsObject, String loggedInUserId) {
         JSONObject jObject = new JSONObject();
         String toBeUnfollowedUserId = paramsObject.getString("userId");
+        boolean unfollowDone = Main.deleteFollow(loggedInUserId,toBeUnfollowedUserId);
+
         JSONObject inner = new JSONObject();
-        inner.put("success", "true");
-        inner.put("error","null");
+        if(unfollowDone){
+            inner.put("success", "true");
+            inner.put("error","null");
+        }else {
+            inner.put("success", "false");
+            inner.put("error", "0");
+        }
         jObject.put("response", inner);
 
         return jObject;

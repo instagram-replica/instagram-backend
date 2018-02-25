@@ -136,12 +136,33 @@ public class Main {
         return newReport.saveIt();
     }
 
-    public static long GetFollowingsCount(String userId){
-        return UsersFollowModel.count("follower_id",userId);
+    public static long getFollowingsCount(String userId){
+        return UsersFollowModel.count("follower_id = ?",userId);
     }
 
-    public static long GetFollowersCount(String userId){
-        return UsersFollowModel.count("followed_id",userId);
+    public static long getFollowersCount(String userId){
+        return UsersFollowModel.count("followed_id = ?",userId);
+    }
+
+    public static List getFollowers(String userId){
+       return UsersFollowModel.find("followed_id", userId).collect("follower_id");
+    }
+
+    public static List getFollowings(String userId){
+        return UsersFollowModel.find("follower_id", userId).collect("followed_id");
+    }
+
+    public static boolean createFollow(String followerId, String followedId){
+        UsersFollowModel usersFollowModel = new UsersFollowModel();
+        usersFollowModel.set("follower_id", followerId);
+        usersFollowModel.set("followed_id", followedId);
+        usersFollowModel.set("id", utilities.Main.generateUUID());
+        usersFollowModel.set("created_at", new java.util.Date());
+        return usersFollowModel.saveIt();
+    }
+
+    public static boolean deleteFollow(String followerId, String followedId){
+        return (UsersFollowModel.delete("follower_id = ? AND followed_id = ?", followerId, followedId) == 1);
     }
 
     private static User mapModelToUser(UsersModel model) {
@@ -162,8 +183,8 @@ public class Main {
         user.setUpdatedAt(model.getDate("updated_at"));
         user.setBlockedAt(model.getDate("blocked_at"));
         user.setDeletedAt(model.getDate("deleted_at"));
-        user.setNumberOfFollowers(""+GetFollowersCount(user.getId()));
-        user.setNumberOfFollowings(""+GetFollowingsCount(user.getId()));
+        user.setNumberOfFollowers(""+getFollowersCount(user.getId()));
+        user.setNumberOfFollowings(""+getFollowingsCount(user.getId()));
 
         String gender = model.getString("username");
 
