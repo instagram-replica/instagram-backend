@@ -7,7 +7,7 @@ public class User {
     private String username;
     private String email;
     private String passwordHash;
-    private boolean isPublic;
+    private boolean isPrivate;
     private String fullName;
     private Gender gender;
     private String bio;
@@ -56,12 +56,12 @@ public class User {
         this.passwordHash = passwordHash;
     }
 
-    public boolean isPublic() {
-        return isPublic;
+    public boolean isPrivate() {
+        return isPrivate;
     }
 
-    public void setPublic(boolean aPublic) {
-        isPublic = aPublic;
+    public void setPrivate(boolean privacy) {
+        isPrivate = privacy;
     }
 
     public String getFullName() {
@@ -191,7 +191,7 @@ public class User {
                 ", \n\tusername='" + username + '\'' +
                 ", \n\temail='" + email + '\'' +
                 ", \n\tpasswordHash='" + passwordHash + '\'' +
-                ", \n\tisPublic=" + isPublic +
+                ", \n\tisPrivate=" + isPrivate +
                 ", \n\tfullName='" + fullName + '\'' +
                 ", \n\tgender='" + gender + '\'' +
                 ", \n\tbio='" + bio + '\'' +

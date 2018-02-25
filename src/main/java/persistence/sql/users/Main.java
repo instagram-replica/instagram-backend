@@ -1,6 +1,8 @@
 package persistence.sql.users;
 
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static persistence.sql.users.Validation.isValidUser;
@@ -8,7 +10,7 @@ import static persistence.sql.users.Validation.isValidUserId;
 
 public class Main {
     public static List<User> getAllUsers() {
-        List<Model> results = Model.findAll();
+        List<UsersModel> results = UsersModel.findAll();
         return results
                 .stream()
                 .map(Main::mapModelToUser)
@@ -22,7 +24,7 @@ public class Main {
             );
         }
 
-        Model result = Model.findById(userId);
+        UsersModel result = UsersModel.findById(userId);
 
         if(result == null) {
             return null;
@@ -31,20 +33,32 @@ public class Main {
         return mapModelToUser(result);
     }
 
-    public static User createUser(User user) {
+    public static boolean createUser(User user) {
         if(!isValidUser(user)) {
             throw new RuntimeException(
                     "Cannot create user: Invalid user data"
             );
         }
 
-        // TODO: Generate UUID
-        // TODO: Create user
+        UsersModel usersModel = new UsersModel();
+        usersModel.set("id", user.getId());
+        usersModel.set("username", user.getUsername());
+        usersModel.set("email", user.getEmail());
+        usersModel.set("password_hash", user.getPasswordHash());
+        usersModel.set("is_private", user.isPrivate());
+        usersModel.set("full_name", user.getFullName());
+        usersModel.set("gender", user.getGender());
+        usersModel.set("bio", user.getBio());
+        usersModel.set("phone_number", user.getPhoneNumber());
+        usersModel.set("profile_picture_url", user.getProfilePictureUrl());
+        usersModel.set("website_url", user.getWebsiteUrl());
+        usersModel.set("verified_at", user.getVerifiedAt());
+        usersModel.set("created_at", new java.util.Date());
 
-        return new User();
+        return usersModel.saveIt();
     }
 
-    public static User updateUser(String userId, User user) {
+    public static boolean updateUser(String userId, User user) {
         if(!isValidUserId(userId)) {
             throw new RuntimeException(
                     "Cannot update user: Invalid user ID"
@@ -56,35 +70,40 @@ public class Main {
                     "Cannot update user: Invalid user data"
             );
         }
-
-        // TODO: Update user
-
-        return new User();
+        UsersModel usersModel = new UsersModel();
+        usersModel.set("username", user.getUsername());
+        usersModel.set("name", user.getFullName());
+        usersModel.set("website", user.getWebsiteUrl());
+        usersModel.set("bio", user.getBio());
+        usersModel.set("phone", user.getPhoneNumber());
+        usersModel.set("gender", user.getGender());
+        usersModel.set("email", user.getEmail());
+        usersModel.set("updated_at", new java.util.Date());
+        return usersModel.saveIt();
     }
 
-    public static User deleteUser(String userId) {
+    public static boolean deleteUser(String userId) {
         if(!isValidUserId(userId)) {
             throw new RuntimeException(
                     "Cannot delete user: Invalid user ID"
             );
         }
-
-        // TODO: Delete user
-
-        return new User();
+        UsersModel userModel = UsersModel.findById(userId);
+        userModel.set("deleted_at", new java.util.Date());
+        return userModel.saveIt();
     }
 
-    public static boolean deactivateAccount(String userId) {
-        if(!isValidUserId(userId)) {
-            throw new RuntimeException(
-                    "Cannot deactivate account: Invalid user ID"
-            );
-        }
-
-        // TODO: deactivate account
-
-        return true;
-    }
+//    public static boolean deactivateAccount(String userId) {
+//        if(!isValidUserId(userId)) {
+//            throw new RuntimeException(
+//                    "Cannot deactivate account: Invalid user ID"
+//            );
+//        }
+//
+//        // TODO: deactivate account
+//
+//        return true;
+//    }
 
     public static boolean blockUser(String blockerId,String blockedId) {
         if(!isValidUserId(blockerId) || !isValidUserId(blockedId)) {
@@ -92,10 +111,12 @@ public class Main {
                     "Cannot block user: Invalid user ID"
             );
         }
-
-        // TODO: block user
-
-        return true;
+        UsersBlockModel newBlock = UsersBlockModel.create();
+        newBlock.set("id", utilities.Main.generateUUID());
+        newBlock.set("blocker_id", blockedId);
+        newBlock.set("blocked_id",blockedId);
+        newBlock.set("created_at", new java.util.Date());
+        return newBlock.saveIt();
     }
 
 
@@ -105,22 +126,23 @@ public class Main {
                     "Cannot report user: Invalid user ID"
             );
         }
-
-        // TODO: report user
-
-        return true;
+        UsersReportModel newReport = new UsersReportModel();
+        newReport.set("id", utilities.Main.generateUUID());
+        newReport.set("reporter_id", reporterId);
+        newReport.set("reported_id", reportedId);
+        return newReport.saveIt();
     }
 
 
 
-    private static User mapModelToUser(Model model) {
+    private static User mapModelToUser(UsersModel model) {
         User user = new User();
 
         user.setId(model.getString("id"));
         user.setUsername(model.getString("username"));
         user.setEmail(model.getString("email"));
         user.setPasswordHash(model.getString("password_hash"));
-        user.setPublic(model.getBoolean("is_public"));
+        user.setPrivate(model.getBoolean("is_private"));
         user.setFullName(model.getString("full_name"));
         user.setBio(model.getString("bio"));
         user.setPhoneNumber(model.getString("phone_number"));

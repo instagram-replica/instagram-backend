@@ -12,16 +12,8 @@ import persistence.sql.users.*;
 public class Authentication {
 
     public static JSONObject SignUp(JSONObject params, String userId){
-        User newUser = new User();
-        newUser.setUsername(params.getString("userName"));
-        newUser.setFullName(params.getString("fullName"));
-        newUser.setPasswordHash(params.getString("passwordHash"));
-        newUser.setEmail(params.getString("email"));
-        newUser.setPhoneNumber(params.getString("phone"));
-
-        JSONObject response = new JSONObject();
-        response.put("sessionId", 12);
-        return response;
+        //@stub
+        return null;
     }
 
     public static JSONObject SignIn(JSONObject params, String userId){
@@ -51,7 +43,7 @@ public class Authentication {
         userProfile.put("noOfFollowers",100);
         userProfile.put("noOfFollowing",100);
 
-        if(requestedUser.isPublic())
+        if(requestedUser.isPrivate())
             userProfile.put("privacy","public");
         else
             userProfile.put("privacy","private");
