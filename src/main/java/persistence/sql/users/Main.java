@@ -1,8 +1,11 @@
 package persistence.sql.users;
 
-import java.util.Date;
+import persistence.sql.users.Models.UsersBlockModel;
+import persistence.sql.users.Models.UsersFollowModel;
+import persistence.sql.users.Models.UsersModel;
+import persistence.sql.users.Models.UsersReportModel;
+
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static persistence.sql.users.Validation.isValidUser;
@@ -133,7 +136,13 @@ public class Main {
         return newReport.saveIt();
     }
 
+    public static long GetFollowingsCount(String userId){
+        return UsersFollowModel.count("follower_id",userId);
+    }
 
+    public static long GetFollowersCount(String userId){
+        return UsersFollowModel.count("followed_id",userId);
+    }
 
     private static User mapModelToUser(UsersModel model) {
         User user = new User();
