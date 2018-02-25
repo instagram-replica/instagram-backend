@@ -5,6 +5,9 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.json.JSONObject;
 
+import static persistence.sql.Main.closeConnection;
+import static persistence.sql.Main.openConnection;
+
 @ChannelHandler.Sharable
 public class JSONHandler extends SimpleChannelInboundHandler {
 
@@ -22,5 +25,6 @@ public class JSONHandler extends SimpleChannelInboundHandler {
         JSONObject output = controller.execute(input, "fakejsonid");
 
         Helpers.sendJSON(ctx, output);
+        closeConnection();
     }
 }

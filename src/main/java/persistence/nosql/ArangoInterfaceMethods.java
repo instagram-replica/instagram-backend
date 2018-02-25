@@ -4,8 +4,12 @@ import com.arangodb.ArangoDB;
 import com.arangodb.ArangoDBException;
 import com.arangodb.entity.BaseDocument;
 import com.arangodb.entity.CollectionEntity;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.sql.Timestamp;
+import java.util.ArrayList;
 
 
 public class ArangoInterfaceMethods {
@@ -23,7 +27,26 @@ public class ArangoInterfaceMethods {
 
 
     public static void main(String[]args) {
+
         initializeDB();
+        String id  = utilities.Main.generateUUID();
+        String userid1 = utilities.Main.generateUUID();
+        String userid2  = utilities.Main.generateUUID();
+        JSONObject obj = new JSONObject();
+        obj.put("id", id);
+        obj.put("user_id",utilities.Main.generateUUID());
+        obj.put("caption","Taken By MiSO EL Gen");
+        obj.put("media", new ArrayList<String>());
+        obj.put("likes", new ArrayList<String>());
+        obj.put("tags",new ArrayList<String>());
+        obj.put("location","{ name: EspressoLab, coordinates:{long: 1.0.01.01, lat: 2.1.0.10} }");
+        obj.put("created_at",new Timestamp(System.currentTimeMillis()));
+        obj.put("updated_at",new Timestamp(System.currentTimeMillis()));
+        obj.put("blocked_at",new Timestamp(System.currentTimeMillis()));
+        obj.put("deleted_at",new Timestamp(System.currentTimeMillis()));
+        ArangoInterfaceMethods.insertPost(obj);
+        likePost(id,userid1);
+        likePost(id,userid2 );
     }
 
 
@@ -416,6 +439,12 @@ public class ArangoInterfaceMethods {
         }
     }
 
+    public static void likePost(String postID, String userID){
+        JSONObject post = getPost(postID);
+        JSONArray likes = (JSONArray) post.get("likes");
+        likes.put(userID);
+        updatePost(postID, post);
+    }
     public static void updatePost(String id,JSONObject postJSON){
         try {
             BaseDocument myObject = new BaseDocument();
