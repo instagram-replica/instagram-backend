@@ -74,6 +74,45 @@ public class Main {
         return new User();
     }
 
+    public static boolean deactivateAccount(String userId) {
+        if(!isValidUserId(userId)) {
+            throw new RuntimeException(
+                    "Cannot deactivate account: Invalid user ID"
+            );
+        }
+
+        // TODO: deactivate account
+
+        return true;
+    }
+
+    public static boolean blockUser(String blockerId,String blockedId) {
+        if(!isValidUserId(blockerId) || !isValidUserId(blockedId)) {
+            throw new RuntimeException(
+                    "Cannot block user: Invalid user ID"
+            );
+        }
+
+        // TODO: block user
+
+        return true;
+    }
+
+
+    public static boolean reportUser(String reporterId,String reportedId) {
+        if(!isValidUserId(reporterId) || !isValidUserId(reportedId)) {
+            throw new RuntimeException(
+                    "Cannot report user: Invalid user ID"
+            );
+        }
+
+        // TODO: report user
+
+        return true;
+    }
+
+
+
     private static User mapModelToUser(Model model) {
         User user = new User();
 

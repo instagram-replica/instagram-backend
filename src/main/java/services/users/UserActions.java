@@ -93,12 +93,47 @@ public class UserActions {
     public static JSONObject CreateBlockUser(JSONObject paramsObject, String loggedInUserId)
     {
         JSONObject jObject = new JSONObject();
-        int userIdToBeBlocked = paramsObject.getInt("userId");
+        String userIdToBeBlocked = paramsObject.getString("userId");
 
         //@stub how to block a user?
-        jObject.put("success","false");
+
+       // insert into table user_blocks as blocker_id: loggedInUserId, as blocked_id: userIdToBeBlocked
+        boolean blocked = Main.blockUser(loggedInUserId,userIdToBeBlocked);
+
+        jObject.put("success",blocked);
+        if(blocked)
+            jObject.put("error","null");
+        else
         jObject.put("error","cant block user");
+
         return jObject;
+    }
+    public static JSONObject CreateUserReport(JSONObject paramsObject, String loggedInUserId)
+    {
+        JSONObject jsonObject = new JSONObject();
+        String userIdToBeReported = paramsObject.getString("userId");
+        //@stub how to block a user?
+
+        // insert into table user_reports as reporter_id: loggedInUserId, as reported_id: userIdToBeReported
+        boolean reported = Main.reportUser(loggedInUserId,userIdToBeReported);
+
+        jsonObject.put("success",reported);
+        if(reported)
+            jsonObject.put("error","null");
+        else
+            jsonObject.put("error","cant report user");
+
+        return  jsonObject;
+    }
+    public static JSONObject CreateUserDeactivate(JSONObject paramsObject, String loggedInUserId)
+    {
+        JSONObject jsonObject = new JSONObject();
+        boolean deactivated = Main.deactivateAccount(loggedInUserId);
+        jsonObject.put("success",deactivated);
+        if(deactivated)
+            jsonObject.put("error","null");
+        else jsonObject.put("error","cannot deactivate account");
+        return jsonObject;
     }
 
 }
