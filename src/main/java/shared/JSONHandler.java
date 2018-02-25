@@ -20,8 +20,8 @@ public class JSONHandler extends SimpleChannelInboundHandler {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Object o) throws Exception {
 
-//        JSONObject input = Helpers.getJSONFromByteBuf(ctx, o);
-        JSONObject input  = new JSONObject();
+        JSONObject input = Helpers.getJSONFromByteBuf(ctx, o);
+        System.out.println("HHHHHHhhhh " + o.toString());
         JSONObject output = controller.execute(input, "fakejsonid");
 
         Helpers.sendJSON(ctx, output);
