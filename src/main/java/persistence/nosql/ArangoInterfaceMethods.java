@@ -31,7 +31,6 @@ public class ArangoInterfaceMethods {
 
     public static void main(String[]args) {
         initializeDB();
-        followsGraph();
     }
 
 
