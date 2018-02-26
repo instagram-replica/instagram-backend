@@ -25,7 +25,9 @@ public class User {
     private Date deletedAt;
     private Date dateOfBirth;
 
+
     public String getId() {
+
         return id;
     }
 
