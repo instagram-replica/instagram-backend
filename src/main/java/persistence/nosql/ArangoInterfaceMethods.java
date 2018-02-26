@@ -7,6 +7,8 @@ import com.arangodb.entity.CollectionEntity;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import java.sql.Timestamp;
+import java.util.ArrayList;
 
 
 public class ArangoInterfaceMethods {
@@ -25,6 +27,7 @@ public class ArangoInterfaceMethods {
 
     public static void main(String[]args) {
         initializeDB();
+        insertCommentReply("75373","ca9bcae1-af3a-4523-be06-1311ebcbbe87");
     }
 
 
@@ -100,14 +103,11 @@ public class ArangoInterfaceMethods {
 //    }
 
     //Thread CRUD
-    public static void insertThread(JSONObject threadJSON){
+    public static String insertThread(JSONObject threadJSON){
 
         try {
 
-
             BaseDocument myObject = new BaseDocument();
-            myObject.setKey(threadJSON.get("id").toString());
-            myObject.addAttribute("id", threadJSON.get("id").toString());
             myObject.addAttribute("creator_id", threadJSON.get("creator_id").toString());
             myObject.addAttribute("users_ids", threadJSON.get("users_ids").toString());
             myObject.addAttribute("name", threadJSON.get("name").toString());
@@ -115,14 +115,15 @@ public class ArangoInterfaceMethods {
             myObject.addAttribute("deleted_at", threadJSON.get("deleted_at").toString());
             myObject.addAttribute("blocked_at", threadJSON.get("blocked_at").toString());
             myObject.addAttribute("messages", threadJSON.get("messages").toString());
-            arangoDB.db(dbName).collection(threadsCollectionName).insertDocument(myObject);
+            String id = arangoDB.db(dbName).collection(threadsCollectionName).insertDocument(threadJSON.toString()).getKey();
             System.out.println("Thread inserted");
+            return id;
         } catch (ArangoDBException e) {
             System.err.println("Failed to insert thread. " + e.getMessage());
         } catch (JSONException e){
             System.err.println("JSON Thread Incorrect format. " + e.getMessage());
         }
-
+        return null;
     }
 
     public static JSONObject getThread(String id){
@@ -144,8 +145,6 @@ public class ArangoInterfaceMethods {
     public static void updateThread(String id,JSONObject threadJSON){
         try {
             BaseDocument myObject = new BaseDocument();
-            myObject.setKey(threadJSON.get("id").toString());
-            myObject.addAttribute("id", threadJSON.get("id").toString());
             myObject.addAttribute("creator_id", threadJSON.get("creator_id").toString());
             myObject.addAttribute("users_ids", threadJSON.get("users_ids").toString());
             myObject.addAttribute("name", threadJSON.get("name").toString());
@@ -153,7 +152,7 @@ public class ArangoInterfaceMethods {
             myObject.addAttribute("deleted_at", threadJSON.get("deleted_at").toString());
             myObject.addAttribute("blocked_at", threadJSON.get("blocked_at").toString());
             myObject.addAttribute("messages", threadJSON.get("messages").toString());
-            arangoDB.db(dbName).collection(threadsCollectionName).updateDocument(id, myObject);
+            arangoDB.db(dbName).collection(threadsCollectionName).updateDocument(id, threadJSON.toString());
             System.out.println("Thread Updated");
         } catch (ArangoDBException e) {
             System.err.println("Failed to Update Thread. " + e.getMessage());
@@ -173,23 +172,23 @@ public class ArangoInterfaceMethods {
 
 
     //NOTIFICATION CRUD
-    public static void insertNotification(JSONObject notificationJSON){
+    public static String insertNotification(JSONObject notificationJSON){
         try {
             BaseDocument myObject = new BaseDocument();
-            myObject.setKey(notificationJSON.get("id").toString());
-            myObject.addAttribute("id", notificationJSON.get("id").toString());
             myObject.addAttribute("activity_type", notificationJSON.get("activity_type").toString());
             myObject.addAttribute("receiver_id", notificationJSON.get("receiver_id").toString());
             myObject.addAttribute("sender_id", notificationJSON.get("sender_id").toString());
             myObject.addAttribute("created_at", notificationJSON.get("created_at").toString());
             myObject.addAttribute("blocked_at", notificationJSON.get("blocked_at").toString());
-            arangoDB.db(dbName).collection(notificationsCollectionName).insertDocument(myObject);
+            String id = arangoDB.db(dbName).collection(notificationsCollectionName).insertDocument(notificationJSON.toString()).getKey();
             System.out.println("Notification inserted");
+            return id;
         } catch (ArangoDBException e) {
             System.err.println("Failed to insert Notification. " + e.getMessage());
         } catch (JSONException e){
             System.err.println("JSON Notification Incorrect format. " + e.getMessage());
         }
+        return null;
     }
 
     public static JSONObject getNotification(String id){
@@ -211,14 +210,12 @@ public class ArangoInterfaceMethods {
     public static void updateNotification(String id,JSONObject notificationJSON){
         try {
             BaseDocument myObject = new BaseDocument();
-            myObject.setKey(notificationJSON.get("id").toString());
-            myObject.addAttribute("id", notificationJSON.get("id").toString());
             myObject.addAttribute("activity_type", notificationJSON.get("activity_type").toString());
             myObject.addAttribute("receiver_id", notificationJSON.get("receiver_id").toString());
             myObject.addAttribute("sender_id", notificationJSON.get("sender_id").toString());
             myObject.addAttribute("created_at", notificationJSON.get("created_at").toString());
             myObject.addAttribute("blocked_at", notificationJSON.get("blocked_at").toString());
-            arangoDB.db(dbName).collection(notificationsCollectionName).updateDocument(id, myObject);
+            arangoDB.db(dbName).collection(notificationsCollectionName).updateDocument(id, notificationJSON.toString());
             System.out.println("Notification Updated");
         } catch (ArangoDBException e) {
             System.err.println("Failed to Update Notification. " + e.getMessage());
@@ -239,23 +236,23 @@ public class ArangoInterfaceMethods {
 
 
     //ACTIVITY CRUD
-    public static void insertActivity(JSONObject activityJSON){
+    public static String insertActivity(JSONObject activityJSON){
         try {
             BaseDocument myObject = new BaseDocument();
-            myObject.setKey(activityJSON.get("id").toString());
-            myObject.addAttribute("id", activityJSON.get("id").toString());
             myObject.addAttribute("activity_type", activityJSON.get("activity_type").toString());
             myObject.addAttribute("receiver_id", activityJSON.get("receiver_id").toString());
             myObject.addAttribute("sender_id", activityJSON.get("sender_id").toString());
             myObject.addAttribute("created_at", activityJSON.get("created_at").toString());
             myObject.addAttribute("blocked_at", activityJSON.get("blocked_at").toString());
-            arangoDB.db(dbName).collection(activitiesCollectionName).insertDocument(myObject);
+            String id = arangoDB.db(dbName).collection(activitiesCollectionName).insertDocument(activityJSON.toString()).getKey();
             System.out.println("Activity inserted");
+            return id;
         } catch (ArangoDBException e) {
             System.err.println("Failed to insert Activity. " + e.getMessage());
         } catch (JSONException e){
             System.err.println("JSON Activity Incorrect format. " + e.getMessage());
         }
+        return null;
     }
 
     public static JSONObject getActivity(String id){
@@ -277,14 +274,12 @@ public class ArangoInterfaceMethods {
     public static void updateActivity(String id,JSONObject activityJSON){
         try {
             BaseDocument myObject = new BaseDocument();
-            myObject.setKey(activityJSON.get("id").toString());
-            myObject.addAttribute("id", activityJSON.get("id").toString());
             myObject.addAttribute("activity_type", activityJSON.get("activity_type").toString());
             myObject.addAttribute("receiver_id", activityJSON.get("receiver_id").toString());
             myObject.addAttribute("sender_id", activityJSON.get("sender_id").toString());
             myObject.addAttribute("created_at", activityJSON.get("created_at").toString());
             myObject.addAttribute("blocked_at", activityJSON.get("blocked_at").toString());
-            arangoDB.db(dbName).collection(activitiesCollectionName).updateDocument(id, myObject);
+            arangoDB.db(dbName).collection(activitiesCollectionName).updateDocument(id, activityJSON.toString());
             System.out.println("Activity Updated");
         } catch (ArangoDBException e) {
             System.err.println("Failed to Update Activity. " + e.getMessage());
@@ -304,11 +299,9 @@ public class ArangoInterfaceMethods {
 
 
     //STORY CRUD
-    public static void insertStory(JSONObject storyJSON){
+    public static String insertStory(JSONObject storyJSON){
         try {
             BaseDocument myObject = new BaseDocument();
-            myObject.setKey(storyJSON.get("id").toString());
-            myObject.addAttribute("id", storyJSON.get("id").toString());
             myObject.addAttribute("user_id", storyJSON.get("user_id").toString());
             myObject.addAttribute("is_featured", storyJSON.get("is_featured").toString());
             myObject.addAttribute("media_id", storyJSON.get("media_id").toString());
@@ -318,13 +311,15 @@ public class ArangoInterfaceMethods {
             myObject.addAttribute("deleted_at", storyJSON.get("deleted_at").toString());
             myObject.addAttribute("expired_at", storyJSON.get("expired_at").toString());
             myObject.addAttribute("blocked_at", storyJSON.get("blocked_at").toString());
-            arangoDB.db(dbName).collection(storiesCollectionName).insertDocument(myObject);
+            String id = arangoDB.db(dbName).collection(storiesCollectionName).insertDocument(storyJSON.toString()).getKey();
             System.out.println("Story inserted");
+            return id;
         } catch (ArangoDBException e) {
             System.err.println("Failed to insert Story. " + e.getMessage());
         } catch (JSONException e){
             System.err.println("JSON Story Incorrect format. " + e.getMessage());
         }
+        return null;
     }
 
     public static JSONObject getStory(String id){
@@ -346,8 +341,6 @@ public class ArangoInterfaceMethods {
     public static void updateStory(String id,JSONObject storyJSON){
         try {
             BaseDocument myObject = new BaseDocument();
-            myObject.setKey(storyJSON.get("id").toString());
-            myObject.addAttribute("id", storyJSON.get("id").toString());
             myObject.addAttribute("user_id", storyJSON.get("user_id").toString());
             myObject.addAttribute("is_featured", storyJSON.get("is_featured").toString());
             myObject.addAttribute("media_id", storyJSON.get("media_id").toString());
@@ -357,7 +350,7 @@ public class ArangoInterfaceMethods {
             myObject.addAttribute("deleted_at", storyJSON.get("deleted_at").toString());
             myObject.addAttribute("expired_at", storyJSON.get("expired_at").toString());
             myObject.addAttribute("blocked_at", storyJSON.get("blocked_at").toString());
-            arangoDB.db(dbName).collection(storiesCollectionName).updateDocument(id, myObject);
+            arangoDB.db(dbName).collection(storiesCollectionName).updateDocument(id, storyJSON.toString());
             System.out.println("Story Updated");
         } catch (ArangoDBException e) {
             System.err.println("Failed to Update Story. " + e.getMessage());
@@ -377,29 +370,31 @@ public class ArangoInterfaceMethods {
 
 
     //POSTS CRUD
-    public static void insertPost(JSONObject postJSON){
+    public static String insertPost(JSONObject postJSON){
         try {
+
             BaseDocument myObject = new BaseDocument();
-            myObject.setKey(postJSON.get("id").toString());
-            myObject.addAttribute("id", postJSON.get("id").toString());
             myObject.addAttribute("user_id", postJSON.get("user_id").toString());
             myObject.addAttribute("caption", postJSON.get("caption").toString());
             myObject.addAttribute("media", postJSON.get("media").toString());
             myObject.addAttribute("likes", postJSON.get("likes").toString());
             myObject.addAttribute("tags", postJSON.get("tags").toString());
             myObject.addAttribute("location", postJSON.get("location").toString());
-            myObject.addAttribute("comments", postJSON.get("comments").toString());
+            myObject.addAttribute("comments",  postJSON.get("comments"));
             myObject.addAttribute("created_at", postJSON.get("created_at").toString());
             myObject.addAttribute("updated_at", postJSON.get("updated_at").toString());
             myObject.addAttribute("blocked_at", postJSON.get("blocked_at").toString());
             myObject.addAttribute("deleted_at", postJSON.get("deleted_at").toString());
-            arangoDB.db(dbName).collection(postsCollectionName).insertDocument(myObject);
+            String id = arangoDB.db(dbName).collection(postsCollectionName).insertDocument(postJSON.toString()).getKey();
             System.out.println("Post inserted");
+            return id;
+
         } catch (ArangoDBException e) {
             System.err.println("Failed to insert Post. " + e.getMessage());
         } catch (JSONException e){
             System.err.println("JSON Post Incorrect format. " + e.getMessage());
         }
+        return null;
     }
 
     public static JSONObject getPost(String id){
@@ -422,8 +417,6 @@ public class ArangoInterfaceMethods {
     public static void updatePost(String id,JSONObject postJSON){
         try {
             BaseDocument myObject = new BaseDocument();
-            myObject.setKey(postJSON.get("id").toString());
-            myObject.addAttribute("id", postJSON.get("id").toString());
             myObject.addAttribute("user_id", postJSON.get("user_id").toString());
             myObject.addAttribute("caption", postJSON.get("caption").toString());
             myObject.addAttribute("media", postJSON.get("media").toString());
@@ -435,7 +428,7 @@ public class ArangoInterfaceMethods {
             myObject.addAttribute("updated_at", postJSON.get("updated_at").toString());
             myObject.addAttribute("blocked_at", postJSON.get("blocked_at").toString());
             myObject.addAttribute("deleted_at", postJSON.get("deleted_at").toString());
-            arangoDB.db(dbName).collection(postsCollectionName).updateDocument(id, myObject);
+            arangoDB.db(dbName).collection(postsCollectionName).updateDocument(id, postJSON.toString());
             System.out.println("Post Updated");
         } catch (ArangoDBException e) {
             System.err.println("Failed to Update Post. " + e.getMessage());
@@ -456,19 +449,20 @@ public class ArangoInterfaceMethods {
 
 
     //BOOKMARKS CRUD
-    public static void insertBookmark(JSONObject bookmarkJSON){
+    public static String insertBookmark(JSONObject bookmarkJSON){
         try {
             BaseDocument myObject = new BaseDocument();
-            myObject.setKey(bookmarkJSON.get("user_id").toString());
             myObject.addAttribute("user_id", bookmarkJSON.get("user_id").toString());
             myObject.addAttribute("posts_ids", bookmarkJSON.get("posts_ids").toString());
-            arangoDB.db(dbName).collection(bookmarksCollectionName).insertDocument(myObject);
+            String id = arangoDB.db(dbName).collection(bookmarksCollectionName).insertDocument(bookmarkJSON.toString()).getKey();
             System.out.println("Bookmark inserted");
+            return id;
         } catch (ArangoDBException e) {
             System.err.println("Failed to insert Bookmark. " + e.getMessage());
         } catch (JSONException e){
             System.err.println("JSON Bookmark Incorrect format. " + e.getMessage());
         }
+        return null;
     }
 
     public static JSONObject getBookmark(String id){
@@ -491,10 +485,9 @@ public class ArangoInterfaceMethods {
     public static void updateBookmark(String id,JSONObject bookmarkJSON){
         try {
             BaseDocument myObject = new BaseDocument();
-            myObject.setKey(bookmarkJSON.get("user_id").toString());
             myObject.addAttribute("user_id", bookmarkJSON.get("user_id").toString());
             myObject.addAttribute("posts_ids", bookmarkJSON.get("posts_ids").toString());
-            arangoDB.db(dbName).collection(bookmarksCollectionName).updateDocument(id, myObject);
+            arangoDB.db(dbName).collection(bookmarksCollectionName).updateDocument(id, bookmarkJSON.toString());
             System.out.println("Bookmark Updated");
         } catch (ArangoDBException e) {
             System.err.println("Failed to Update Bookmark. " + e.getMessage());
@@ -514,6 +507,62 @@ public class ArangoInterfaceMethods {
 
 
     //COMMENTS CRUD
+    public static void insertCommentReply(String postID, String commentID){
+//        JSONObject post = getPost(postID);
+//        System.out.println(post);
+////        JSONArray comments = (JSONArray) post.get("comments");
+////        JSONObject jsonComment = new JSONObject();
+////        jsonComment.put("text","Hello22");
+////        jsonComment.put("id", Main.generateUUID());
+////
+////        for(int i = 0;i<comments.length();i++){
+//////            if(){
+////                System.out.println(((JSONObject)comments.get(i)).get("id"));
+//////            }
+////        }
+////        insertCommentOnPost(postID,jsonComment);
+//
+//
+////        System.out.println(comments);
+//
+//
+//
+//
+//        JSONObject obj = new JSONObject();
+//        String id  = utilities.Main.generateUUID();
+//        System.out.println("ID:  "+id);
+//
+//        JSONObject comment = new JSONObject();
+//
+//        comment.put("text","hello");
+//        comment.put("id",utilities.Main.generateUUID());
+//
+//        JSONObject comment2 = new JSONObject();
+//
+//        comment2.put("text","ayman");
+//        comment2.put("id",utilities.Main.generateUUID());
+//
+//        JSONArray commentsArray = new JSONArray();
+//
+//        commentsArray.put(comment);
+//        commentsArray.put(comment2);
+//
+//        obj.put("id", id);
+//        obj.put("user_id",utilities.Main.generateUUID());
+//        obj.put("caption","Taken By MiSO EL Gen");
+//        obj.put("media", new ArrayList<String>());
+//        obj.put("likes", new ArrayList<String>());
+//        obj.put("tags",new ArrayList<String>());
+//        obj.put("location","{ name: EspressoLab, coordinates:{long: 1.0.01.01, lat: 2.1.0.10} }");
+//        obj.put("comments", commentsArray);
+//        obj.put("created_at",new Timestamp(System.currentTimeMillis()));
+//        obj.put("updated_at",new Timestamp(System.currentTimeMillis()));
+//        obj.put("blocked_at",new Timestamp(System.currentTimeMillis()));
+//        obj.put("deleted_at",new Timestamp(System.currentTimeMillis()));
+//        System.out.println(obj);
+//        ArangoInterfaceMethods.insertPost(obj);
+    }
+
     public static void insertCommentOnPost(String postID, JSONObject comment){
         JSONObject post = getPost(postID);
         ((JSONArray) post.get("comments")).put(comment);
@@ -534,6 +583,8 @@ public class ArangoInterfaceMethods {
             return null;
         }
     }
+
+
 
     //MESSAGES CRUD
     public static void insertMessageOnThread(String threadID, JSONObject message){

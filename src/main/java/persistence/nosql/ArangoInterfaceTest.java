@@ -3,7 +3,6 @@ package persistence.nosql;
 import com.arangodb.ArangoDB;
 import com.arangodb.ArangoDBException;
 import com.arangodb.entity.CollectionEntity;
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.*;
 
@@ -73,9 +72,7 @@ public class ArangoInterfaceTest {
 
     @Test
     public void insertAndGetThread() {
-        String id  = utilities.Main.generateUUID();
         JSONObject obj = new JSONObject();
-        obj.put("id", id);
         obj.put("creator_id",utilities.Main.generateUUID());
         obj.put("users_ids",new ArrayList<String>());
         obj.put("name","Ahmed");
@@ -85,7 +82,7 @@ public class ArangoInterfaceTest {
         obj.put("messages",new ArrayList<String>());
 
 
-        ArangoInterfaceMethods.insertThread(obj);
+        String id = ArangoInterfaceMethods.insertThread(obj);
         JSONObject readObj = ArangoInterfaceMethods.getThread(id);
         Iterator iterator = Objects.requireNonNull(readObj).keys();
         while(iterator.hasNext()){
@@ -98,9 +95,7 @@ public class ArangoInterfaceTest {
 
     @Test
     public void updateAndDeleteThread() {
-        String id  = utilities.Main.generateUUID();
         JSONObject obj = new JSONObject();
-        obj.put("id", id);
         obj.put("creator_id",utilities.Main.generateUUID());
         obj.put("users_ids",new ArrayList<String>());
         obj.put("name","Abd El Rahman");
@@ -110,7 +105,6 @@ public class ArangoInterfaceTest {
         obj.put("messages",new ArrayList<String>());
 
         JSONObject updatedObj = new JSONObject();
-        updatedObj.put("id", id);
         updatedObj.put("creator_id",utilities.Main.generateUUID());
         updatedObj.put("users_ids",new ArrayList<String>());
         updatedObj.put("name","Mohamed");
@@ -120,7 +114,7 @@ public class ArangoInterfaceTest {
         updatedObj.put("messages",new ArrayList<String>());
 
 
-        ArangoInterfaceMethods.insertThread(obj);
+        String id = ArangoInterfaceMethods.insertThread(obj);
         ArangoInterfaceMethods.updateThread(id,updatedObj);
         JSONObject jsonThread = ArangoInterfaceMethods.getThread(id);
         Assert.assertEquals(Objects.requireNonNull(jsonThread).get("name"),"Mohamed");
@@ -132,9 +126,7 @@ public class ArangoInterfaceTest {
 
     @Test
     public void insertAndGetNotification() {
-        String id  = utilities.Main.generateUUID();
         JSONObject obj = new JSONObject();
-        obj.put("id", id);
         obj.put("activity_type","{ type: follow, user_id: 2343-2342");
         obj.put("receiver_id", utilities.Main.generateUUID());
         obj.put("sender_id", utilities.Main.generateUUID());
@@ -142,7 +134,7 @@ public class ArangoInterfaceTest {
         obj.put("blocked_at",new Timestamp(System.currentTimeMillis()));
 
 
-        ArangoInterfaceMethods.insertNotification(obj);
+        String id = ArangoInterfaceMethods.insertNotification(obj);
         JSONObject readObj = ArangoInterfaceMethods.getNotification(id);
         Iterator iterator = Objects.requireNonNull(readObj).keys();
         while(iterator.hasNext()){
@@ -155,9 +147,7 @@ public class ArangoInterfaceTest {
 
     @Test
     public void updateAndDeleteNotification() {
-        String id  = utilities.Main.generateUUID();
         JSONObject obj = new JSONObject();
-        obj.put("id", id);
         obj.put("activity_type","{ type: follow, user_id: 2343-2342 }");
         obj.put("receiver_id", utilities.Main.generateUUID());
         obj.put("sender_id", utilities.Main.generateUUID());
@@ -165,7 +155,6 @@ public class ArangoInterfaceTest {
         obj.put("blocked_at",new Timestamp(System.currentTimeMillis()));
 
         JSONObject updatedObj = new JSONObject();
-        updatedObj.put("id", id);
         updatedObj.put("activity_type","{ type: tag, user_id: 2343-2342 }");
         updatedObj.put("receiver_id", utilities.Main.generateUUID());
         updatedObj.put("sender_id", utilities.Main.generateUUID());
@@ -173,7 +162,7 @@ public class ArangoInterfaceTest {
         updatedObj.put("blocked_at",new Timestamp(System.currentTimeMillis()));
 
 
-        ArangoInterfaceMethods.insertNotification(obj);
+        String id = ArangoInterfaceMethods.insertNotification(obj);
         ArangoInterfaceMethods.updateNotification(id,updatedObj);
         JSONObject jsonNotification = ArangoInterfaceMethods.getNotification(id);
 
@@ -187,9 +176,7 @@ public class ArangoInterfaceTest {
 
     @Test
     public void insertAndGetActivity() {
-        String id  = utilities.Main.generateUUID();
         JSONObject obj = new JSONObject();
-        obj.put("id", id);
         obj.put("activity_type","{ type: follow, user_id: 2343-2342");
         obj.put("receiver_id", utilities.Main.generateUUID());
         obj.put("sender_id", utilities.Main.generateUUID());
@@ -197,7 +184,7 @@ public class ArangoInterfaceTest {
         obj.put("blocked_at",new Timestamp(System.currentTimeMillis()));
 
 
-        ArangoInterfaceMethods.insertActivity(obj);
+        String id = ArangoInterfaceMethods.insertActivity(obj);
         JSONObject readObj = ArangoInterfaceMethods.getActivity(id);
         Iterator iterator = Objects.requireNonNull(readObj).keys();
         while(iterator.hasNext()){
@@ -210,9 +197,7 @@ public class ArangoInterfaceTest {
 
     @Test
     public void updateAndDeleteActivity() {
-        String id  = utilities.Main.generateUUID();
         JSONObject obj = new JSONObject();
-        obj.put("id", id);
         obj.put("activity_type","{ type: follow, user_id: 2343-2342 }");
         obj.put("receiver_id", utilities.Main.generateUUID());
         obj.put("sender_id", utilities.Main.generateUUID());
@@ -220,7 +205,6 @@ public class ArangoInterfaceTest {
         obj.put("blocked_at",new Timestamp(System.currentTimeMillis()));
 
         JSONObject updatedObj = new JSONObject();
-        updatedObj.put("id", id);
         updatedObj.put("activity_type","{ type: tag, user_id: 2343-2342 }");
         updatedObj.put("receiver_id", utilities.Main.generateUUID());
         updatedObj.put("sender_id", utilities.Main.generateUUID());
@@ -228,7 +212,7 @@ public class ArangoInterfaceTest {
         updatedObj.put("blocked_at",new Timestamp(System.currentTimeMillis()));
 
 
-        ArangoInterfaceMethods.insertActivity(obj);
+        String id = ArangoInterfaceMethods.insertActivity(obj);
         ArangoInterfaceMethods.updateActivity(id,updatedObj);
         JSONObject jsonNotification = ArangoInterfaceMethods.getActivity(id);
 
@@ -245,9 +229,8 @@ public class ArangoInterfaceTest {
     @Test
     public void insertAndGetStory() {
 
-        String id  = utilities.Main.generateUUID();
+        utilities.Main.generateUUID();
         JSONObject obj = new JSONObject();
-        obj.put("id", id);
         obj.put("user_id",utilities.Main.generateUUID());
         obj.put("is_featured",false);
         obj.put("media_id", utilities.Main.generateUUID());
@@ -258,7 +241,7 @@ public class ArangoInterfaceTest {
         obj.put("expired_at",new Timestamp(System.currentTimeMillis()));
         obj.put("blocked_at",new Timestamp(System.currentTimeMillis()));
 
-        ArangoInterfaceMethods.insertStory(obj);
+        String id = ArangoInterfaceMethods.insertStory(obj);
         JSONObject readObj = ArangoInterfaceMethods.getStory(id);
         Iterator iterator = Objects.requireNonNull(readObj).keys();
         while(iterator.hasNext()){
@@ -271,9 +254,8 @@ public class ArangoInterfaceTest {
 
     @Test
     public void updateAndDeleteStory() {
-        String id  = utilities.Main.generateUUID();
+         utilities.Main.generateUUID();
         JSONObject obj = new JSONObject();
-        obj.put("id", id);
         obj.put("user_id",utilities.Main.generateUUID());
         obj.put("is_featured",false);
         obj.put("media_id", utilities.Main.generateUUID());
@@ -285,7 +267,6 @@ public class ArangoInterfaceTest {
         obj.put("blocked_at",new Timestamp(System.currentTimeMillis()));
 
         JSONObject updatedObj = new JSONObject();
-        updatedObj.put("id", id);
         updatedObj.put("user_id",utilities.Main.generateUUID());
         updatedObj.put("is_featured",true);
         updatedObj.put("media_id", utilities.Main.generateUUID());
@@ -297,13 +278,13 @@ public class ArangoInterfaceTest {
         updatedObj.put("blocked_at",new Timestamp(System.currentTimeMillis()));
 
 
-        ArangoInterfaceMethods.insertStory(obj);
+        String id =ArangoInterfaceMethods.insertStory(obj);
         ArangoInterfaceMethods.updateStory(id,updatedObj);
         JSONObject jsonNotification = ArangoInterfaceMethods.getStory(id);
 
         Assert.assertEquals(
                 Objects.requireNonNull(jsonNotification).get("is_featured"),
-                "true");
+                true);
 
         ArangoInterfaceMethods.deleteStory(id);
         Assert.assertEquals(ArangoInterfaceMethods.getStory(id),null);
@@ -312,9 +293,7 @@ public class ArangoInterfaceTest {
     @Test
     public void insertAndGetPost() {
 
-        String id  = utilities.Main.generateUUID();
         JSONObject obj = new JSONObject();
-        obj.put("id", id);
         obj.put("user_id",utilities.Main.generateUUID());
         obj.put("caption","Taken By MiSO EL Gen");
         obj.put("media", new ArrayList<String>());
@@ -327,7 +306,7 @@ public class ArangoInterfaceTest {
         obj.put("blocked_at",new Timestamp(System.currentTimeMillis()));
         obj.put("deleted_at",new Timestamp(System.currentTimeMillis()));
 
-        ArangoInterfaceMethods.insertPost(obj);
+        String id = ArangoInterfaceMethods.insertPost(obj);
         JSONObject readObj = ArangoInterfaceMethods.getPost(id);
         Iterator iterator = Objects.requireNonNull(readObj).keys();
         while(iterator.hasNext()){
@@ -343,9 +322,8 @@ public class ArangoInterfaceTest {
     @Test
     public void updateAndDeletePost() {
 
-        String id  = utilities.Main.generateUUID();
+        utilities.Main.generateUUID();
         JSONObject obj = new JSONObject();
-        obj.put("id", id);
         obj.put("user_id",utilities.Main.generateUUID());
         obj.put("caption","Taken By MiSO EL Gen");
         obj.put("media", new ArrayList<String>());
@@ -359,7 +337,6 @@ public class ArangoInterfaceTest {
         obj.put("deleted_at",new Timestamp(System.currentTimeMillis()));
 
         JSONObject updatedObj = new JSONObject();
-        updatedObj.put("id", id);
         updatedObj.put("user_id",utilities.Main.generateUUID());
         updatedObj.put("caption","Friends");
         updatedObj.put("media", new ArrayList<String>());
@@ -373,7 +350,7 @@ public class ArangoInterfaceTest {
         updatedObj.put("deleted_at",new Timestamp(System.currentTimeMillis()));
 
 
-        ArangoInterfaceMethods.insertPost(obj);
+        String id = ArangoInterfaceMethods.insertPost(obj);
         ArangoInterfaceMethods.updatePost(id,updatedObj);
         JSONObject jsonNotification = ArangoInterfaceMethods.getPost(id);
 
@@ -388,12 +365,11 @@ public class ArangoInterfaceTest {
     @Test
     public void insertAndGetBookmark() {
 
-        String id  = utilities.Main.generateUUID();
         JSONObject obj = new JSONObject();
-        obj.put("user_id", id);
         obj.put("posts_ids",new ArrayList<String>());
+        obj.put("user_id",utilities.Main.generateUUID());
 
-        ArangoInterfaceMethods.insertBookmark(obj);
+        String id = ArangoInterfaceMethods.insertBookmark(obj);
         JSONObject readObj = ArangoInterfaceMethods.getBookmark(id);
         Iterator iterator = Objects.requireNonNull(readObj).keys();
         while(iterator.hasNext()){
@@ -408,9 +384,8 @@ public class ArangoInterfaceTest {
     @Test
     public void updateAndDeleteBookmark() {
 
-        String id  = utilities.Main.generateUUID();
         JSONObject obj = new JSONObject();
-        obj.put("user_id", id);
+        obj.put("user_id", utilities.Main.generateUUID());
         obj.put("posts_ids",new ArrayList<String>());
 
         JSONObject updatedObj = new JSONObject();
@@ -419,12 +394,12 @@ public class ArangoInterfaceTest {
         post_ids.add(utilities.Main.generateUUID());
 
 
-        updatedObj.put("user_id", id);
+        updatedObj.put("user_id", utilities.Main.generateUUID());
         updatedObj.put("posts_ids", post_ids);
 
 
 
-        ArangoInterfaceMethods.insertBookmark(obj);
+        String id = ArangoInterfaceMethods.insertBookmark(obj);
         ArangoInterfaceMethods.updateBookmark(id,updatedObj);
         JSONObject jsonBookmark = ArangoInterfaceMethods.getBookmark(id);
 
@@ -443,9 +418,7 @@ public class ArangoInterfaceTest {
     @Test
     public void insertCommentInPost(){
 
-        String id  = utilities.Main.generateUUID();
         JSONObject obj = new JSONObject();
-        obj.put("id", id);
         obj.put("user_id",utilities.Main.generateUUID());
         obj.put("caption","Taken By MiSO EL Gen");
         obj.put("media", new ArrayList<String>());
@@ -458,7 +431,7 @@ public class ArangoInterfaceTest {
         obj.put("blocked_at",new Timestamp(System.currentTimeMillis()));
         obj.put("deleted_at",new Timestamp(System.currentTimeMillis()));
 
-        ArangoInterfaceMethods.insertPost(obj);
+        String id =ArangoInterfaceMethods.insertPost(obj);
         JSONObject comment = new JSONObject();
         comment.put("content","Hello");
 
