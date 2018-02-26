@@ -6,14 +6,31 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 
+import org.json.JSONObject;
+import persistence.sql.users.*;
+
 public class Authentication {
 
-    public static JSONObject getUserInfo(JSONObject jsonObject, String userID){
+    public static JSONObject SignUp(JSONObject params, String userId){
+        //@stub
+        return null;
+    }
 
+    public static JSONObject SignIn(JSONObject params, String userId){
+        User user = Main.getUserById(params.getString("username"));
+        if(user.getPasswordHash().equals(params.getString("password"))){
+            JSONObject session = new JSONObject();
+            session.put("sessionId", 12);
+            JSONObject response = new JSONObject();
+            response.put("response", session);
+            return response;
+        }
+        else return new JSONObject().put("error", "null");
+    }
+
+    public static JSONObject GetUserInfo(JSONObject jsonObject, String userID){
         JSONObject userData = new JSONObject();
-
         User requestedUser = Main.getUserById(jsonObject.getString("userId"));
-
         JSONObject userProfile = new JSONObject();
 
         userProfile.put("userId",userID);
@@ -26,7 +43,7 @@ public class Authentication {
         userProfile.put("noOfFollowers",100);
         userProfile.put("noOfFollowing",100);
 
-        if(requestedUser.isPublic())
+        if(requestedUser.isPrivate())
             userProfile.put("privacy","public");
         else
             userProfile.put("privacy","private");
@@ -50,10 +67,4 @@ public class Authentication {
 
            return userData;
     }
-
-
-
-
-
-
 }
