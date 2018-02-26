@@ -3,8 +3,6 @@ package persistence.sql.users;
 import java.util.Date;
 import java.util.List;
 
-
-
 public class User {
     private String id;
     private String username;
