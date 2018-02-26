@@ -28,11 +28,11 @@ public class HTTPHandler extends SimpleChannelInboundHandler<Object> {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Object msg)
             throws Exception {
-
+        System.out.println(msg);
         if (msg instanceof HttpRequest) {
             HttpRequest request = this.request = (HttpRequest) msg;
             if (HttpHeaders.is100ContinueExpected(request)) {
-            send100Continue(ctx);
+                send100Continue(ctx);
             }
 
         }

@@ -2,6 +2,8 @@ package persistence.sql.users;
 
 import java.util.Date;
 
+
+
 public class User {
     private String id;
     private String username;
@@ -20,7 +22,9 @@ public class User {
     private Date blockedAt;
     private Date deletedAt;
 
+
     public String getId() {
+
         return id;
     }
 
