@@ -27,7 +27,6 @@ public class ArangoInterfaceMethods {
 
     public static void main(String[]args) {
         initializeDB();
-        insertCommentReply("75373","ca9bcae1-af3a-4523-be06-1311ebcbbe87");
     }
 
 
@@ -507,60 +506,12 @@ public class ArangoInterfaceMethods {
 
 
     //COMMENTS CRUD
-    public static void insertCommentReply(String postID, String commentID){
-//        JSONObject post = getPost(postID);
-//        System.out.println(post);
-////        JSONArray comments = (JSONArray) post.get("comments");
-////        JSONObject jsonComment = new JSONObject();
-////        jsonComment.put("text","Hello22");
-////        jsonComment.put("id", Main.generateUUID());
-////
-////        for(int i = 0;i<comments.length();i++){
-//////            if(){
-////                System.out.println(((JSONObject)comments.get(i)).get("id"));
-//////            }
-////        }
-////        insertCommentOnPost(postID,jsonComment);
-//
-//
-////        System.out.println(comments);
-//
-//
-//
-//
-//        JSONObject obj = new JSONObject();
-//        String id  = utilities.Main.generateUUID();
-//        System.out.println("ID:  "+id);
-//
-//        JSONObject comment = new JSONObject();
-//
-//        comment.put("text","hello");
-//        comment.put("id",utilities.Main.generateUUID());
-//
-//        JSONObject comment2 = new JSONObject();
-//
-//        comment2.put("text","ayman");
-//        comment2.put("id",utilities.Main.generateUUID());
-//
-//        JSONArray commentsArray = new JSONArray();
-//
-//        commentsArray.put(comment);
-//        commentsArray.put(comment2);
-//
-//        obj.put("id", id);
-//        obj.put("user_id",utilities.Main.generateUUID());
-//        obj.put("caption","Taken By MiSO EL Gen");
-//        obj.put("media", new ArrayList<String>());
-//        obj.put("likes", new ArrayList<String>());
-//        obj.put("tags",new ArrayList<String>());
-//        obj.put("location","{ name: EspressoLab, coordinates:{long: 1.0.01.01, lat: 2.1.0.10} }");
-//        obj.put("comments", commentsArray);
-//        obj.put("created_at",new Timestamp(System.currentTimeMillis()));
-//        obj.put("updated_at",new Timestamp(System.currentTimeMillis()));
-//        obj.put("blocked_at",new Timestamp(System.currentTimeMillis()));
-//        obj.put("deleted_at",new Timestamp(System.currentTimeMillis()));
-//        System.out.println(obj);
-//        ArangoInterfaceMethods.insertPost(obj);
+    public static void insertCommentReply(String commentID, JSONObject commentReply){
+
+
+        String dbQuery = "FOR post in Posts LET willUpdateDocument = ( FOR comment IN post.comments FILTER comment.id == '"+commentID+"' LIMIT 1 RETURN 1) FILTER LENGTH(willUpdateDocument) > 0 LET alteredList = ( FOR comment IN post.comments LET newItem = (comment.id == '"+commentID+"' ? merge(comment, { 'comments' : append(comment.comments,"+commentReply.toString()+")}) : comment) RETURN newItem) UPDATE post WITH { comments:  alteredList } IN Posts";
+        arangoDB.db(dbName).query(dbQuery,null,null,null);
+        
     }
 
     public static void insertCommentOnPost(String postID, JSONObject comment){
