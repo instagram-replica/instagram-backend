@@ -1,15 +1,18 @@
 package persistence.sql.users;
 
+import org.javalite.activejdbc.Model;
 import persistence.sql.users.Models.UsersBlockModel;
 import persistence.sql.users.Models.UsersFollowModel;
 import persistence.sql.users.Models.UsersModel;
 import persistence.sql.users.Models.UsersReportModel;
 
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static persistence.sql.users.Validation.isValidUser;
 import static persistence.sql.users.Validation.isValidUserId;
+import static utilities.Main.generateUUID;
 
 public class Main {
     public static List<User> getAllUsers() {
@@ -56,9 +59,9 @@ public class Main {
         usersModel.set("profile_picture_url", user.getProfilePictureUrl());
         usersModel.set("website_url", user.getWebsiteUrl());
         usersModel.set("verified_at", user.getVerifiedAt());
-        usersModel.set("created_at", new java.util.Date());
+//        usersModel.set("created_at", "2001-08-14 03:03:37");
 
-        return usersModel.saveIt();
+        return usersModel.insert();
     }
 
     public static boolean updateUser(String userId, User user) {
@@ -115,7 +118,7 @@ public class Main {
             );
         }
         UsersBlockModel newBlock = UsersBlockModel.create();
-        newBlock.set("id", utilities.Main.generateUUID());
+        newBlock.set("id", generateUUID());
         newBlock.set("blocker_id", blockedId);
         newBlock.set("blocked_id",blockedId);
         newBlock.set("created_at", new java.util.Date());
@@ -130,7 +133,7 @@ public class Main {
             );
         }
         UsersReportModel newReport = new UsersReportModel();
-        newReport.set("id", utilities.Main.generateUUID());
+        newReport.set("id", generateUUID());
         newReport.set("reporter_id", reporterId);
         newReport.set("reported_id", reportedId);
         return newReport.saveIt();
@@ -156,13 +159,19 @@ public class Main {
         UsersFollowModel usersFollowModel = new UsersFollowModel();
         usersFollowModel.set("follower_id", followerId);
         usersFollowModel.set("followed_id", followedId);
-        usersFollowModel.set("id", utilities.Main.generateUUID());
+        usersFollowModel.set("id", generateUUID());
         usersFollowModel.set("created_at", new java.util.Date());
         return usersFollowModel.saveIt();
     }
 
     public static boolean deleteFollow(String followerId, String followedId){
         return (UsersFollowModel.delete("follower_id = ? AND followed_id = ?", followerId, followedId) == 1);
+    }
+
+    public static List searchForUser(String userFullName){
+
+        return UsersModel.where("username like ?", "%?%", userFullName);
+
     }
 
     private static User mapModelToUser(UsersModel model) {
@@ -189,20 +198,7 @@ public class Main {
         String gender = model.getString("username");
 
         if (gender != null) {
-            switch (gender) {
-                case "male":
-                    user.setGender(Gender.MALE);
-                    break;
-                case "female":
-                    user.setGender(Gender.FEMALE);
-                    break;
-                case "undefined":
-                    user.setGender(Gender.UNDEFINED);
-                    break;
-                default:
-                    user.setGender(null);
-                    break;
-            }
+            user.setGender(gender);
         }
 
         return user;
