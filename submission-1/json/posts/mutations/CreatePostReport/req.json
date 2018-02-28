@@ -1,8 +1,0 @@
-{
-    "method": "createPostReport",
-    "params" : 
-    {
-    	"postId": 12,
-    	"report": "unethical"	
-    }
-}

@@ -20,6 +20,9 @@ public class Controller extends shared.Controller {
            // case "getTaggedPosts": return Team2.getTaggedPosts(paramsObject, userId);
             case "deletePost": return Team2.deletePost(paramsObject, userId, methodName);
             case "createPostLike": return Team2.createPostLike(paramsObject, userId, methodName);
+            case "createComment" : return Team1.createComment(paramsObject,userId,methodName);
+            case "getComments" : return Team1.getCommentsOnPost(paramsObject,userId,methodName);
+            case "createCommentReply": return Team1.createCommentReply(paramsObject,userId,methodName);
         }
         System.out.println(methodName);
         System.out.println(paramsObject.toString());
