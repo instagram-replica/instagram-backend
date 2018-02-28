@@ -53,6 +53,15 @@ public class ArangoInterfaceMethods {
         getAllfollowingIDs("Users/f5e1008c-6157-e05d-c01c-5f5c7e055b2c");
         System.out.println("_______________________________________________");
         getAllfollowersIDs("Users/f5e1008c-6157-e05d-c01c-5f5c7e055b2c");
+
+        unFollowUser("Users/f5e1008c-6157-e05d-c01c-5f5c7e055b2c", "Users/3d9c043c-7608-8afa-8e09-1f62bb84427b");
+        System.out.println("_______________________________________________");
+        getAllfollowingIDs("Users/f5e1008c-6157-e05d-c01c-5f5c7e055b2c");
+        String newUserUUID = UUID.randomUUID().toString();
+        makeUserNode(newUserUUID);
+        followUser("Users/f5e1008c-6157-e05d-c01c-5f5c7e055b2c","Users/"+newUserUUID);
+        System.out.println("_______________________________________________");
+        getAllfollowingIDs("Users/f5e1008c-6157-e05d-c01c-5f5c7e055b2c");
     }
 
 
@@ -639,6 +648,9 @@ public class ArangoInterfaceMethods {
         followedDoc.setKey(followedID);
 
         BaseEdgeDocument edge = new BaseEdgeDocument();
+        String followerKey = followerID.split("/")[1];
+        String followedKey = followedID.split("/")[1];
+        edge.setKey(followerKey+followedKey);
         edge.setFrom(followerID);
         edge.setTo(followedID);
 
@@ -655,9 +667,18 @@ public class ArangoInterfaceMethods {
     }
 
     public static boolean unFollowUser(String followerID, String followedID){
-        ArangoEdgeCollection edgecollection = arangoDB.db(dbName).graph(graphName).edgeCollection(graphUserFollowsCollectionName);
-//        edgecollection.deleteEdge();
-        return true;
+        try {
+            String followerKey = followerID.split("/")[1];
+            String followedKey = followedID.split("/")[1];
+            ArangoEdgeCollection edgecollection = arangoDB.db(dbName).graph(graphName).edgeCollection(graphUserFollowsCollectionName);
+            edgecollection.deleteEdge(followerKey + followedKey);
+            return true;
+        }
+        catch (ArangoDBException e){
+            System.err.println("Edge Deletion Failed In Graph: " + e.getMessage());
+            return false;
+        }
+
 
     }
 
@@ -685,6 +706,7 @@ public class ArangoInterfaceMethods {
                     BaseDocument.class);
             cursor.forEachRemaining(aDocument -> {
                 IDs.add(aDocument.getKey());
+                System.out.println("ID following: "+ aDocument.getKey());
             });
             return IDs;
         } catch (ArangoDBException e) {
@@ -704,6 +726,7 @@ public class ArangoInterfaceMethods {
                     BaseDocument.class);
             cursor.forEachRemaining(aDocument -> {
                 IDs.add(aDocument.getKey());
+                System.out.println("ID follower: "+ aDocument.getKey());
             });
             return IDs;
         } catch (ArangoDBException e) {
