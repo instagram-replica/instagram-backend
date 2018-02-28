@@ -5,10 +5,19 @@ import com.arangodb.ArangoDB;
 import com.arangodb.ArangoDBException;
 import com.arangodb.entity.BaseDocument;
 import com.arangodb.entity.CollectionEntity;
+import com.arangodb.*;
+import com.arangodb.entity.*;
+import com.arangodb.model.GraphCreateOptions;
+import com.arangodb.util.MapBuilder;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.util.*;
+
+import static persistence.sql.Main.openConnection;
+import static persistence.sql.users.Main.getAllUsersIds;
 
 public class ArangoInterfaceMethods {
 
@@ -21,11 +30,29 @@ public class ArangoInterfaceMethods {
     private static final String storiesCollectionName = "Stories";
     private static final String postsCollectionName = "Posts";
     private static final String bookmarksCollectionName = "Bookmarks";
+    private static final String userCollectionName = "Users";
+    private static final String hashtagCollectionName = "Hashtags";
+
+    private static final String graphUserFollowsCollectionName = "UserFollows";
+    private static final String graphUserInteractsCollectionName = "UserInteracts";
+
+    private static final String graphName = "UserRelationsGraph";
 
 
 
-    public static void main(String[]args) {
+    public static void main(String[]args) throws IOException {
         initializeDB();
+        initializeGraphCollections();
+        followUser("Users/f5e1008c-6157-e05d-c01c-5f5c7e055b2c","Users/3d9c043c-7608-8afa-8e09-1f62bb84427b");
+        followUser("Users/f5e1008c-6157-e05d-c01c-5f5c7e055b2c","Users/040ea46c-fb03-5ea8-dcae-7b42a06909e8");
+
+        followUser("Users/a10d47bf-7c9c-8193-381f-79db326cc8dd","Users/f5e1008c-6157-e05d-c01c-5f5c7e055b2c");
+        followUser("Users/c38233c6-cddd-4e04-5b8b-7d667854b61a","Users/f5e1008c-6157-e05d-c01c-5f5c7e055b2c");
+        followUser("Users/f1099115-5201-7e6a-34c3-b61591a37b84","Users/f5e1008c-6157-e05d-c01c-5f5c7e055b2c");
+        followUser("Users/040ea46c-fb03-5ea8-dcae-7b42a06909e8","Users/f5e1008c-6157-e05d-c01c-5f5c7e055b2c");
+        getAllfollowingIDs("Users/f5e1008c-6157-e05d-c01c-5f5c7e055b2c");
+        System.out.println("_______________________________________________");
+        getAllfollowersIDs("Users/f5e1008c-6157-e05d-c01c-5f5c7e055b2c");
     }
 
 
@@ -52,6 +79,7 @@ public class ArangoInterfaceMethods {
                 CollectionEntity bookmarksCollection = arangoDB.db(dbName).createCollection(bookmarksCollectionName);
                 System.out.println("Collection created: " + bookmarksCollection.getName());
             }
+
 
         } catch (ArangoDBException e) {
             System.err.println("Failed to create database and collections: " + dbName + "; " + e.getMessage());
@@ -529,10 +557,52 @@ public class ArangoInterfaceMethods {
         arangoDB.db(dbName).query(dbQuery,null,null,null);
     }
 
-    public static void insertCommentOnPost(String postID, JSONObject comment){
+
+    public static void insertCommentOnPost(String postID, JSONObject comment) {
         JSONObject post = getPost(postID);
         ((JSONArray) post.get("comments")).put(comment);
-        updatePost(postID,post);
+        updatePost(postID, post);
+    }
+
+    public static void initializeGraphCollections() throws IOException {
+        openConnection();
+        List<String> user_ids = getAllUsersIds();
+        closeConnection();
+        arangoDB.db(dbName).drop();
+        arangoDB.createDatabase(dbName);
+        try{
+            arangoDB.db(dbName).graph(graphName).drop();
+        }
+        catch (ArangoDBException e ){
+
+        }
+
+        Collection<EdgeDefinition> edgeDefinitions = new ArrayList<>();
+        EdgeDefinition edgeUserFollows = new EdgeDefinition();
+
+        edgeUserFollows.collection(graphUserFollowsCollectionName);
+        edgeUserFollows.from(userCollectionName);
+        edgeUserFollows.to(userCollectionName);
+
+        edgeDefinitions.add(edgeUserFollows);
+
+        GraphCreateOptions options = new GraphCreateOptions();
+        options.orphanCollections("dummyCollection");
+
+        arangoDB.db(dbName).createGraph(graphName, edgeDefinitions, options);
+        System.out.println(user_ids.toString());
+        Iterator<CollectionEntity> iterator = arangoDB.db(dbName).getCollections().iterator();
+        boolean found = false;
+        while (iterator.hasNext()){
+            System.out.println(iterator.next().getName().toString());
+        }
+        for(int i =0 ;i< user_ids.size();i++){
+            BaseDocument userDocument = new BaseDocument();
+            userDocument.setKey(user_ids.get(i));
+            arangoDB.db(dbName).graph(graphName).vertexCollection(userCollectionName).insertVertex(userDocument, null);
+        }
+
+
     }
 
     public static JSONArray getCommentsOnPost(String postID){
@@ -557,6 +627,90 @@ public class ArangoInterfaceMethods {
         JSONObject post = getThread(threadID);
         ((JSONArray) post.get("messages")).put(message);
         updatePost(threadID,post);
+    }
+
+    public static boolean followUser(String followerID, String followedID){
+
+
+        BaseDocument followerDoc = new BaseDocument();
+        followerDoc.setKey(followerID);
+
+        BaseDocument followedDoc = new BaseDocument();
+        followedDoc.setKey(followedID);
+
+        BaseEdgeDocument edge = new BaseEdgeDocument();
+        edge.setFrom(followerID);
+        edge.setTo(followedID);
+
+        try{
+            ArangoEdgeCollection edgecollection = arangoDB.db(dbName).graph(graphName).edgeCollection(graphUserFollowsCollectionName);
+
+            edgecollection.insertEdge(edge,null);
+            return true;
+        }
+        catch (ArangoDBException e){
+            System.err.println("Edge Insertion Failed In Graph: " + e.getMessage());
+            return false;
+        }
+    }
+
+    public static boolean unFollowUser(String followerID, String followedID){
+        ArangoEdgeCollection edgecollection = arangoDB.db(dbName).graph(graphName).edgeCollection(graphUserFollowsCollectionName);
+//        edgecollection.deleteEdge();
+        return true;
+
+    }
+
+    public static boolean makeUserNode(String userID){
+        try{
+            BaseDocument userDocument = new BaseDocument();
+            userDocument.setKey(userID);
+            arangoDB.db(dbName).graph(graphName).vertexCollection(userCollectionName).insertVertex(userDocument, null);
+            return true;
+        }
+        catch(ArangoDBException e){
+            System.err.println("Failed to initialize a node for user In Graph: " + e.getMessage());
+            return false;
+        }
+
+    }
+
+    public static ArrayList<String> getAllfollowingIDs(String userID){
+        try{
+            ArrayList<String> IDs = new ArrayList<>();
+            String query = "FOR vertex IN OUTBOUND \""  + userID+"\" "+ graphUserFollowsCollectionName + " RETURN vertex " ;
+            System.out.println(query);
+            Map<String, Object> bindVars = new MapBuilder().get();
+            ArangoCursor<BaseDocument> cursor = arangoDB.db(dbName).query(query, bindVars, null,
+                    BaseDocument.class);
+            cursor.forEachRemaining(aDocument -> {
+                IDs.add(aDocument.getKey());
+            });
+            return IDs;
+        } catch (ArangoDBException e) {
+            System.err.println("Failed to execute query. " + e.getMessage());
+            return null;
+        }
+
+
+    }
+    public static ArrayList<String> getAllfollowersIDs(String userID){
+        try{
+            ArrayList<String> IDs = new ArrayList<>();
+            String query = "FOR vertex IN INBOUND \""  + userID+"\" "+ graphUserFollowsCollectionName + " RETURN vertex " ;
+            System.out.println(query);
+            Map<String, Object> bindVars = new MapBuilder().get();
+            ArangoCursor<BaseDocument> cursor = arangoDB.db(dbName).query(query, bindVars, null,
+                    BaseDocument.class);
+            cursor.forEachRemaining(aDocument -> {
+                IDs.add(aDocument.getKey());
+            });
+            return IDs;
+        } catch (ArangoDBException e) {
+            System.err.println("Failed to execute query. " + e.getMessage());
+            return null;
+        }
+
     }
 
 

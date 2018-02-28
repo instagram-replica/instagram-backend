@@ -7,9 +7,7 @@ import org.json.JSONObject;
 import org.junit.*;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Objects;
+import java.util.*;
 
 public class ArangoInterfaceTest {
 
@@ -22,6 +20,8 @@ public class ArangoInterfaceTest {
     private static final String storiesCollectionName = "Stories";
     private static final String postsCollectionName = "Posts";
     private static final String bookmarksCollectionName = "Bookmarks";
+
+
     @BeforeClass
     public static void setUp() {
 
@@ -440,10 +440,7 @@ public class ArangoInterfaceTest {
         JSONObject fetchedPost = ArangoInterfaceMethods.getPost(id);
         System.out.println("POSSST:  "+fetchedPost);
 
-//        JSONArray comments = (JSONArray)fetchedPost.get("comments"));
-
         Assert.assertTrue(fetchedPost.get("comments").toString().contains(comment.toString()));
     }
-
 
 }
