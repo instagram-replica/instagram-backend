@@ -10,7 +10,7 @@ public class User {
     private String passwordHash;
     private boolean isPrivate;
     private String fullName;
-    private Gender gender;
+    private String gender;
     private String bio;
     private String phoneNumber;
     private String profilePictureUrl;
@@ -75,11 +75,11 @@ public class User {
         this.fullName = fullName;
     }
 
-    public Gender getGender() {
+    public String getGender() {
         return gender;
     }
 
-    public void setGender(Gender gender) {
+    public void setGender(String gender) {
         this.gender = gender;
     }
 

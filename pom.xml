@@ -39,6 +39,7 @@
             <artifactId>arangodb-java-driver</artifactId>
             <version>4.2.2</version>
         </dependency>
+
     </dependencies>
 
     <build>

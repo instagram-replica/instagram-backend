@@ -79,7 +79,7 @@ public class UserActions {
         user.setBio(bio);
         user.setEmail(email);
         user.setPhoneNumber(phone);
-        user.setGender(Gender.valueOf(gender));
+        user.setGender(gender);
         jObject.put("data", paramsObject);
         boolean updated = Main.updateUser(loggedInUserId,user);
 

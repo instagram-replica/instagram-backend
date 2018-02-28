@@ -22,7 +22,7 @@ public class UsersTests {
         dummy.setUsername("hamada");
         dummy.setPhoneNumber("0100");
         dummy.setPrivate(true);
-        dummy.setGender(Gender.MALE);
+        dummy.setGender("male");
         dummy.setDateOfBirth(new Date(311294));
         dummy.setPasswordHash("12!@#RF1wd1@#");
         dummy.setEmail("hamada@g.c");
