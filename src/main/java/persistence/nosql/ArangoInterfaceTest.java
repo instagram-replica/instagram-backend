@@ -2,17 +2,27 @@ package persistence.nosql;
 
 import com.arangodb.ArangoDB;
 import com.arangodb.ArangoDBException;
+import com.arangodb.entity.BaseDocument;
 import com.arangodb.entity.CollectionEntity;
+import com.arangodb.entity.EdgeDefinition;
+import com.arangodb.entity.GraphEntity;
+import com.arangodb.model.GraphCreateOptions;
 import org.json.JSONObject;
 import org.junit.*;
 
+import java.io.IOException;
+import java.sql.Array;
 import java.sql.Timestamp;
 import java.util.*;
+
+import static persistence.nosql.ArangoInterfaceMethods.*;
+import static persistence.sql.Main.openConnection;
+import static persistence.sql.users.Main.getAllUsersIds;
 
 public class ArangoInterfaceTest {
 
     private static ArangoDB arangoDB;
-    private static String dbName =  "InstagramTestAQL";
+    static String dbName =  "InstagramTestAQL";
 
     private static final String threadsCollectionName = "Threads";
     private static final String notificationsCollectionName = "Notifications";
@@ -20,16 +30,24 @@ public class ArangoInterfaceTest {
     private static final String storiesCollectionName = "Stories";
     private static final String postsCollectionName = "Posts";
     private static final String bookmarksCollectionName = "Bookmarks";
+    private static final String userCollectionName = "Users";
+    private static final String hashtagCollectionName = "Hashtags";
+
+    private static final String graphUserFollowsCollectionName = "UserFollows";
+    private static final String graphUserInteractsCollectionName = "UserInteracts";
+
+
+    private static final String graphName = "InstagramGraph";
 
 
     @BeforeClass
-    public static void setUp() {
+    public static void setUp() throws IOException {
 
         ArangoInterfaceMethods.dbName = ArangoInterfaceTest.dbName;
-        dbName =  "InstagramTestAQL";
         arangoDB = new ArangoDB.Builder().build();
+        arangoDB.db(dbName).drop();
         try {
-            if(arangoDB.getDatabases().contains(dbName)){
+            if (arangoDB.getDatabases().contains(dbName)) {
                 arangoDB.db(dbName).drop();
             }
             arangoDB.createDatabase(dbName);
@@ -63,6 +81,53 @@ public class ArangoInterfaceTest {
         } catch (ArangoDBException e) {
             System.err.println("Failed to create collections: " + e.getMessage());
         }
+
+        Iterator<GraphEntity> graphs = arangoDB.db(dbName).getGraphs().iterator();
+        while (graphs.hasNext()) {
+            if (graphs.next().getName().equals(graphName)) {
+                return;
+            }
+        }
+
+        openConnection();
+        List<String> user_ids = getAllUsersIds();
+        closeConnection();
+        try {
+
+            Collection<EdgeDefinition> edgeDefinitions = new ArrayList<>();
+            EdgeDefinition edgeUserFollows = new EdgeDefinition();
+
+            edgeUserFollows.collection(graphUserFollowsCollectionName);
+            edgeUserFollows.from(userCollectionName);
+            edgeUserFollows.to(userCollectionName);
+
+
+            EdgeDefinition edgeUserInteracts = new EdgeDefinition();
+
+            edgeUserInteracts.collection(graphUserInteractsCollectionName);
+            edgeUserInteracts.from(userCollectionName);
+            edgeUserInteracts.to(hashtagCollectionName);
+
+            edgeDefinitions.add(edgeUserFollows);
+            edgeDefinitions.add(edgeUserInteracts);
+
+            GraphCreateOptions options = new GraphCreateOptions();
+            options.orphanCollections("dummyOptions");
+
+            arangoDB.db(dbName).createGraph(graphName, edgeDefinitions, options);
+
+
+            for (int i = 0; i < user_ids.size(); i++) {
+                BaseDocument userDocument = new BaseDocument();
+                userDocument.setKey(user_ids.get(i));
+                arangoDB.db(dbName).graph(graphName).vertexCollection(userCollectionName).insertVertex(userDocument, null);
+            }
+        }
+        catch (ArangoDBException e ){
+            System.err.println("Faild to intilize graph: " + e.getMessage());
+            return;
+        }
+
     }
 
     @AfterClass
@@ -438,9 +503,74 @@ public class ArangoInterfaceTest {
         ArangoInterfaceMethods.insertCommentOnPost(id,comment);
 
         JSONObject fetchedPost = ArangoInterfaceMethods.getPost(id);
-        System.out.println("POSSST:  "+fetchedPost);
 
         Assert.assertTrue(fetchedPost.get("comments").toString().contains(comment.toString()));
+    }
+
+    @Test
+    public void followTest(){
+        followUser("Users/f5e1008c-6157-e05d-c01c-5f5c7e055b2c","Users/3d9c043c-7608-8afa-8e09-1f62bb84427b");
+        followUser("Users/f5e1008c-6157-e05d-c01c-5f5c7e055b2c","Users/040ea46c-fb03-5ea8-dcae-7b42a06909e8");
+
+        followUser("Users/a10d47bf-7c9c-8193-381f-79db326cc8dd","Users/f5e1008c-6157-e05d-c01c-5f5c7e055b2c");
+        followUser("Users/c38233c6-cddd-4e04-5b8b-7d667854b61a","Users/f5e1008c-6157-e05d-c01c-5f5c7e055b2c");
+        followUser("Users/f1099115-5201-7e6a-34c3-b61591a37b84","Users/f5e1008c-6157-e05d-c01c-5f5c7e055b2c");
+        followUser("Users/040ea46c-fb03-5ea8-dcae-7b42a06909e8","Users/f5e1008c-6157-e05d-c01c-5f5c7e055b2c");
+
+        ArrayList<String> following = getAllfollowingIDs("Users/f5e1008c-6157-e05d-c01c-5f5c7e055b2c");
+        following.size();
+        Assert.assertEquals(following.size(),2);
+
+        ArrayList<String> followers = getAllfollowersIDs("Users/f5e1008c-6157-e05d-c01c-5f5c7e055b2c");
+        Assert.assertEquals(followers.size(),4);
+
+        unFollowUser("Users/f5e1008c-6157-e05d-c01c-5f5c7e055b2c", "Users/3d9c043c-7608-8afa-8e09-1f62bb84427b");
+
+        ArrayList<String> followingAfterUnfollow = getAllfollowingIDs("Users/f5e1008c-6157-e05d-c01c-5f5c7e055b2c");
+        Assert.assertEquals(followingAfterUnfollow.size(),1);
+
+        String newUserUUID = UUID.randomUUID().toString();
+        makeUserNode(newUserUUID);
+
+        followUser("Users/f5e1008c-6157-e05d-c01c-5f5c7e055b2c","Users/"+newUserUUID);
+        ArrayList<String> newFollowing = getAllfollowingIDs("Users/f5e1008c-6157-e05d-c01c-5f5c7e055b2c");
+        Assert.assertEquals(newFollowing.size(),2);;
+
+//        removeUserNode("f5e1008c-6157-e05d-c01c-5f5c7e055b2c");
+//        ArrayList<String> emptyFollowing = getAllfollowingIDs("Users/f5e1008c-6157-e05d-c01c-5f5c7e055b2c");
+//        Assert.assertEquals(emptyFollowing.size(),0);
+
+        Assert.assertTrue(isFollowing("Users/f5e1008c-6157-e05d-c01c-5f5c7e055b2c","Users/040ea46c-fb03-5ea8-dcae-7b42a06909e8"));
+        Assert.assertFalse(isFollowing("Users/a10d47bf-7c9c-8193-381f-79db326cc8dd", "Users/c38233c6-cddd-4e04-5b8b-7d667854b61a"));
+    }
+
+    @Test
+    public void interactTest(){
+
+        makeHashtagNode("manU");
+        makeHashtagNode("pancakes");
+        makeHashtagNode("3eesh_namlla_takol_sokar");
+        System.out.println("_______________________________________________");
+
+        followHashtag("Users/f5e1008c-6157-e05d-c01c-5f5c7e055b2c", "Hashtags/manU");
+        followHashtag("Users/f5e1008c-6157-e05d-c01c-5f5c7e055b2c", "Hashtags/pancakes");
+        followHashtag("Users/f5e1008c-6157-e05d-c01c-5f5c7e055b2c", "Hashtags/3eesh_namlla_takol_sokar");
+
+        followHashtag("Users/a10d47bf-7c9c-8193-381f-79db326cc8dd", "Hashtags/manU");
+
+        ArrayList<String> myHashtags = getAllFollowingHashtags("Users/f5e1008c-6157-e05d-c01c-5f5c7e055b2c");
+        Assert.assertEquals(myHashtags.size(),3);
+
+        ArrayList<String> hashtagFollowers = getAllHashtagFollowers("Hashtags/manU");
+        Assert.assertEquals(hashtagFollowers.size(),2);
+
+        unFolllowHashtag("Users/f5e1008c-6157-e05d-c01c-5f5c7e055b2c","Hashtags/manU");
+        ArrayList<String> myHashtagsUpdated = getAllFollowingHashtags("Users/f5e1008c-6157-e05d-c01c-5f5c7e055b2c");
+        Assert.assertEquals(myHashtagsUpdated.size(),2);
+
+
+        Assert.assertTrue(isInteracting("Users/f5e1008c-6157-e05d-c01c-5f5c7e055b2c","Hashtags/pancakes"));
+        Assert.assertFalse(isInteracting("Users/a10d47bf-7c9c-8193-381f-79db326cc8dd", "Hashtags/pancakes"));
     }
 
 }
