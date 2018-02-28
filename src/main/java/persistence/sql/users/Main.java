@@ -61,12 +61,6 @@ public class Main {
         usersModel.set("password_hash", user.getPasswordHash());
         usersModel.set("is_private", user.isPrivate());
         usersModel.set("full_name", user.getFullName());
-//        usersModel.set(
-//                "gender",
-//                user.getGender() == Gender.MALE? "male"
-//                        : user.getGender() == Gender.FEMALE? "female"
-//                        : "undefined"
-//        );
         usersModel.set("gender", user.getGender());
         usersModel.set("bio", user.getBio());
         usersModel.set("phone_number", user.getPhoneNumber());
@@ -90,16 +84,16 @@ public class Main {
                     "Cannot update user: Invalid user data"
             );
         }
-        UsersModel usersModel = UsersModel.findById(userId);
-        usersModel.set("username", user.getUsername());
-        usersModel.set("name", user.getFullName());
-        usersModel.set("website", user.getWebsiteUrl());
-        usersModel.set("bio", user.getBio());
-        usersModel.set("phone", user.getPhoneNumber());
-        usersModel.set("gender", user.getGender());
-        usersModel.set("email", user.getEmail());
-        usersModel.set("updated_at", new java.util.Date());
-        return usersModel.saveIt();
+        UsersModel usersModel = UsersModel.findFirst("id = ?", userId);
+        boolean set1 = usersModel.set("username", user.getUsername()).saveIt();
+        boolean set2 = usersModel.set("full_name", user.getFullName()).saveIt();
+        boolean set3 = usersModel.set("website_url", user.getWebsiteUrl()).saveIt();
+        boolean set4 = usersModel.set("bio", user.getBio()).saveIt();
+        boolean set5 = usersModel.set("phone_number", user.getPhoneNumber()).saveIt();
+        boolean set6 = usersModel.set("gender", user.getGender()).saveIt();
+        boolean set7 = usersModel.set("email", user.getEmail()).saveIt();
+        boolean set8 = usersModel.set("updated_at", new java.util.Date()).saveIt();
+        return set1 && set2 && set3 && set4 && set5 && set6 && set7 && set8;
     }
 
     public static boolean deleteUser(String userId) {
@@ -108,10 +102,8 @@ public class Main {
                     "Cannot delete user: Invalid user ID"
             );
         }
-        UsersModel userModel = UsersModel.findById(userId);
+        UsersModel userModel = UsersModel.findFirst("id = ?", userId);
         return userModel.delete();
-//        userModel.set("deleted_at", new java.util.Date());
-       // return userModel.saveIt();
     }
 
 //    public static boolean deactivateAccount(String userId) {
