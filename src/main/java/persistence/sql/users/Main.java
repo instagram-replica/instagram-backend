@@ -1,12 +1,16 @@
 package persistence.sql.users;
 
+
 import org.json.JSONObject;
+
+import org.javalite.activejdbc.Model;
 import persistence.sql.users.Models.UsersBlockModel;
 import persistence.sql.users.Models.UsersFollowModel;
 import persistence.sql.users.Models.UsersModel;
 import persistence.sql.users.Models.UsersReportModel;
 
 import java.io.IOException;
+
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -69,9 +73,9 @@ public class Main {
         usersModel.set("profile_picture_url", user.getProfilePictureUrl());
         usersModel.set("website_url", user.getWebsiteUrl());
         usersModel.set("verified_at", user.getVerifiedAt());
-       // usersModel.set("created_at", new java.util.Date());
 
-        return usersModel.saveIt();
+
+        return usersModel.insert();
     }
 
     public static boolean updateUser(String userId, User user) {
@@ -179,6 +183,12 @@ public class Main {
     }
 
 
+    public static List searchForUser(String userFullName){
+
+        return UsersModel.where("username like ?", "%?%", userFullName);
+
+    }
+
     private static User mapModelToUser(UsersModel model) {
         User user = new User();
 
@@ -202,22 +212,10 @@ public class Main {
 
         String gender = model.getString("username");
 
-//        if (gender != null) {
-//            switch (gender) {
-//                case "male":
-//                    user.setGender(Gender.MALE);
-//                    break;
-//                case "female":
-//                    user.setGender(Gender.FEMALE);
-//                    break;
-//                case "undefined":
-//                    user.setGender(Gender.UNDEFINED);
-//                    break;
-//                default:
-//                    user.setGender(null);
-//                    break;
-//            }
-//        }
+
+        if (gender != null) {
+            user.setGender(gender);
+        }
 
         return user;
     }

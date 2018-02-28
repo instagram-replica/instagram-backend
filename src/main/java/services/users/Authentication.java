@@ -9,10 +9,31 @@ import org.json.JSONObject;
 import org.json.JSONObject;
 import persistence.sql.users.*;
 
+import java.sql.Date;
+
 public class Authentication {
 
     public static JSONObject SignUp(JSONObject params, String userId){
-        //@stub
+        User newUser = new User();
+        newUser.setUsername(params.getString("username"));
+        newUser.setFullName(params.getString("fullname"));
+        newUser.setEmail(params.getString("email"));
+        newUser.setGender(params.getString("gender"));
+        newUser.setDateOfBirth((Date)params.get("dateOfBirth"));
+        newUser.setProfilePictureUrl(params.getString("avatar"));
+        newUser.setPhoneNumber(params.getString("phone"));
+        newUser.setPasswordHash(params.getString("passwordHash"));
+
+        boolean created = Main.createUser(newUser);
+
+           if(created) {
+               JSONObject session = new JSONObject();
+               session.put("sessionId", 20);
+               JSONObject res = new JSONObject();
+               res.put("response",session);
+
+               return res;
+           }
         return null;
     }
 
