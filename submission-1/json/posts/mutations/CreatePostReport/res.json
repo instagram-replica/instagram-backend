@@ -1,7 +1,0 @@
-{
-  "method": "createPostReport",
-  "response": {
-    "success": true,
-    "error": null
-  }
-}

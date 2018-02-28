@@ -19,6 +19,7 @@ public class JSONHandler extends SimpleChannelInboundHandler {
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Object o) throws Exception {
+
         openConnection();
         JSONObject input = Helpers.getJSONFromByteBuf(ctx, o);
 
