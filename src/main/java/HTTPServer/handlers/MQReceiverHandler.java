@@ -20,7 +20,7 @@ public class MQReceiverHandler extends SimpleChannelInboundHandler<MQHandlerPair
 
         final JSONObject[] resJSON = {new JSONObject()};
 
-        channel.queueDeclare(mqPair.queue.getResponseQueueName(), false, false, false, null);
+        channel.queueDeclare(mqPair.queue.getResponseQueueName(), true, false, false, null);
         Consumer consumer = new DefaultConsumer(channel) {
             @Override
             public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body)

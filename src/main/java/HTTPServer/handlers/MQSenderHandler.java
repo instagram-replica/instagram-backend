@@ -31,7 +31,7 @@ public class MQSenderHandler extends SimpleChannelInboundHandler<JSONObject> {
         String uuid = UUID.randomUUID().toString();
         jsonObject.put("uuid", uuid);
 
-        channel.queueDeclare(queue.getRequestQueueName(), false, false, false, null);
+        channel.queueDeclare(queue.getRequestQueueName(), true, false, false, null);
         channel.basicPublish("", queue.getRequestQueueName(), null, jsonObject.toString().getBytes("UTF-8"));
 
         ctx.fireChannelRead(new MQHandlerPair(uuid, queue));

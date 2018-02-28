@@ -30,7 +30,7 @@ public class Server {
             ExecutorService executor = Executors.newFixedThreadPool(numberOfThreads);
 
             //TODO: Research these boolean variables
-            channel.queueDeclare(queue.getRequestQueueName(), false, false, false, null);
+            channel.queueDeclare(queue.getRequestQueueName(), true, false, false, null);
             channel.basicQos(numberOfThreads);
 
             Consumer consumer = handleDelivery(channel, queue, executor, controller);
@@ -62,7 +62,7 @@ public class Server {
                         JSONObject resObj = controller.execute(jsonObject, "");
                         resObj.put("uuid", uuid);
 
-                        channel.queueDeclare(queue.getResponseQueueName(), false, false, false, null);
+                        channel.queueDeclare(queue.getResponseQueueName(), true, false, false, null);
 
                         channel.basicPublish("", queue.getResponseQueueName(), null, resObj.toString().getBytes("UTF-8"));
 
