@@ -95,16 +95,16 @@ public class Main {
                     "Cannot update user: Invalid user data"
             );
         }
-        UsersModel usersModel = new UsersModel();
-        usersModel.set("username", user.getUsername());
-        usersModel.set("name", user.getFullName());
-        usersModel.set("website", user.getWebsiteUrl());
-        usersModel.set("bio", user.getBio());
-        usersModel.set("phone", user.getPhoneNumber());
-        usersModel.set("gender", user.getGender());
-        usersModel.set("email", user.getEmail());
-        usersModel.set("updated_at", new java.util.Date());
-        return usersModel.saveIt();
+        UsersModel usersModel = UsersModel.findFirst("id = ?", userId);
+        boolean set1 = usersModel.set("username", user.getUsername()).saveIt();
+        boolean set2 = usersModel.set("full_name", user.getFullName()).saveIt();
+        boolean set3 = usersModel.set("website_url", user.getWebsiteUrl()).saveIt();
+        boolean set4 = usersModel.set("bio", user.getBio()).saveIt();
+        boolean set5 = usersModel.set("phone_number", user.getPhoneNumber()).saveIt();
+        boolean set6 = usersModel.set("gender", user.getGender()).saveIt();
+        boolean set7 = usersModel.set("email", user.getEmail()).saveIt();
+        boolean set8 = usersModel.set("updated_at", new java.util.Date()).saveIt();
+        return set1 && set2 && set3 && set4 && set5 && set6 && set7 && set8;
     }
 
     public static boolean deleteUser(String userId) {
@@ -113,9 +113,8 @@ public class Main {
                     "Cannot delete user: Invalid user ID"
             );
         }
-        UsersModel userModel = UsersModel.findById(userId);
-        userModel.set("deleted_at", new java.util.Date());
-        return userModel.saveIt();
+        UsersModel userModel = UsersModel.findFirst("id = ?", userId);
+        return userModel.delete();
     }
 
 //    public static boolean deactivateAccount(String userId) {
@@ -141,7 +140,7 @@ public class Main {
         newBlock.set("blocker_id", blockedId);
         newBlock.set("blocked_id",blockedId);
         newBlock.set("created_at", new java.util.Date());
-        return newBlock.saveIt();
+        return newBlock.insert();
     }
 
 
@@ -151,11 +150,11 @@ public class Main {
                     "Cannot report user: Invalid user ID"
             );
         }
-        UsersReportModel newReport = new UsersReportModel();
+        UsersReportModel newReport =  UsersReportModel.create();
         newReport.set("id", generateUUID());
         newReport.set("reporter_id", reporterId);
         newReport.set("reported_id", reportedId);
-        return newReport.saveIt();
+        return newReport.insert();
     }
 
     public static long getFollowingsCount(String userId){
@@ -175,12 +174,12 @@ public class Main {
     }
 
     public static boolean createFollow(String followerId, String followedId){
-        UsersFollowModel usersFollowModel = new UsersFollowModel();
+        UsersFollowModel usersFollowModel =  UsersFollowModel.create();
         usersFollowModel.set("follower_id", followerId);
         usersFollowModel.set("followed_id", followedId);
         usersFollowModel.set("id", generateUUID());
         usersFollowModel.set("created_at", new java.util.Date());
-        return usersFollowModel.saveIt();
+        return usersFollowModel.insert();
     }
 
     public static boolean deleteFollow(String followerId, String followedId){
