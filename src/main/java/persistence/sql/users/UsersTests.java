@@ -70,4 +70,31 @@ public class UsersTests {
         closeConnection();
     }
 
+    @Test
+    public void TestBlock() throws  IOException{
+        openConnection();
+
+        User user1 = getAllUsers().get(0);
+        User user2 = getAllUsers().get(1);
+        boolean blocked = blockUser(user1.getId(), user2.getId());
+        Assert.assertEquals(true, blocked);
+        Assert.assertEquals(true, blocks(user1.getId(), user2.getId()));
+        Assert.assertEquals(false, blocks(user2.getId(), user1.getId()));
+
+        closeConnection();
+    }
+
+    @Test
+    public void TestReport() throws  IOException{
+        openConnection();
+
+        User user1 = getAllUsers().get(1);
+        User user2 = getAllUsers().get(2);
+        boolean reported = reportUser(user1.getId(), user2.getId());
+        Assert.assertEquals(true, reported);
+        Assert.assertEquals(true, reports(user1.getId(), user2.getId()));
+        Assert.assertEquals(false, reports(user2.getId(), user1.getId()));
+
+        closeConnection();
+    }
 }
