@@ -90,7 +90,7 @@ public class Main {
                     "Cannot update user: Invalid user data"
             );
         }
-        UsersModel usersModel = new UsersModel();
+        UsersModel usersModel = UsersModel.findById(userId);
         usersModel.set("username", user.getUsername());
         usersModel.set("name", user.getFullName());
         usersModel.set("website", user.getWebsiteUrl());
@@ -109,8 +109,9 @@ public class Main {
             );
         }
         UsersModel userModel = UsersModel.findById(userId);
-        userModel.set("deleted_at", new java.util.Date());
-        return userModel.saveIt();
+        return userModel.delete();
+//        userModel.set("deleted_at", new java.util.Date());
+       // return userModel.saveIt();
     }
 
 //    public static boolean deactivateAccount(String userId) {
@@ -136,7 +137,7 @@ public class Main {
         newBlock.set("blocker_id", blockedId);
         newBlock.set("blocked_id",blockedId);
         newBlock.set("created_at", new java.util.Date());
-        return newBlock.saveIt();
+        return newBlock.insert();
     }
 
 
@@ -146,11 +147,11 @@ public class Main {
                     "Cannot report user: Invalid user ID"
             );
         }
-        UsersReportModel newReport = new UsersReportModel();
+        UsersReportModel newReport =  UsersReportModel.create();
         newReport.set("id", generateUUID());
         newReport.set("reporter_id", reporterId);
         newReport.set("reported_id", reportedId);
-        return newReport.saveIt();
+        return newReport.insert();
     }
 
     public static long getFollowingsCount(String userId){
@@ -170,12 +171,12 @@ public class Main {
     }
 
     public static boolean createFollow(String followerId, String followedId){
-        UsersFollowModel usersFollowModel = new UsersFollowModel();
+        UsersFollowModel usersFollowModel =  UsersFollowModel.create();
         usersFollowModel.set("follower_id", followerId);
         usersFollowModel.set("followed_id", followedId);
         usersFollowModel.set("id", generateUUID());
         usersFollowModel.set("created_at", new java.util.Date());
-        return usersFollowModel.saveIt();
+        return usersFollowModel.insert();
     }
 
     public static boolean deleteFollow(String followerId, String followedId){

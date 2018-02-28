@@ -9,6 +9,7 @@ import java.util.Date;
 import static persistence.sql.Main.closeConnection;
 import static persistence.sql.Main.openConnection;
 import static persistence.sql.users.Main.createUser;
+import static persistence.sql.users.Main.deleteUser;
 import static utilities.Main.generateUUID;
 
 public class UsersTests {
@@ -31,9 +32,11 @@ public class UsersTests {
         dummy.setFullName("Hamada ta7aroosh");
         dummy.setCreatedAt(new java.util.Date());
 
-        boolean created = createUser(dummy);
-        Assert.assertEquals(true, created);
+//        boolean created = createUser(dummy);
+//        Assert.assertEquals(true, created);
 
+        boolean deleted = deleteUser(dummy.getId());
+        Assert.assertEquals(true, deleted);
         closeConnection();
     }
 
