@@ -1,5 +1,6 @@
 package persistence.nosql;
 
+import com.arangodb.ArangoCursor;
 import com.arangodb.ArangoDB;
 import com.arangodb.ArangoDBException;
 import com.arangodb.entity.BaseDocument;
@@ -7,8 +8,6 @@ import com.arangodb.entity.CollectionEntity;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import java.sql.Timestamp;
-import java.util.ArrayList;
 
 
 public class ArangoInterfaceMethods {
@@ -367,6 +366,24 @@ public class ArangoInterfaceMethods {
         }
     }
 
+    public static JSONArray getStories(String user_id){
+
+        try {
+            String dbQuery = "For story in "+storiesCollectionName+" FILTER story.user_id == "+user_id+" RETURN story";
+            ArangoCursor<BaseDocument> cursor = arangoDB.db(dbName).query(dbQuery, null, null, BaseDocument.class);
+            JSONArray result = new JSONArray();
+            cursor.forEachRemaining(aDocument -> {
+                JSONObject postJSON  = new JSONObject(aDocument.getProperties());
+                result.put(reformatJSON(postJSON));
+            });
+            return result;
+        } catch (ArangoDBException e) {
+            System.err.println("Failed to execute query. " + e.getMessage());
+            return null;
+        }
+
+    }
+
 
     //POSTS CRUD
     public static String insertPost(JSONObject postJSON){
@@ -508,10 +525,8 @@ public class ArangoInterfaceMethods {
     //COMMENTS CRUD
     public static void insertCommentReply(String commentID, JSONObject commentReply){
 
-
         String dbQuery = "FOR post in Posts LET willUpdateDocument = ( FOR comment IN post.comments FILTER comment.id == '"+commentID+"' LIMIT 1 RETURN 1) FILTER LENGTH(willUpdateDocument) > 0 LET alteredList = ( FOR comment IN post.comments LET newItem = (comment.id == '"+commentID+"' ? merge(comment, { 'comments' : append(comment.comments,"+commentReply.toString()+")}) : comment) RETURN newItem) UPDATE post WITH { comments:  alteredList } IN Posts";
         arangoDB.db(dbName).query(dbQuery,null,null,null);
-        
     }
 
     public static void insertCommentOnPost(String postID, JSONObject comment){
