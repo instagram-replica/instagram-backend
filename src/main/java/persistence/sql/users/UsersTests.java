@@ -8,7 +8,9 @@ import java.util.Date;
 
 import static persistence.sql.Main.closeConnection;
 import static persistence.sql.Main.openConnection;
+
 import static persistence.sql.users.Main.*;
+
 import static utilities.Main.generateUUID;
 
 public class UsersTests {
@@ -44,12 +46,14 @@ public class UsersTests {
 
         User dummy = new User();
         dummy.setId(generateUUID());
+
         dummy.setUsername("hamada9");
         dummy.setPhoneNumber("010123456789");
         dummy.setPrivate(true);
         dummy.setGender("male");
         dummy.setDateOfBirth(new Date(311294));
         dummy.setPasswordHash("12!@#RF1wd1@#");
+
         dummy.setEmail("hamada9@gmail.com");
         dummy.setBio("7ob gamed");
         dummy.setFullName("Hamada ta7aroosh");
@@ -57,6 +61,7 @@ public class UsersTests {
 
         //create user
         boolean created = createUser(dummy);
+
         Assert.assertEquals(true, created);
 
         //update user and check for updated

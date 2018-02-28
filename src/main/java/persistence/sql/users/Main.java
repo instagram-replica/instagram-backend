@@ -47,6 +47,17 @@ public class Main {
         return mapModelToUser(result);
     }
 
+
+    public static List getUserByUsername(String username){
+
+        return UsersModel.findBySQL("SELECT user FROM users WHERE username=?",username);
+    }
+
+    public static List getUserByEmail(String email){
+
+        return UsersModel.findBySQL("SELECT user FROM users WHERE email=?",email);
+    }
+
     public static boolean createUser(User user) {
         if(!isValidUser(user)) {
             throw new RuntimeException(
@@ -235,24 +246,4 @@ public class Main {
         return user;
     }
 
-    public static void main(String[] args) throws IOException {
-        openConnection();
-
-        User dummy = new User();
-
-        dummy.setId(generateUUID());
-        dummy.setUsername("hamada");
-        dummy.setPhoneNumber("0100");
-        dummy.setPrivate(true);
-        dummy.setGender("male");
-        dummy.setDateOfBirth(new Date(311294));
-        dummy.setPasswordHash("12!@#RF1wd1@#");
-        dummy.setEmail("hamada@g.c");
-        dummy.setBio("7ob gamed");
-        dummy.setFullName("Hamada ta7aroosh");
-
-        createUser(dummy);
-
-        closeConnection();
-    }
 }
