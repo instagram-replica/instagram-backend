@@ -24,8 +24,7 @@ public class Controller extends shared.Controller {
             case "getComments" : return Team1.getCommentsOnPost(paramsObject,userId,methodName);
             case "createCommentReply": return Team1.createCommentReply(paramsObject,userId,methodName);
         }
-        System.out.println(methodName);
-        System.out.println(paramsObject.toString());
+
         JSONObject newJsonObj = new JSONObject();
         newJsonObj.put("application", "feed/posts");
         return newJsonObj;

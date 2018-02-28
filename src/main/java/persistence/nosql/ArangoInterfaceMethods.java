@@ -32,6 +32,7 @@ public class ArangoInterfaceMethods {
     public static void main(String[]args) {
 
         initializeDB();
+
         String id1  = utilities.Main.generateUUID();
         String id2 = utilities.Main.generateUUID();
         String userid1  = utilities.Main.generateUUID();
@@ -42,6 +43,7 @@ public class ArangoInterfaceMethods {
         obj.put("media", new ArrayList<String>());
         obj.put("likes", new ArrayList<String>());
         obj.put("tags",new ArrayList<String>());
+        obj.put("comments",new ArrayList<String>());
         obj.put("location","{ name: EspressoLab, coordinates:{long: 1.0.01.01, lat: 2.1.0.10} }");
         obj.put("created_at",new Timestamp(System.currentTimeMillis()));
         obj.put("updated_at",new Timestamp(System.currentTimeMillis()));
@@ -446,7 +448,7 @@ public class ArangoInterfaceMethods {
             myObject.addAttribute("deleted_at", postJSON.get("deleted_at").toString());
             String id = arangoDB.db(dbName).collection(postsCollectionName).insertDocument(postJSON.toString()).getKey();
             System.out.println("Post inserted");
-            return postId;
+            return id;
         } catch (ArangoDBException e) {
             System.err.println("Failed to insert Post. " + e.getMessage());
             return "";
@@ -454,7 +456,7 @@ public class ArangoInterfaceMethods {
             System.err.println("JSON Post Incorrect format. " + e.getMessage());
             return "";
         }
-        return null;
+//        return null;
     }
 
     public static JSONObject getPost(String id){

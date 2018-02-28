@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Team2 {
+    //Tested
     public static JSONObject getPost(JSONObject paramsObject, String loggedInUserId, String methodName){
         String postId = paramsObject.getString("postId");
         JSONObject post = ArangoInterfaceMethods.getPost(postId);
@@ -39,7 +40,7 @@ public class Team2 {
         response.put("method", methodName);
         post.put("id",postId );
         response.put("post", post);
-        response.put("error", "null");
+        response.put("error", "0");
         return response;
 
     }
@@ -49,7 +50,7 @@ public class Team2 {
         JSONObject response = new JSONObject();
         JSONObject res = new JSONObject();
         res.put("postId", postId);
-        res.put("error", "null");
+        res.put("error", "0");
         response.put("method", methodName);
         response.put("response", res);
         return response;
