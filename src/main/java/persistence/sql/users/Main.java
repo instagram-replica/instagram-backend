@@ -31,6 +31,15 @@ public class Main {
                 .collect(Collectors.toList());
     }
 
+    public static List<String> getAllUsersIds() {
+        List<Model> results =  Model.findBySQL("SELECT id FROM users");
+        return results
+                .stream()
+                .map(Main::mapModelToUser)
+                .map(User::getId)
+                .collect(Collectors.toList());
+    }
+
     public static User getUserById(String userId) {
         if(!isValidUserId(userId)) {
             throw new RuntimeException(
