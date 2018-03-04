@@ -32,6 +32,15 @@ public class Main {
                 .collect(Collectors.toList());
     }
 
+    public static List<String> getAllUsersIds() {
+        List<Model> results =  Model.findBySQL("SELECT id FROM users");
+        return results
+                .stream()
+                .map(Main::mapModelToUser)
+                .map(User::getId)
+                .collect(Collectors.toList());
+    }
+
     public static User getUserById(String userId) {
         if(!isValidUserId(userId)) {
             throw new RuntimeException(
@@ -145,6 +154,15 @@ public class Main {
         return newBlock.insert();
     }
 
+    public static boolean blocks(String blockerId, String blockedId){
+        if(!isValidUserId(blockerId) || !isValidUserId(blockedId)) {
+            throw new RuntimeException(
+                    "Cannot block user: Invalid user ID"
+            );
+        }
+        UsersBlockModel block = UsersBlockModel.findFirst("blocker_id = ? AND blocked_id = ?", blockerId, blockedId);
+        return block != null;
+    }
 
     public static boolean reportUser(String reporterId,String reportedId) {
         if(!isValidUserId(reporterId) || !isValidUserId(reportedId)) {
@@ -153,10 +171,22 @@ public class Main {
             );
         }
         UsersReportModel newReport =  UsersReportModel.create();
-        newReport.set("id", generateUUID());
+        long nextId = (long)UsersReportModel.findAll().get(UsersReportModel.findAll().size()-1).get("id")+1;
+
+        newReport.set("id", nextId);
         newReport.set("reporter_id", reporterId);
         newReport.set("reported_id", reportedId);
         return newReport.insert();
+    }
+
+    public static boolean reports(String reporterId, String reportedId){
+        if(!isValidUserId(reporterId) || !isValidUserId(reportedId)) {
+            throw new RuntimeException(
+                    "Cannot block user: Invalid user ID"
+            );
+        }
+        UsersReportModel report = UsersReportModel.findFirst("reporter_id = ? AND reported_id = ?", reporterId, reportedId);
+        return report != null;
     }
 
     public static long getFollowingsCount(String userId){
