@@ -1,6 +1,7 @@
 package persistence.sql.users;
 
 
+import org.javalite.activejdbc.Base;
 import org.json.JSONObject;
 
 import org.javalite.activejdbc.Model;
@@ -136,10 +137,11 @@ public class Main {
             );
         }
         UsersBlockModel newBlock = UsersBlockModel.create();
-        newBlock.set("id", generateUUID());
-        newBlock.set("blocker_id", blockedId);
+        long nextId = (long)UsersBlockModel.findAll().get(UsersBlockModel.findAll().size()-1).get("id")+1;
+
+        newBlock.set("id", nextId);
+        newBlock.set("blocker_id", blockerId);
         newBlock.set("blocked_id",blockedId);
-        newBlock.set("created_at", new java.util.Date());
         return newBlock.insert();
     }
 
@@ -187,10 +189,16 @@ public class Main {
     }
 
 
-    public static List searchForUser(String userFullName){
+    public static List searchForUser(String userFullName, String searcher){
 
-        return UsersModel.where("username like ?", "%?%", userFullName);
+        List allResults = UsersModel.findBySQL("SELECT* FROM users WHERE full_name LIKE '%' || ? || '%'", userFullName);
 
+
+        //TODO exclude blocked user from the searcher's/blocker search result
+        List blockedUsers = UsersBlockModel.findBySQL("SELECT* FROM users_blocks WHERE blocker_id = ?", searcher);
+        Base.findAll("SELECT* FROM users u FULL OUTTER JOIN users_blocks ub ON u.id = ub.blocked_id WHERE u.id IS NULL OR ub.blocked_id IS NULL AND ub.blocker_id = ?", searcher);
+
+        return allResults;
     }
 
     private static User mapModelToUser(UsersModel model) {
