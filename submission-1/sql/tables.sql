@@ -8,7 +8,7 @@ CREATE TABLE users (
   password_hash VARCHAR NOT NULL,
   is_private BOOLEAN NOT NULL,
   full_name VARCHAR NOT NULL,
-  gender GENDER,
+  gender VARCHAR,
   bio VARCHAR,
   phone_number VARCHAR,
   profile_picture_url VARCHAR,
