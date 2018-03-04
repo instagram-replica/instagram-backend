@@ -354,7 +354,7 @@ public class ArangoInterfaceMethods {
         }
     }
 
-    public static void updateStory(String id,JSONObject storyJSON){
+    public static boolean updateStory(String id,JSONObject storyJSON){
         try {
             BaseDocument myObject = new BaseDocument();
             myObject.addAttribute("user_id", storyJSON.get("user_id").toString());
@@ -368,19 +368,24 @@ public class ArangoInterfaceMethods {
             myObject.addAttribute("blocked_at", storyJSON.get("blocked_at").toString());
             arangoDB.db(dbName).collection(storiesCollectionName).updateDocument(id, storyJSON.toString());
             System.out.println("Story Updated");
+            return true;
         } catch (ArangoDBException e) {
             System.err.println("Failed to Update Story. " + e.getMessage());
+            return false;
         } catch (JSONException e){
             System.err.println("JSON Story Incorrect format. " + e.getMessage());
+            return false;
         }
     }
 
-    public static void deleteStory(String id){
+    public static boolean deleteStory(String id){
         try {
             arangoDB.db(dbName).collection(storiesCollectionName).deleteDocument(id);
             System.out.println("Story Deleted: "+id);
+            return true;
         } catch (ArangoDBException e){
             System.err.println("Story ID does not exist:  "+id+",  "+e.getMessage());
+            return false;
         }
     }
 

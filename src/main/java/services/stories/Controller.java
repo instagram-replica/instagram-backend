@@ -1,10 +1,7 @@
 package services.stories;
 
-import com.arangodb.ArangoDBException;
-import com.arangodb.entity.BaseDocument;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
+import persistence.nosql.ArangoInterfaceMethods;
 
 public class Controller extends shared.Controller {
 
@@ -18,15 +15,14 @@ public class Controller extends shared.Controller {
         JSONObject newJsonObj = new JSONObject();
 
         String methodName = jsonObject.getString("method");
-//        JSONObject paramsObject = jsonObject.getJSONObject("params");
-
-//        System.out.println(methodName);
+        JSONObject paramsObject = jsonObject.getJSONObject("params");
 
         switch(methodName){
-            case "createStory":createStory();break;
-            case "deleteStory":deleteStory();break;
-//            case "getMyStory":getMyStory(userId);break;
+            case "createStory":createStory(paramsObject);break;
+            case "deleteStory":deleteStory(paramsObject);break;
+            case "getMyStory":getMyStories(userId);break;
             case "getMyStories":getStories();break;
+            case "getStory" :getStory(paramsObject);break;
             case "getDiscoverStories":getDiscoverStories();break;
         }
 
@@ -35,55 +31,51 @@ public class Controller extends shared.Controller {
     }
 
 
-    public static void createStory(){
-        BaseDocument myObject = new BaseDocument();
-        myObject.setKey("myKey");
-        myObject.addAttribute("a", "Foo");
-        myObject.addAttribute("b", 42);
-        try {
-//            arangoDB.db(dbName).collection(collectionName).insertDocument(myObject);
-        } catch (ArangoDBException e) {
-            System.err.println("Failed to create document. " + e.getMessage());
+    public static void createStory(JSONObject paramsObject){
+        JSONObject createStory = new JSONObject();
+        if(!ArangoInterfaceMethods.insertStory(paramsObject).equals(null)){
+            createStory.put("success","true");
+            createStory.put("error","0");
+
+        }else{
+            createStory.put("success","false");
+            createStory.put("error","Story not created");
         }
     }
 
-    public static void deleteStory(){
-        try {
-//            arangoDB.db(dbName).collection(collectionName).deleteDocument(idUser);
-        } catch (ArangoDBException e) {
-            System.err.println("Failed to delete document. " + e.getMessage());
+
+    public static JSONObject deleteStory(JSONObject paramsObject){
+
+        JSONObject delteStory = new JSONObject();
+        if(ArangoInterfaceMethods.deleteStory(paramsObject.getString("id"))){
+            delteStory.put("success","true");
+            delteStory.put("error", "0");
+        }else{
+            delteStory.put("success","false");
+            delteStory.put("error", "Story not deleted");
         }
+        return delteStory;
     }
 
-    public static void getMyStory(int userId){
-        try {
-//            BaseDocument myStory = arangoDB.db(dbName).collection(collectionName).getDocument(userId,
-//                    BaseDocument.class);
-        } catch (ArangoDBException e) {
-            System.err.println("Failed to get document: myKey; " + e.getMessage());
-        }
+    public static JSONObject getStory(JSONObject paramsObject){
+        JSONObject story = new JSONObject();
+        story.put("error","0");
+        story.put("response",ArangoInterfaceMethods.getStory(paramsObject.getString("id")));
+        return story;
+    }
+    public static JSONObject getMyStories(String userId){
+        JSONObject myStory = new JSONObject();
+        myStory.put("error","0");
+        myStory.put("response",ArangoInterfaceMethods.getStories(userId));
+        return myStory;
     }
 
     public static void getStories(){
-       // ArrayList <int> friendsIds = get followers
-       // for(int i=0;i<friendsIds;i++)
-        try {
-//            BaseDocument myDocument = arangoDB.db(dbName).collection(collectionName).getDocument(friendsIds[i],
-//                    BaseDocument.class);
-        } catch (ArangoDBException e) {
-            System.err.println("Failed to get document: myKey; " + e.getMessage());
-        }
+
     }
 
     public static void getDiscoverStories(){
-        // ArrayList <int> locationBasedPeople = get people that are near the one requesting
-        // for(int i=0;i<locationBasedPeople;i++)
-        try {
-//            BaseDocument myDocument = arangoDB.db(dbName).collection(collectionName).getDocument(locationBasedPeople[i],
-//                    BaseDocument.class);
-        } catch (ArangoDBException e) {
-            System.err.println("Failed to get document: myKey; " + e.getMessage());
-        }
+
     }
 
 }
