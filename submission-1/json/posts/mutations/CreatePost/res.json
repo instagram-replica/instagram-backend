@@ -1,0 +1,7 @@
+{
+  "method": "createPost",
+  "response":{
+    "postId":1123,
+    "error":null
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "method": "updatePost",
+  "posts": {
+    "postId": 12,
+    "caption": "Ya alby",
+    "tags": [
+      {
+        "taggedUsers": [
+          {
+            "username": "AhmedMagdy",
+            "location": {
+              "x": 20,
+              "y": 10
+            }
+          },
+          {
+            "username": "Sawahel",
+            "location": {
+              "x": 20,
+              "y": 10
+            }
+          },
+          {
+            "username": "Messiry",
+            "location": {
+              "x": 20,
+              "y": 10
+            }
+          }
+        ]
+      }
+    ],
+    "location": {
+      "longitiude": "122.3.12.33",
+      "latitude": "122.3.12.33"
+    }
+  },
+  "error": null
+}

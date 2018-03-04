@@ -1,0 +1,17 @@
+{
+	"method" : "createThread",
+	"params" : {
+		"threadUsers": [
+			{
+				"id": 132
+			},
+			{
+				"id": 12314
+			},
+			{
+				"id": 4754
+			}
+		],
+		"threadName" : "A7la Group Da Walla Eh"
+	}
+}

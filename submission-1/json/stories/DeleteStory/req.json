@@ -1,0 +1,6 @@
+{
+    "method":"deleteStory",
+    "params":{
+        "storyId":12
+    }
+}

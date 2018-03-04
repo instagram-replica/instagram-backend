@@ -1,0 +1,6 @@
+{
+    "method":"getHashtagPosts",
+    "params":{
+        "name":"pancakes"
+    }
+}

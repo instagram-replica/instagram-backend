@@ -1,0 +1,6 @@
+{
+    "method":"getCommentsReplies",
+    "params":{
+        "commentId":12
+    }
+}

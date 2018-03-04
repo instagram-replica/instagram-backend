@@ -1,0 +1,6 @@
+{
+  "method": "getPost",
+  "params": {
+    "postId": 12
+  }
+}

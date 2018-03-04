@@ -1,0 +1,22 @@
+{
+  "method": "createStory",
+  "post": [
+    {
+      "media": [
+        {
+          "id": 123,
+          "type": "img",
+          "blob": "..."
+        },
+        {
+          "id": 111,
+          "type": "video",
+          "blob": "..."
+        }
+      ],
+      "createAt": "2012-04-23T18:25:43.511Z",
+      "expiredAt": "2012-04-23T18:25:43.511Z",
+      "deletedAt": "2012-04-23T18:25:43.511Z"
+    }
+  ]
+}

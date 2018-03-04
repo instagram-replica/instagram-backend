@@ -1,0 +1,7 @@
+{
+  "method": "createFollow",
+  "response": {
+    "success": true,
+    "error": null
+  }
+}

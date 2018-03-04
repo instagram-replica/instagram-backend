@@ -1,0 +1,10 @@
+{
+  "method": "getDiscoverFeed",
+  "posts": [
+    {
+      "id":12,
+      "thumbnail":"https:///..."
+    }
+  ]
+
+}

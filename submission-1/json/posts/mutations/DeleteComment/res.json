@@ -1,0 +1,7 @@
+{
+  "method": "deleteComment",
+  "comment": {
+    "id": 1
+  },
+  "error":null
+}

@@ -1,0 +1,7 @@
+{
+    "method": "createBlockUser",
+    "params" : 
+    {
+    	"userId": 3312
+    }
+}
