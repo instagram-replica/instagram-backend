@@ -1,7 +1,7 @@
 {
 	"method" : "signUp",
 	"params": {
-		"username" : "sawahel",
+		"userName" : "sawahel",
 		"fullName" : "Ahmed Sawahel",
 		"passwordHash" : "!@#!@$C!",
 		"email" : "sawahel@magdy.com",
