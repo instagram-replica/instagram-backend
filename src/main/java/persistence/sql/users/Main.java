@@ -33,7 +33,7 @@ public class Main {
     }
 
     public static List<String> getAllUsersIds() {
-        List<Model> results =  Model.findBySQL("SELECT id FROM users");
+        List<UsersModel> results =  Model.findBySQL("SELECT id FROM users");
         return results
                 .stream()
                 .map(Main::mapModelToUser)
