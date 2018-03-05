@@ -14,7 +14,6 @@ import java.util.concurrent.Executors;
 
 @ChannelHandler.Sharable
 public class HTTPHandler extends SimpleChannelInboundHandler<Object> {
-    ExecutorService executorService = Executors.newCachedThreadPool();
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Object msg)

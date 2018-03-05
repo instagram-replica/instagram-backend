@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static shared.Helpers.createJSONError;
+
 public class Comments {
 
     //Tested
@@ -22,20 +24,24 @@ public class Comments {
         JSONObject commentJSON = createCommentJSON(comment, 0, loggedInUserId, postId);
 
 
-        ArangoInterfaceMethods.insertCommentOnPost(postId, commentJSON);
-        JSONObject jsonValue = new JSONObject();
-        JSONObject response = new JSONObject();
-        JSONObject data = new JSONObject();
-        JSONObject newComment = new JSONObject();
-        newComment.put("postId", postId);
-        newComment.put("text", comment);
-        newComment.put("id", commentJSON.get("id"));
-        data.put("newComment", newComment);
-        response.put("data", data);
-        response.put("error", "0");
-        jsonValue.put("method", methodName);
-        jsonValue.put("response", response);
-        return jsonValue;
+        try {
+            ArangoInterfaceMethods.insertCommentOnPost(postId, commentJSON);
+            JSONObject jsonValue = new JSONObject();
+            JSONObject response = new JSONObject();
+            JSONObject data = new JSONObject();
+            JSONObject newComment = new JSONObject();
+            newComment.put("postId", postId);
+            newComment.put("text", comment);
+            newComment.put("id", commentJSON.get("id"));
+            data.put("newComment", newComment);
+            response.put("data", data);
+            response.put("error", "0");
+            jsonValue.put("method", methodName);
+            jsonValue.put("response", response);
+            return jsonValue;
+        } catch (Exception e) {
+            return createJSONError(e.getMessage());
+        }
     }
 
     //tested

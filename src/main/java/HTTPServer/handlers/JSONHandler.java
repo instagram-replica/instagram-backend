@@ -7,6 +7,8 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.util.CharsetUtil;
 import org.json.JSONObject;
 
+import static shared.Helpers.sendJSON;
+
 @ChannelHandler.Sharable
 public class JSONHandler extends SimpleChannelInboundHandler<Object> {
 
@@ -14,9 +16,14 @@ public class JSONHandler extends SimpleChannelInboundHandler<Object> {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Object o) throws Exception {
         ByteBuf buffer = (ByteBuf) o;
-        //TODO: if the json is malformed the server breaks, FIX IT!!!
-        JSONObject jsonObject = new JSONObject(buffer.toString(CharsetUtil.UTF_8));
-        ctx.fireChannelRead(jsonObject);
+        //TODO: @MAGDY long json gets cut off
+        try {
+            JSONObject jsonObject = new JSONObject(buffer.toString(CharsetUtil.UTF_8));
+            ctx.fireChannelRead(jsonObject);
+
+        } catch (Exception e) {
+            sendJSON(ctx, new JSONObject().put("error", "Malformed JSON"));
+        }
     }
 
 
