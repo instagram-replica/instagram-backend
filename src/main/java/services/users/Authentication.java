@@ -1,4 +1,5 @@
 package services.users;
+
 import persistence.sql.users.Main;
 import persistence.sql.users.User;
 import netscape.javascript.JSObject;
@@ -11,81 +12,94 @@ import persistence.sql.users.*;
 
 import java.sql.Date;
 
+import static shared.Helpers.createJSONError;
+
 public class Authentication {
 
-    public static JSONObject SignUp(JSONObject params, String userId){
+    public static JSONObject SignUp(JSONObject params) {
         User newUser = new User();
         newUser.setUsername(params.getString("username"));
         newUser.setFullName(params.getString("fullname"));
         newUser.setEmail(params.getString("email"));
         newUser.setGender(params.getString("gender"));
-        newUser.setDateOfBirth((Date)params.get("dateOfBirth"));
-        newUser.setProfilePictureUrl(params.getString("avatar"));
+        //TODO: Add dateOfBirth to users' table
+//        newUser.setDateOfBirth((Date)params.get("dateOfBirth"));
+        //TODO: @Maged send avatar param from the media server handler
+//        newUser.setProfilePictureUrl(params.getString("avatar"));
         newUser.setPhoneNumber(params.getString("phone"));
         newUser.setPasswordHash(params.getString("passwordHash"));
-
-        boolean created = Main.createUser(newUser);
-
-           if(created) {
-               JSONObject session = new JSONObject();
-               session.put("sessionId", 20);
-               JSONObject res = new JSONObject();
-               res.put("response",session);
-
-               return res;
-           }
-        return null;
-    }
-
-    public static JSONObject SignIn(JSONObject params, String userId){
-        User user = Main.getUserById(params.getString("username"));
-        if(user.getPasswordHash().equals(params.getString("password"))){
+        try {
+            Main.createUser(newUser);
             JSONObject session = new JSONObject();
-            session.put("sessionId", 12);
-            JSONObject response = new JSONObject();
-            response.put("response", session);
-            return response;
+            session.put("sessionId", 20);
+            JSONObject res = new JSONObject();
+            res.put("response", session);
+            return res;
+        } catch (Exception e) {
+            return createJSONError(e.getMessage());
         }
-        else return new JSONObject().put("error", "null");
     }
 
-    public static JSONObject GetUserInfo(JSONObject jsonObject, String userID){
+    public static JSONObject SignIn(JSONObject params, String userId) {
+        User user = null;
+        try {
+            user = Main.getUserById(params.getString("username"));
+            if (user.getPasswordHash().equals(params.getString("password"))) {
+                JSONObject session = new JSONObject();
+                session.put("sessionId", 12);
+                JSONObject response = new JSONObject();
+                response.put("response", session);
+                return response;
+            } else return new JSONObject().put("error", "Password doesn't match");
+        } catch (Exception e) {
+            return createJSONError(e.getMessage());
+        }
+    }
+
+    public static JSONObject GetUserInfo(JSONObject jsonObject, String userID) {
+        //TODO: If the user is private and userId is not following requested user return meaningful json with private user as message
         JSONObject userData = new JSONObject();
-        User requestedUser = Main.getUserById(jsonObject.getString("userId"));
-        JSONObject userProfile = new JSONObject();
+        User requestedUser = null;
+        try {
+            requestedUser = Main.getUserById(jsonObject.getString("userId"));
+            JSONObject userProfile = new JSONObject();
 
-        userProfile.put("userId",userID);
-        userProfile.put("username",requestedUser.getUsername());
-        userProfile.put("name",requestedUser.getFullName());
-        userProfile.put("avatar",requestedUser.getProfilePictureUrl());
-        userProfile.put("bio",requestedUser.getBio());
-        userProfile.put("website",requestedUser.getWebsiteUrl());
-        userProfile.put("noOfPosts",100);
-        userProfile.put("noOfFollowers",100);
-        userProfile.put("noOfFollowing",100);
+            userProfile.put("userId", requestedUser.getId());
+            userProfile.put("username", requestedUser.getUsername());
+            userProfile.put("name", requestedUser.getFullName());
+            userProfile.put("avatar", requestedUser.getProfilePictureUrl());
+            userProfile.put("bio", requestedUser.getBio());
+            userProfile.put("website", requestedUser.getWebsiteUrl());
+            // TODO: Connect with the nosql
+            userProfile.put("noOfPosts", 100);
+            userProfile.put("noOfFollowers", 100);
+            userProfile.put("noOfFollowing", 100);
 
-        if(requestedUser.isPrivate())
-            userProfile.put("privacy","public");
-        else
-            userProfile.put("privacy","private");
+            if (requestedUser.isPrivate())
+                userProfile.put("privacy", "private");
+            else
+                userProfile.put("privacy", "public");
 
 
-        if(userID.equals(jsonObject.get("userId"))) {
+            if (userID.equals(jsonObject.get("userId"))) {
 
-            userProfile.put("following",true);
-            userProfile.put("followers",true);
+                userProfile.put("following", true);
+                userProfile.put("followers", true);
 
-        } else {
+            } else {
 
-            //TODO  set the following and followers flag based on the following/followers
-            // lists of the requested user
+                //TODO set the following and followers flag based on the following/followers
+                // lists of the requested user
 
+            }
+
+            userData.put("method", "getUserInfo");
+            userData.put("profile", userProfile);
+            userData.put("error", "null");
+        } catch (Exception e) {
+            return createJSONError(e.getMessage());
         }
 
-        userData.put("method","getUserInfo");
-        userData.put("profile",userProfile);
-        userData.put("error", "null");
-
-           return userData;
+        return userData;
     }
 }

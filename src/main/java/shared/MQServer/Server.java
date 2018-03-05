@@ -7,6 +7,8 @@ import shared.Controller;
 import java.io.IOException;
 import java.util.concurrent.*;
 
+import static persistence.sql.Main.openConnection;
+
 public class Server {
     Queue queue;
 

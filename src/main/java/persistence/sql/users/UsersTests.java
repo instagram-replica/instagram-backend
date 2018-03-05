@@ -61,19 +61,13 @@ public class UsersTests {
         dummy3.setCreatedAt(new java.util.Date());
 
 
-
-
-//        Assert.assertEquals(true,createUser(dummy));
-//        Assert.assertEquals(true,createUser(dummy2));
-//        Assert.assertEquals(true,createUser(dummy3));
-
-      // List l = getUserByUsername("AhmedAsh");
-//       List l = searchForUser("soha","");
-    //   System.out.println(l);
-        Assert.assertEquals(true,blockUser(dummy.getId(),dummy2.getId()));
-
-       //Assert.assertNotNull(searchForUser("soha"));
-      //  Assert.assertEquals(true, created);
+        try {
+            Assert.assertEquals(true,createUser(dummy));
+            Assert.assertEquals(true,createUser(dummy2));
+            Assert.assertEquals(true,createUser(dummy3));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
 //        boolean deleted = deleteUser(dummy.getId());
 //        Assert.assertEquals(true, deleted);
@@ -119,7 +113,7 @@ public class UsersTests {
 //    }
 
     @Test
-    public void TestBlock() throws  IOException{
+    public void TestBlock() throws Exception {
         openConnection();
 
         User user1 = getAllUsers().get(0);
@@ -133,7 +127,7 @@ public class UsersTests {
     }
 
     @Test
-    public void TestReport() throws  IOException{
+    public void TestReport() throws Exception {
         openConnection();
 
         User user1 = getAllUsers().get(1);

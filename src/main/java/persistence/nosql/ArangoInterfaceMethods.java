@@ -47,24 +47,24 @@ public class ArangoInterfaceMethods {
     public static void main(String[]args) throws IOException {
         initializeDB();
         initializeGraphCollections();
-//         String id1  = utilities.Main.generateUUID();
-//         String id2 = utilities.Main.generateUUID();
-//         String userid1  = utilities.Main.generateUUID();
-//         JSONObject obj = new JSONObject();
-//         obj.put("id", id1);
-//         obj.put("user_id",userid1);
-//         obj.put("caption","Taken By Heba EL Gen");
-//         obj.put("media", new ArrayList<String>());
-//         obj.put("likes", new ArrayList<String>());
-//         obj.put("tags",new ArrayList<String>());
-//         obj.put("comments",new ArrayList<String>());
-//         obj.put("location","{ name: EspressoLab, coordinates:{long: 1.0.01.01, lat: 2.1.0.10} }");
-//         obj.put("created_at",new Timestamp(System.currentTimeMillis()));
-//         obj.put("updated_at",new Timestamp(System.currentTimeMillis()));
-//         obj.put("blocked_at",new Timestamp(System.currentTimeMillis()));
-//         obj.put("deleted_at",new Timestamp(System.currentTimeMillis()));
-//         ArangoInterfaceMethods.insertPost(obj);
-
+         String id1  = utilities.Main.generateUUID();
+         String id2 = utilities.Main.generateUUID();
+         String userid1  = utilities.Main.generateUUID();
+         JSONObject obj = new JSONObject();
+         obj.put("id", id1);
+         obj.put("user_id",userid1);
+         obj.put("caption","Taken By Heba EL Gen");
+         obj.put("media", new ArrayList<String>());
+         obj.put("likes", new ArrayList<String>());
+         obj.put("tags",new ArrayList<String>());
+         obj.put("comments",new ArrayList<String>());
+         obj.put("location","{ name: EspressoLab, coordinates:{long: 1.0.01.01, lat: 2.1.0.10} }");
+         obj.put("created_at",new Timestamp(System.currentTimeMillis()));
+         obj.put("updated_at",new Timestamp(System.currentTimeMillis()));
+         obj.put("blocked_at",new Timestamp(System.currentTimeMillis()));
+         obj.put("deleted_at",new Timestamp(System.currentTimeMillis()));
+         ArangoInterfaceMethods.insertPost(obj);
+        System.out.println(userid1);
 
 //         JSONObject obj2 = new JSONObject();
 //         obj.put("id", id2);

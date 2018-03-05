@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Team1 {
+public class Comments {
 
     //Tested
     public static JSONObject createComment(JSONObject paramsObject, String loggedInUserId, String methodName) {

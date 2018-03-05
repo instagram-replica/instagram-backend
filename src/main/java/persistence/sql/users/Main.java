@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import org.postgresql.core.types.*;
 
 import static persistence.sql.Main.closeConnection;
@@ -33,7 +34,7 @@ public class Main {
     }
 
     public static List<String> getAllUsersIds() {
-        List<UsersModel> results =  Model.findBySQL("SELECT id FROM users");
+        List<UsersModel> results = Model.findBySQL("SELECT id FROM users");
         return results
                 .stream()
                 .map(Main::mapModelToUser)
@@ -41,16 +42,16 @@ public class Main {
                 .collect(Collectors.toList());
     }
 
-    public static User getUserById(String userId) {
-        if(!isValidUserId(userId)) {
-            throw new RuntimeException(
+    public static User getUserById(String userId) throws Exception {
+        if (!isValidUserId(userId)) {
+            throw new Exception(
                     "Cannot fetch user: Invalid user ID"
             );
         }
 
         UsersModel result = UsersModel.findById(userId);
 
-        if(result == null) {
+        if (result == null) {
             return null;
         }
 
@@ -58,78 +59,73 @@ public class Main {
     }
 
 
-    public static List getUserByUsername(String username){
+    public static List getUserByUsername(String username) {
 
-        return UsersModel.findBySQL("SELECT user FROM users WHERE username=?",username);
+        return UsersModel.findBySQL("SELECT user FROM users WHERE username=?", username);
     }
 
-    public static List getUserByEmail(String email){
+    public static List getUserByEmail(String email) {
 
-        return UsersModel.findBySQL("SELECT user FROM users WHERE email=?",email);
+        return UsersModel.findBySQL("SELECT user FROM users WHERE email=?", email);
     }
 
-    public static boolean createUser(User user) {
-        if(!isValidUser(user)) {
-            throw new RuntimeException(
-                    "Cannot create user: Invalid user data"
-            );
+    public static boolean createUser(User user) throws Exception {
+        if (isValidUser(user)) {
+            UsersModel usersModel = new UsersModel();
+            usersModel.set("id", generateUUID());
+            usersModel.set("username", user.getUsername());
+            usersModel.set("email", user.getEmail());
+            usersModel.set("password_hash", user.getPasswordHash());
+            usersModel.set("is_private", user.isPrivate());
+            usersModel.set("full_name", user.getFullName());
+            usersModel.set("gender", user.getGender());
+            usersModel.set("bio", user.getBio());
+            usersModel.set("phone_number", user.getPhoneNumber());
+            usersModel.set("profile_picture_url", user.getProfilePictureUrl());
+            usersModel.set("website_url", user.getWebsiteUrl());
+            usersModel.set("verified_at", user.getVerifiedAt());
+            return usersModel.insert();
+
         }
-
-        UsersModel usersModel = new UsersModel();
-        usersModel.set("id", user.getId());
-        usersModel.set("username", user.getUsername());
-        usersModel.set("email", user.getEmail());
-        usersModel.set("password_hash", user.getPasswordHash());
-        usersModel.set("is_private", user.isPrivate());
-        usersModel.set("full_name", user.getFullName());
-        usersModel.set("gender", user.getGender());
-        usersModel.set("bio", user.getBio());
-        usersModel.set("phone_number", user.getPhoneNumber());
-        usersModel.set("profile_picture_url", user.getProfilePictureUrl());
-        usersModel.set("website_url", user.getWebsiteUrl());
-        usersModel.set("verified_at", user.getVerifiedAt());
-
-
-        return usersModel.insert();
+        return false;
     }
 
-    public static boolean updateUser(String userId, User user) {
-        if(!isValidUserId(userId)) {
-            throw new RuntimeException(
+    public static boolean updateUser(String userId, User user) throws Exception {
+        if (!isValidUserId(userId)) {
+            throw new Exception(
                     "Cannot update user: Invalid user ID"
             );
         }
 
-        if(!isValidUser(user)) {
-            throw new RuntimeException(
-                    "Cannot update user: Invalid user data"
-            );
+        if (isValidUser(user)) {
+            UsersModel usersModel = UsersModel.findFirst("id = ?", userId);
+            boolean set1 = usersModel.set("username", user.getUsername()).saveIt();
+            boolean set2 = usersModel.set("full_name", user.getFullName()).saveIt();
+            boolean set3 = usersModel.set("website_url", user.getWebsiteUrl()).saveIt();
+            boolean set4 = usersModel.set("bio", user.getBio()).saveIt();
+            boolean set5 = usersModel.set("phone_number", user.getPhoneNumber()).saveIt();
+            boolean set6 = usersModel.set("gender", user.getGender()).saveIt();
+            boolean set7 = usersModel.set("email", user.getEmail()).saveIt();
+            boolean set8 = usersModel.set("updated_at", new java.util.Date()).saveIt();
+            return set1 && set2 && set3 && set4 && set5 && set6 && set7 && set8;
         }
-        UsersModel usersModel = UsersModel.findFirst("id = ?", userId);
-        boolean set1 = usersModel.set("username", user.getUsername()).saveIt();
-        boolean set2 = usersModel.set("full_name", user.getFullName()).saveIt();
-        boolean set3 = usersModel.set("website_url", user.getWebsiteUrl()).saveIt();
-        boolean set4 = usersModel.set("bio", user.getBio()).saveIt();
-        boolean set5 = usersModel.set("phone_number", user.getPhoneNumber()).saveIt();
-        boolean set6 = usersModel.set("gender", user.getGender()).saveIt();
-        boolean set7 = usersModel.set("email", user.getEmail()).saveIt();
-        boolean set8 = usersModel.set("updated_at", new java.util.Date()).saveIt();
-        return set1 && set2 && set3 && set4 && set5 && set6 && set7 && set8;
+        return false;
     }
 
-    public static boolean deleteUser(String userId) {
-        if(!isValidUserId(userId)) {
-            throw new RuntimeException(
+    public static boolean deleteUser(String userId) throws Exception {
+        if (!isValidUserId(userId)) {
+            throw new Exception(
                     "Cannot delete user: Invalid user ID"
             );
         }
         UsersModel userModel = UsersModel.findFirst("id = ?", userId);
+        if(userModel == null) throw new Exception("User was not found");
         return userModel.delete();
     }
 
 //    public static boolean deactivateAccount(String userId) {
 //        if(!isValidUserId(userId)) {
-//            throw new RuntimeException(
+//            throw new Exception(
 //                    "Cannot deactivate account: Invalid user ID"
 //            );
 //        }
@@ -139,24 +135,24 @@ public class Main {
 //        return true;
 //    }
 
-    public static boolean blockUser(String blockerId,String blockedId) {
-        if(!isValidUserId(blockerId) || !isValidUserId(blockedId)) {
-            throw new RuntimeException(
+    public static boolean blockUser(String blockerId, String blockedId) throws Exception {
+        if (!isValidUserId(blockerId) || !isValidUserId(blockedId)) {
+            throw new Exception(
                     "Cannot block user: Invalid user ID"
             );
         }
         UsersBlockModel newBlock = UsersBlockModel.create();
-        long nextId = (long)UsersBlockModel.findAll().get(UsersBlockModel.findAll().size()-1).get("id")+1;
+        long nextId = (long) UsersBlockModel.findAll().get(UsersBlockModel.findAll().size() - 1).get("id") + 1;
 
         newBlock.set("id", nextId);
         newBlock.set("blocker_id", blockerId);
-        newBlock.set("blocked_id",blockedId);
+        newBlock.set("blocked_id", blockedId);
         return newBlock.insert();
     }
 
-    public static boolean blocks(String blockerId, String blockedId){
-        if(!isValidUserId(blockerId) || !isValidUserId(blockedId)) {
-            throw new RuntimeException(
+    public static boolean blocks(String blockerId, String blockedId) throws Exception {
+        if (!isValidUserId(blockerId) || !isValidUserId(blockedId)) {
+            throw new Exception(
                     "Cannot block user: Invalid user ID"
             );
         }
@@ -164,14 +160,14 @@ public class Main {
         return block != null;
     }
 
-    public static boolean reportUser(String reporterId,String reportedId) {
-        if(!isValidUserId(reporterId) || !isValidUserId(reportedId)) {
-            throw new RuntimeException(
+    public static boolean reportUser(String reporterId, String reportedId) throws Exception {
+        if (!isValidUserId(reporterId) || !isValidUserId(reportedId)) {
+            throw new Exception(
                     "Cannot report user: Invalid user ID"
             );
         }
-        UsersReportModel newReport =  UsersReportModel.create();
-        long nextId = (long)UsersReportModel.findAll().get(UsersReportModel.findAll().size()-1).get("id")+1;
+        UsersReportModel newReport = UsersReportModel.create();
+        long nextId = (long) UsersReportModel.findAll().get(UsersReportModel.findAll().size() - 1).get("id") + 1;
 
         newReport.set("id", nextId);
         newReport.set("reporter_id", reporterId);
@@ -179,9 +175,9 @@ public class Main {
         return newReport.insert();
     }
 
-    public static boolean reports(String reporterId, String reportedId){
-        if(!isValidUserId(reporterId) || !isValidUserId(reportedId)) {
-            throw new RuntimeException(
+    public static boolean reports(String reporterId, String reportedId) throws Exception {
+        if (!isValidUserId(reporterId) || !isValidUserId(reportedId)) {
+            throw new Exception(
                     "Cannot block user: Invalid user ID"
             );
         }
@@ -189,24 +185,24 @@ public class Main {
         return report != null;
     }
 
-    public static long getFollowingsCount(String userId){
-        return UsersFollowModel.count("follower_id = ?",userId);
+    public static long getFollowingsCount(String userId) {
+        return UsersFollowModel.count("follower_id = ?", userId);
     }
 
-    public static long getFollowersCount(String userId){
-        return UsersFollowModel.count("followed_id = ?",userId);
+    public static long getFollowersCount(String userId) {
+        return UsersFollowModel.count("followed_id = ?", userId);
     }
 
-    public static List getFollowers(String userId){
-       return UsersFollowModel.find("followed_id", userId).collect("follower_id");
+    public static List getFollowers(String userId) {
+        return UsersFollowModel.find("followed_id", userId).collect("follower_id");
     }
 
-    public static List getFollowings(String userId){
+    public static List getFollowings(String userId) {
         return UsersFollowModel.find("follower_id", userId).collect("followed_id");
     }
 
-    public static boolean createFollow(String followerId, String followedId){
-        UsersFollowModel usersFollowModel =  UsersFollowModel.create();
+    public static boolean createFollow(String followerId, String followedId) {
+        UsersFollowModel usersFollowModel = UsersFollowModel.create();
         usersFollowModel.set("follower_id", followerId);
         usersFollowModel.set("followed_id", followedId);
         usersFollowModel.set("id", generateUUID());
@@ -214,12 +210,12 @@ public class Main {
         return usersFollowModel.insert();
     }
 
-    public static boolean deleteFollow(String followerId, String followedId){
+    public static boolean deleteFollow(String followerId, String followedId) {
         return (UsersFollowModel.delete("follower_id = ? AND followed_id = ?", followerId, followedId) == 1);
     }
 
 
-    public static List searchForUser(String userFullName, String searcher){
+    public static List searchForUser(String userFullName, String searcher) {
 
         List allResults = UsersModel.findBySQL("SELECT* FROM users WHERE full_name LIKE '%' || ? || '%'", userFullName);
 
@@ -249,8 +245,8 @@ public class Main {
         user.setUpdatedAt(model.getDate("updated_at"));
         user.setBlockedAt(model.getDate("blocked_at"));
         user.setDeletedAt(model.getDate("deleted_at"));
-        user.setNumberOfFollowers(""+getFollowersCount(user.getId()));
-        user.setNumberOfFollowings(""+getFollowingsCount(user.getId()));
+        user.setNumberOfFollowers("" + getFollowersCount(user.getId()));
+        user.setNumberOfFollowings("" + getFollowingsCount(user.getId()));
 
         String gender = model.getString("username");
 

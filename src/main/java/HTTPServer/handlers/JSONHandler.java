@@ -14,6 +14,7 @@ public class JSONHandler extends SimpleChannelInboundHandler<Object> {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Object o) throws Exception {
         ByteBuf buffer = (ByteBuf) o;
+        //TODO: if the json is malformed the server breaks, FIX IT!!!
         JSONObject jsonObject = new JSONObject(buffer.toString(CharsetUtil.UTF_8));
         ctx.fireChannelRead(jsonObject);
     }

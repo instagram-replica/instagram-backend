@@ -1,16 +1,11 @@
 package services.posts;
 
-import org.json.JSONObject;
 import org.json.JSONArray;
+import org.json.JSONObject;
 import persistence.nosql.ArangoInterfaceMethods;
-import persistence.sql.Post;
-import persistence.sql.Posts_Likes;
-import persistence.sql.Tagged_Posts;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
-public class Team2 {
+public class Posts {
+
     //Tested
     public static JSONObject getPost(JSONObject paramsObject, String loggedInUserId, String methodName){
         String postId = paramsObject.getString("postId");
@@ -55,7 +50,20 @@ public class Team2 {
         response.put("response", res);
         return response;
     }
-//    public static JSONObject getTaggedPosts(JSONObject paramsObject, String loggedInUserId){
+
+    public static JSONObject createPostLike(JSONObject paramsObject, String loggedInUserId, String methodName){
+        String postId = paramsObject.getString("postId");
+        ArangoInterfaceMethods.likePost(postId, loggedInUserId);
+        JSONObject res = new JSONObject();
+        JSONObject response = new JSONObject();
+        response.put("method", methodName );
+        res.put("postID",  postId );
+        res.put("error", "null");
+        response.put("response", res);
+        return response;
+
+    }
+    //    public static JSONObject getTaggedPosts(JSONObject paramsObject, String loggedInUserId){
 //        int pageSize = paramsObject.getInt("pageSize");
 //        int pageIndex = paramsObject.getInt("pageIndex");
 //        String ownerId = paramsObject.getString("userId");
@@ -73,18 +81,4 @@ public class Team2 {
 //        return jsonValue;
 //
 //    }
-
-    public static JSONObject createPostLike(JSONObject paramsObject, String loggedInUserId, String methodName){
-        String postId = paramsObject.getString("postId");
-        ArangoInterfaceMethods.likePost(postId, loggedInUserId);
-        JSONObject res = new JSONObject();
-        JSONObject response = new JSONObject();
-        response.put("method", methodName );
-        res.put("postID",  postId );
-        res.put("error", "null");
-        response.put("response", res);
-        return response;
-
-    }
 }
-

@@ -19,4 +19,10 @@ public class Helpers {
         response.headers().set(HttpHeaders.Names.CONTENT_LENGTH, content.readableBytes());
         channelHandlerContext.writeAndFlush(response);
     }
+
+    public static JSONObject createJSONError(String message) {
+        JSONObject res = new JSONObject();
+        res.put("error", message);
+        return res;
+    }
 }
