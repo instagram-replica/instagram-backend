@@ -11,7 +11,6 @@ import org.json.JSONObject;
 import org.junit.*;
 
 import java.io.IOException;
-import java.sql.Array;
 import java.sql.Timestamp;
 import java.util.*;
 
@@ -35,7 +34,7 @@ public class ArangoInterfaceTest {
 
     private static final String graphUserFollowsCollectionName = "UserFollows";
     private static final String graphUserInteractsCollectionName = "UserInteracts";
-
+    private static final String graphUserTaggedCollectionName = "UserTagged";
 
     private static final String graphName = "InstagramGraph";
 
@@ -83,8 +82,8 @@ public class ArangoInterfaceTest {
         }
 
         Iterator<GraphEntity> graphs = arangoDB.db(dbName).getGraphs().iterator();
-        while (graphs.hasNext()) {
-            if (graphs.next().getName().equals(graphName)) {
+        while(graphs.hasNext()){
+            if(graphs.next().getName().equals(graphName)){
                 return;
             }
         }
@@ -92,14 +91,17 @@ public class ArangoInterfaceTest {
         openConnection();
         List<String> user_ids = getAllUsersIds();
         closeConnection();
-        try {
+        try{
 
             Collection<EdgeDefinition> edgeDefinitions = new ArrayList<>();
+
+
             EdgeDefinition edgeUserFollows = new EdgeDefinition();
 
             edgeUserFollows.collection(graphUserFollowsCollectionName);
             edgeUserFollows.from(userCollectionName);
             edgeUserFollows.to(userCollectionName);
+
 
 
             EdgeDefinition edgeUserInteracts = new EdgeDefinition();
@@ -108,8 +110,16 @@ public class ArangoInterfaceTest {
             edgeUserInteracts.from(userCollectionName);
             edgeUserInteracts.to(hashtagCollectionName);
 
+
+            EdgeDefinition edgeUserTagged = new EdgeDefinition();
+
+            edgeUserTagged.collection(graphUserTaggedCollectionName);
+            edgeUserTagged.from(userCollectionName);
+            edgeUserTagged.to(postsCollectionName);
+
             edgeDefinitions.add(edgeUserFollows);
             edgeDefinitions.add(edgeUserInteracts);
+            edgeDefinitions.add(edgeUserTagged);
 
             GraphCreateOptions options = new GraphCreateOptions();
             options.orphanCollections("dummyOptions");
@@ -117,7 +127,7 @@ public class ArangoInterfaceTest {
             arangoDB.db(dbName).createGraph(graphName, edgeDefinitions, options);
 
 
-            for (int i = 0; i < user_ids.size(); i++) {
+            for(int i =0 ;i< user_ids.size();i++){
                 BaseDocument userDocument = new BaseDocument();
                 userDocument.setKey(user_ids.get(i));
                 arangoDB.db(dbName).graph(graphName).vertexCollection(userCollectionName).insertVertex(userDocument, null);
@@ -372,6 +382,7 @@ public class ArangoInterfaceTest {
         obj.put("deleted_at",new Timestamp(System.currentTimeMillis()));
 
         String id = ArangoInterfaceMethods.insertPost(obj);
+        System.out.println("_____________________ "+id);
         JSONObject readObj = ArangoInterfaceMethods.getPost(id);
         Iterator iterator = Objects.requireNonNull(readObj).keys();
         while(iterator.hasNext()){
@@ -571,6 +582,59 @@ public class ArangoInterfaceTest {
 
         Assert.assertTrue(isInteracting("Users/f5e1008c-6157-e05d-c01c-5f5c7e055b2c","Hashtags/pancakes"));
         Assert.assertFalse(isInteracting("Users/a10d47bf-7c9c-8193-381f-79db326cc8dd", "Hashtags/pancakes"));
+    }
+
+    @Test
+    public void tagTest(){
+
+        JSONObject obj1= new JSONObject();
+        obj1.put("user_id",utilities.Main.generateUUID());
+        obj1.put("caption","Taken By MiSO EL Gen");
+        obj1.put("media", new ArrayList<String>());
+        obj1.put("likes", new ArrayList<String>());
+        obj1.put("tags",new ArrayList<String>());
+        obj1.put("location","{ name: EspressoLab, coordinates:{long: 1.0.01.01, lat: 2.1.0.10} }");
+        obj1.put("comments", new ArrayList<String>());
+        obj1.put("created_at",new Timestamp(System.currentTimeMillis()));
+        obj1.put("updated_at",new Timestamp(System.currentTimeMillis()));
+        obj1.put("blocked_at",new Timestamp(System.currentTimeMillis()));
+        obj1.put("deleted_at",new Timestamp(System.currentTimeMillis()));
+
+        JSONObject obj2= new JSONObject();
+        obj2.put("user_id",utilities.Main.generateUUID());
+        obj2.put("caption","Taken By Mohamed ABouzeid");
+        obj2.put("media", new ArrayList<String>());
+        obj2.put("likes", new ArrayList<String>());
+        obj2.put("tags",new ArrayList<String>());
+        obj2.put("location","{ name: C1, coordinates:{long: 1.0.01.01, lat: 2.1.0.10} }");
+        obj2.put("comments", new ArrayList<String>());
+        obj2.put("created_at",new Timestamp(System.currentTimeMillis()));
+        obj2.put("updated_at",new Timestamp(System.currentTimeMillis()));
+        obj2.put("blocked_at",new Timestamp(System.currentTimeMillis()));
+        obj2.put("deleted_at",new Timestamp(System.currentTimeMillis()));
+
+        String id1 = ArangoInterfaceMethods.insertPost(obj1);
+        String id2 = ArangoInterfaceMethods.insertPost(obj2);
+
+        tagUserInPost("Users/f5e1008c-6157-e05d-c01c-5f5c7e055b2c", "Posts/"+id1);
+        tagUserInPost("Users/a10d47bf-7c9c-8193-381f-79db326cc8dd", "Posts/"+id1);
+        tagUserInPost("Users/040ea46c-fb03-5ea8-dcae-7b42a06909e8","Posts/"+id1);
+
+        tagUserInPost("Users/f5e1008c-6157-e05d-c01c-5f5c7e055b2c", "Posts/"+id2);
+
+        ArrayList<String> posts = getAllTaggedPosts("Users/f5e1008c-6157-e05d-c01c-5f5c7e055b2c");
+        Assert.assertEquals(posts.size(),2);
+
+        ArrayList<String> ids = getAllUsersTaggedInAPost("Posts/"+id1);
+        Assert.assertEquals(ids.size(),3);
+
+        untagUser("Users/a10d47bf-7c9c-8193-381f-79db326cc8dd","Posts/"+id1);
+        ArrayList<String> idsAfterUntagging = getAllUsersTaggedInAPost("Posts/"+id1);
+        Assert.assertEquals(idsAfterUntagging.size(),2);
+
+        Assert.assertTrue(isTagged("Users/f5e1008c-6157-e05d-c01c-5f5c7e055b2c","Posts/"+id1));
+        Assert.assertFalse(isTagged("Users/040ea46c-fb03-5ea8-dcae-7b42a06909e8","Posts/"+id2));
+
     }
 
 }
