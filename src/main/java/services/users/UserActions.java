@@ -4,6 +4,7 @@ import org.json.JSONObject;
 import persistence.sql.users.Gender;
 import persistence.sql.users.Main;
 import persistence.sql.users.User;
+import shared.MQServer.Queue;
 
 import java.sql.Date;
 import java.time.Instant;
@@ -12,8 +13,9 @@ import static shared.Helpers.createJSONError;
 
 public class UserActions {
     public static JSONObject CreateFollow(JSONObject paramsObject, String loggedInUserId) {
-        //TODO: Create activitiy(notification) for the user requested user
+        //TODO: Create activity (notification) @ACTIVITIES_TEAM for the user requested user
         //TODO: Migrate this to use NOSQL
+//        JSONObject jsonObject = controller.send(new Queue("activities"), new JSONObject());
         JSONObject jObject = new JSONObject();
         String toBeFollowedUserId = paramsObject.getString("userId");
         boolean followDone = Main.createFollow(loggedInUserId, toBeFollowedUserId);
@@ -32,6 +34,7 @@ public class UserActions {
     }
 
     public static JSONObject CreateUnfollow(JSONObject paramsObject, String loggedInUserId) {
+        //TODO: Migrate this to use NOSQL
         JSONObject jObject = new JSONObject();
         String toBeUnfollowedUserId = paramsObject.getString("userId");
         boolean unfollowDone = Main.deleteFollow(loggedInUserId, toBeUnfollowedUserId);
@@ -49,13 +52,11 @@ public class UserActions {
         return jObject;
     }
 
-    public static JSONObject DeleteUser(JSONObject paramsObject, String loggedInUserId)
-
-    {
+    public static JSONObject DeleteUser(JSONObject paramsObject, String loggedInUserId) {
         JSONObject jObject = new JSONObject();
         JSONObject inner = new JSONObject();
         try {
-            boolean deleted = Main.deleteUser(loggedInUserId);
+            Main.deleteUser(loggedInUserId);
             inner.put("id", loggedInUserId);
             jObject.put("user", inner);
             jObject.put("error", "null");

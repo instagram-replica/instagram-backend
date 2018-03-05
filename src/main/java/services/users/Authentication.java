@@ -2,19 +2,19 @@ package services.users;
 
 import persistence.sql.users.Main;
 import persistence.sql.users.User;
-import netscape.javascript.JSObject;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
-
-import org.json.JSONObject;
-import persistence.sql.users.*;
-
-import java.sql.Date;
 
 import static shared.Helpers.createJSONError;
 
 public class Authentication {
+
+    public static JSONObject authorizedToView(String viewerId, String toBeViewedId) {
+        //TODO:
+        JSONObject resJSONOb = new JSONObject();
+        resJSONOb.put("authorized", true);
+        return resJSONOb;
+    }
 
     public static JSONObject SignUp(JSONObject params) {
         User newUser = new User();

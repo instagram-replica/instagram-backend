@@ -16,11 +16,10 @@ public abstract class Controller {
 
     public abstract JSONObject execute(JSONObject jsonObject, String userId) throws IOException;
 
-    public JSONObject send(Queue queue, JSONObject jsonObject) throws IOException {
+    public static JSONObject send(Queue queue, JSONObject jsonObject) throws IOException {
         String uuid = generateUUID();
         final JSONObject[] res = new JSONObject[1];
         jsonObject.put("uuid", uuid);
-
         Connection connection = RMQConnection.getSingleton();
         final Channel channel = connection.createChannel();
         channel.queueDeclare(queue.getRequestQueueName(), true, false, false, null);

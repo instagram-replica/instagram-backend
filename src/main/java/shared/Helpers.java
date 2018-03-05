@@ -6,6 +6,9 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.*;
 import io.netty.util.CharsetUtil;
 import org.json.JSONObject;
+import shared.MQServer.Queue;
+
+import java.io.IOException;
 
 public class Helpers {
     public static JSONObject getJSONFromByteBuf(ChannelHandlerContext ctx, Object o) {
@@ -24,5 +27,19 @@ public class Helpers {
         JSONObject res = new JSONObject();
         res.put("error", message);
         return res;
+    }
+
+    public static boolean getAuthJSON(String viewerId, String toBeViewedId) throws IOException {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("method", "authorizedToView");
+
+        JSONObject paramsObj = new JSONObject();
+        paramsObj.put("viewerId", viewerId);
+        paramsObj.put("toBeViewedId", toBeViewedId);
+
+        jsonObject.put("params", paramsObj);
+
+        JSONObject authorizationJSONObj = Controller.send(new Queue("users"), jsonObject);
+        return authorizationJSONObj.getBoolean("authorized");
     }
 }

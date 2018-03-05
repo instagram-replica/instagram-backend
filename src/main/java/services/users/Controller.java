@@ -43,6 +43,8 @@ public class Controller extends shared.Controller {
             case "deleteUser":
                 resJSON = UserActions.DeleteUser(paramsObject, userId);
                 break;
+            case "authorizedToView":
+                resJSON = Authentication.authorizedToView(paramsObject.getString("viewerId"), paramsObject.getString("toBeViewedId"));
         }
         closeConnection();
         return resJSON;

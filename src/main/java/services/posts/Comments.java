@@ -16,8 +16,9 @@ import static shared.Helpers.createJSONError;
 
 public class Comments {
 
-    //Tested
     public static JSONObject createComment(JSONObject paramsObject, String loggedInUserId, String methodName) {
+        //TODO: Create activity for the post's owner, and check for mentions @ACTIVITIES_TEAM
+        //TODO: Check if the user has permission to view the post
         String postId = paramsObject.getString("postId");
         String comment = paramsObject.getString("text");
 
@@ -35,7 +36,7 @@ public class Comments {
             newComment.put("id", commentJSON.get("id"));
             data.put("newComment", newComment);
             response.put("data", data);
-            response.put("error", "0");
+            response.put("error", "null");
             jsonValue.put("method", methodName);
             jsonValue.put("response", response);
             return jsonValue;
@@ -44,18 +45,17 @@ public class Comments {
         }
     }
 
-    //tested
     public static JSONObject getCommentsOnPost(JSONObject paramsObject, String userId, String methodName) {
+        //TODO: Check if the user has permission to view the post
         String postId = paramsObject.getString("postId");
         JSONArray comments = ArangoInterfaceMethods.getCommentsOnPost(postId);
         JSONObject jsonValue = new JSONObject();
         jsonValue.put("method", methodName);
         jsonValue.put("comments", comments);
-        jsonValue.put("error", "0");
+        jsonValue.put("error", "null");
         return jsonValue;
     }
 
-    //Tested
     private static JSONObject createCommentJSON(String text, int depth, String userId, String postId) {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("id", Main.generateUUID());
@@ -71,9 +71,9 @@ public class Comments {
         return jsonObject;
     }
 
-    //Tested
     public static JSONObject createCommentReply(JSONObject paramsObject, String userId, String methodname) {
-
+        //TODO: Create activity for the post's owner, and check for mentions @ACTIVITIES_TEAM
+        //TODO: Check if the user has permission to view the post
         String commentId = paramsObject.getString("commentId");
         String reply = paramsObject.getString("text");
 
@@ -96,7 +96,7 @@ public class Comments {
         data.put("newReply", newReply);
 
         response.put("data", data);
-        response.put("error", "0");
+        response.put("error", "null");
 
         jsonValue.put("method", methodname);
         jsonValue.put("response", response);
