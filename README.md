@@ -4,46 +4,48 @@
 
 <h1 align="center">instagram-backend</h1>
 
-
 ## Architecture
-### HTTP Server (Netty):
-A Netty server that accepts HTTP requests on port `8080`. This server receives the HTTP `POST` request, converts it into JSON, makes sure the user is authenticated, uploads media file(s) (if any) to a media server and injects the returned URL(s) into the JSON request, stamps the request with a `UUID` and forwards it to a RMQ (RabbitMQ) queue using `requests_mapping.properties` file, then it waits for a response with the same UUID and returns to the user when it gets a response with a matching `UUID`.
+
+### HTTP Server
+A Netty server accepts HTTP requests on port `8080`. This server receives an HTTP `POST` request, parses its JSON payload, makes sure the user is authenticated, uploads media file(s) _(if any)_ to a media server & injects the returned URL(s) into the JSON payload, stamps the payload with a UUID & forwards it to a RabbitMQ queue using the `requests_mapping.properties` file, and then it waits for a response with the same UUID & returns to the user when it gets a response with a matching UUID.
 
 ### Services
-Each service consists of an RMQ consumer, RMQ producer and a `ExecutorService`. Each service also has its own unique request and response queue.
+Each service consists of an RMQ consumer, RMQ producer & an `ExecutorService`. Each service also has its own unique request & response queue.
 
 - **RMQ Consumer**: Receives messages from the service's request queue
 - **RMQ Producer**: Sends messages to the service's response queue
-- **ExecutorService**: Initializes a thread pool and makes sure every incoming message gets allocated a thread from the thread pool
+- **ExecutorService**: Initializes a thread pool & makes sure every incoming message gets allocated a thread from the thread pool
 
-## Prequsites 
-- RabbitMQ
-- ArangoDB
+## Prerequisites
 - PostgreSQL
-- [Postman](https://www.getpostman.com/apps) (for testing)
+- ArangoDB
+- RabbitMQ
+- [Postman](https://www.getpostman.com/apps) _(for testing)_
 
 ## Getting started
-- Drop SQL and NoSQL (todo)
-- Make sure RabbitMQ is running
+- Install PostgreSQL _(todo)_
+- Install ArangoDB _(todo)_
+- Install Redis
+- Install RabbitMQ
 - Clone the repo & open in IntelliJ
-- Open Maven Projects tab and click compile
-- Open Maven Projects tab, expand Plugins, expand `activejdbc-instrumentation` and click `activejdbc-instrumentation:instrument`
-- Navigate to `persistence` package, expand `nosql`, click and run `ArangoInterfaceMethods.java` this file creates `NoSQL` tables and graphs
+- Open Maven Projects tab, expand `Lifecycle` & click `compile`
+- Open Maven Projects tab, expand `Plugins`, expand `activejdbc-instrumentation` & click `activejdbc-instrumentation:instrument`
+- Navigate to `persistence` package, expand `nosql`, click & run `ArangoInterfaceMethods.java`. This file creates the NoSQL tables & graphs.
 
 ## Running the app
-- Run `src/main/java/HTTPServer/Server.java`, this makes sure that the server is running on port 8080 and ready to accept HTTP requests
+- Run `src/main/java/HTTPServer/Server.java`, this makes sure that the server is running on port 8080 & ready to accept HTTP requests
 - Run `src/main/java/services/users/Server.java`, this file initializes an RMQ consumer for the users service that will be later used to authenticate requests
 - Run `src/main/java/services/activities/Server.java`, this file initializes an RMQ consumer for activities that will be later used by other services
 - Run `src/main/java/services/<your-service>/Server.java`, this also initializes an RMQ consumer for the specified service
 
 ## Sending requests
 - Open Postman
-- In the URL field write `http://localhost:8080/`
+- In the URL field, write `http://localhost:8080/`
 - Choose the type of the request to be `POST` request
 - Underneath the URL field, click on `Body`, choose `raw` from the presented options
 - Send a Sign up or Sign in request to obtain a token that will be used for authenticating other requests
 
-```JSON
+```json
 {
     "method" : "signUp",
     "params": {
@@ -57,6 +59,5 @@ Each service consists of an RMQ consumer, RMQ producer and a `ExecutorService`. 
     }
 }
 ```
-- Using the returned token, go ahead and create a new tab in Postman, choose the same options mentioned eariler. Before sending the request, go to `Headers` tab and add `x-access-token` with the obtained token (obviously, we don't add any headers in the case of sending Signup or Signin requests)
 
-
+- Using the returned token, go ahead and create a new tab in Postman, choose the same options mentioned eariler. Before sending the request, go to `Headers` tab and add `x-access-token` with the obtained token _(obviously, we don't add any headers in the case of sending Signup or Signin requests)_
