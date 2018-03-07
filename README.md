@@ -47,13 +47,13 @@ Each service consists of an RMQ consumer, RMQ producer & an `ExecutorService`. E
 
 ```json
 {
-    "method" : "signUp",
+    "method" : "signup",
     "params": {
-        "username" : "username",
-        "fullname" : "FullName",
-        "passwordHash" : "!@#!@$C!",
-        "email" : "user@user.com",
-        "gender" : "male/female",
+        "username" : "john.doe",
+        "fullName" : "John Doe",
+        "passwordHash" : "@xQ7HndX$8",
+        "email" : "john.doe@user.com",
+        "gender" : "male",
         "dateOfBirth" : "Sun Mar 04 23:05:25 EET 2018",
         "phone" : "+201009775576"
     }
