@@ -10,11 +10,11 @@
 A Netty server that accepts HTTP requests on port `8080`. This server receives the HTTP `POST` request, converts it into JSON, makes sure the user is authenticated, uploads media file(s) (if any) to a media server and injects the returned URL(s) into the JSON request, stamps the request with a `UUID` and forwards it to a RMQ (RabbitMQ) queue using `requests_mapping.properties` file, then it waits for a response with the same UUID and returns to the user when it gets a response with a matching `UUID`.
 
 ### Services
-Each service consists of an RMQ consumer, RMQ sender and a `ServiceExecutor`. Each service also has its own unique request and response queue.
+Each service consists of an RMQ consumer, RMQ producer and a `ExecutorService`. Each service also has its own unique request and response queue.
 
 - **RMQ Consumer**: Receives messages from the service's request queue
-- **RMQ Sender**: Sends messages to the service's response queue
-- **ServiceExecutor**: Initializes a thread pool and makes sure every incoming message gets allocated a thread from the thread pool
+- **RMQ Producer**: Sends messages to the service's response queue
+- **ExecutorService**: Initializes a thread pool and makes sure every incoming message gets allocated a thread from the thread pool
 
 ## Prequsites 
 - RabbitMQ
