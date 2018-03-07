@@ -214,6 +214,10 @@ public class Main {
         return (UsersFollowModel.delete("follower_id = ? AND followed_id = ?", followerId, followedId) == 1);
     }
 
+    public static String getUserIdFromUsername(String username){
+        return UsersModel.findFirst("username = ?", username).get("id").toString();
+    }
+
 
     public static List searchForUser(String userFullName, String searcher) {
 
