@@ -40,6 +40,8 @@ public class ArangoInterfaceMethods {
     private static final String graphUserFollowsCollectionName = "UserFollows";
     private static final String graphUserInteractsCollectionName = "UserInteracts";
     private static final String graphUserTaggedCollectionName = "UserTagged";
+    private static final String graphPostTaggedCollectionName = "PostTagged";
+
 
     private static final String graphName = "InstagramGraph";
 
@@ -620,6 +622,29 @@ public class ArangoInterfaceMethods {
         updatePost(postID, post);
     }
 
+    public static JSONArray getCommentsOnPost(String postID){
+        try {
+            BaseDocument postDoc = arangoDB.db(dbName).collection(postsCollectionName).getDocument(postID,
+                    BaseDocument.class);
+            if(postDoc == null){
+                throw new ArangoDBException("Post with ID: " + postID +" Not Found");
+            }
+            JSONObject postJSON  = new JSONObject(postDoc.getProperties());
+            return (JSONArray) reformatJSON(postJSON).get("comments");
+        } catch (ArangoDBException e) {
+            System.err.println("Failed to get Post: " + e.getMessage());
+            return null;
+        }
+    }
+
+
+    public static void insertMessageOnThread(String threadID, JSONObject message){
+        JSONObject post = getThread(threadID);
+        ((JSONArray) post.get("messages")).put(message);
+        updatePost(threadID,post);
+    }
+
+
     public static void initializeGraphCollections() throws IOException {
         Iterator<GraphEntity> graphs = arangoDB.db(dbName).getGraphs().iterator();
         while(graphs.hasNext()){
@@ -657,9 +682,16 @@ public class ArangoInterfaceMethods {
             edgeUserTagged.from(userCollectionName);
             edgeUserTagged.to(postsCollectionName);
 
+            EdgeDefinition edgePostTagged = new EdgeDefinition();
+
+            edgePostTagged.collection(graphPostTaggedCollectionName);
+            edgePostTagged.from(postsCollectionName);
+            edgePostTagged.to(hashtagCollectionName);
+
             edgeDefinitions.add(edgeUserFollows);
             edgeDefinitions.add(edgeUserInteracts);
             edgeDefinitions.add(edgeUserTagged);
+            edgeDefinitions.add(edgePostTagged);
 
             GraphCreateOptions options = new GraphCreateOptions();
             options.orphanCollections("dummyOptions");
@@ -679,27 +711,6 @@ public class ArangoInterfaceMethods {
         }
     }
 
-    public static JSONArray getCommentsOnPost(String postID){
-        try {
-            BaseDocument postDoc = arangoDB.db(dbName).collection(postsCollectionName).getDocument(postID,
-                    BaseDocument.class);
-            if(postDoc == null){
-                throw new ArangoDBException("Post with ID: " + postID +" Not Found");
-            }
-            JSONObject postJSON  = new JSONObject(postDoc.getProperties());
-            return (JSONArray) reformatJSON(postJSON).get("comments");
-        } catch (ArangoDBException e) {
-            System.err.println("Failed to get Post: " + e.getMessage());
-            return null;
-        }
-    }
-
-
-    public static void insertMessageOnThread(String threadID, JSONObject message){
-        JSONObject post = getThread(threadID);
-        ((JSONArray) post.get("messages")).put(message);
-        updatePost(threadID,post);
-    }
 
 
     public static boolean followUser(String followerID, String followedID){
