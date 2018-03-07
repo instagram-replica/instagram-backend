@@ -1,6 +1,5 @@
 package persistence.sql.users;
 
-
 import static utilities.Main.isUUID;
 import java.util.regex.*;
 
