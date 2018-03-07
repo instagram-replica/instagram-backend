@@ -3,6 +3,9 @@ package services.activities;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import persistence.nosql.ArangoInterfaceMethods;
+import persistence.sql.users.Main;
+
+import java.sql.Timestamp;
 
 public class NotificationActions {
 
@@ -42,8 +45,17 @@ public class NotificationActions {
         JSONArray receivers = params.getJSONArray("taggedUsers");
         String postID = params.getString("postID");
 
-        //TODO: loop on all tagged users and insert an entry for each user
-        //TODO: use getUserIdFromUsername in users/main to get userIds
+        for(int i=0;i<receivers.length();i++){
+            JSONObject taggedPerson = receivers.getJSONObject(i);
+            JSONObject notifyReceiver = new JSONObject();
+            String recID = Main.getUserIdFromUsername(taggedPerson.getString("username"));
+            notifyReceiver.put("activity_type","{ type: tag, user_id: " + recID+ "\"");
+            notifyReceiver.put("receiver_id", recID);
+            notifyReceiver.put("sender_id", userId);
+            notifyReceiver.put("created_at", new Timestamp(System.currentTimeMillis()));
+            notifyReceiver.put("blocked_at",new Timestamp(System.currentTimeMillis()));
+            ArangoInterfaceMethods.insertActivity(notifyReceiver);
+        }
 
         JSONObject notificationJSON =new JSONObject();
         JSONObject innerJSON = new JSONObject();
