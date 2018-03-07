@@ -55,7 +55,7 @@ Each service consists of an RMQ consumer, RMQ producer & an `ExecutorService`. E
         "email" : "john.doe@user.com",
         "gender" : "male",
         "dateOfBirth" : "Sun Mar 04 23:05:25 EET 2018",
-        "phone" : "+201009775576"
+        "phone" : "201009775576"
     }
 }
 ```
