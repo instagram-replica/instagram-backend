@@ -17,6 +17,6 @@ public class Helpers {
         FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, content);
         response.headers().set(HttpHeaders.Names.CONTENT_TYPE, "application/json");
         response.headers().set(HttpHeaders.Names.CONTENT_LENGTH, content.readableBytes());
-        channelHandlerContext.write(response);
+        channelHandlerContext.writeAndFlush(response);
     }
 }

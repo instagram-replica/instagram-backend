@@ -13,6 +13,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Map;
+
 import java.io.IOException;
 import java.util.*;
 
@@ -44,7 +48,39 @@ public class ArangoInterfaceMethods {
     public static void main(String[]args) throws IOException {
         initializeDB();
         initializeGraphCollections();
+//         String id1  = utilities.Main.generateUUID();
+//         String id2 = utilities.Main.generateUUID();
+//         String userid1  = utilities.Main.generateUUID();
+//         JSONObject obj = new JSONObject();
+//         obj.put("id", id1);
+//         obj.put("user_id",userid1);
+//         obj.put("caption","Taken By Heba EL Gen");
+//         obj.put("media", new ArrayList<String>());
+//         obj.put("likes", new ArrayList<String>());
+//         obj.put("tags",new ArrayList<String>());
+//         obj.put("comments",new ArrayList<String>());
+//         obj.put("location","{ name: EspressoLab, coordinates:{long: 1.0.01.01, lat: 2.1.0.10} }");
+//         obj.put("created_at",new Timestamp(System.currentTimeMillis()));
+//         obj.put("updated_at",new Timestamp(System.currentTimeMillis()));
+//         obj.put("blocked_at",new Timestamp(System.currentTimeMillis()));
+//         obj.put("deleted_at",new Timestamp(System.currentTimeMillis()));
+//         ArangoInterfaceMethods.insertPost(obj);
 
+
+//         JSONObject obj2 = new JSONObject();
+//         obj.put("id", id2);
+//         obj.put("user_id",userid1);
+//         obj.put("caption","Taken By MiSO EL Gen");
+//         obj.put("media", new ArrayList<String>());
+//         obj.put("likes", new ArrayList<String>());
+//         obj.put("tags",new ArrayList<String>());
+//         obj.put("location","{ name: EspressoLab, coordinates:{long: 1.0.01.01, lat: 2.1.0.10} }");
+//         obj.put("created_at",new Timestamp(System.currentTimeMillis()));
+//         obj.put("updated_at",new Timestamp(System.currentTimeMillis()));
+//         obj.put("blocked_at",new Timestamp(System.currentTimeMillis()));
+//         obj.put("deleted_at",new Timestamp(System.currentTimeMillis()));
+//         ArangoInterfaceMethods.insertPost(obj);
+//         JSONArray result = getPosts(userid1);
 
 
 
@@ -414,6 +450,9 @@ public class ArangoInterfaceMethods {
         try {
 
             BaseDocument myObject = new BaseDocument();
+            String postId  = utilities.Main.generateUUID();
+            myObject.setKey(postId);
+            myObject.addAttribute("id", postId);
             myObject.addAttribute("user_id", postJSON.get("user_id").toString());
             myObject.addAttribute("caption", postJSON.get("caption").toString());
             myObject.addAttribute("media", postJSON.get("media").toString());
@@ -428,13 +467,14 @@ public class ArangoInterfaceMethods {
             String id = arangoDB.db(dbName).collection(postsCollectionName).insertDocument(postJSON.toString()).getKey();
             System.out.println("Post inserted");
             return id;
-
         } catch (ArangoDBException e) {
             System.err.println("Failed to insert Post. " + e.getMessage());
+            return "";
         } catch (JSONException e){
             System.err.println("JSON Post Incorrect format. " + e.getMessage());
+            return "";
         }
-        return null;
+//        return null;
     }
 
     public static JSONObject getPost(String id){
@@ -452,7 +492,31 @@ public class ArangoInterfaceMethods {
         }
     }
 
+    public static JSONArray getPosts(String userId){
+        try {
+            String query = "FOR t IN "+postsCollectionName+" FILTER t.user_id == @id RETURN t";
+            Map<String, Object> bindVars = new MapBuilder().put("id", userId).get();
+            ArangoCursor<BaseDocument> cursor = arangoDB.db(dbName).query(query, bindVars, null,
+                    BaseDocument.class);
+            JSONArray result = new JSONArray();
+            cursor.forEachRemaining(aDocument -> {
+                JSONObject postJSON  = new JSONObject(aDocument.getProperties());
+                result.put(reformatJSON(postJSON));
+            });
+            return result;
+        } catch (ArangoDBException e) {
+            System.err.println("Failed to execute query. " + e.getMessage());
+            return null;
+        }
 
+
+    }
+    public static void likePost(String postID, String userID){
+        JSONObject post = getPost(postID);
+        JSONArray likes = (JSONArray) post.get("likes");
+        likes.put(userID);
+        updatePost(postID, post);
+    }
     public static void updatePost(String id,JSONObject postJSON){
         try {
             BaseDocument myObject = new BaseDocument();
@@ -549,7 +613,6 @@ public class ArangoInterfaceMethods {
         String dbQuery = "FOR post in Posts LET willUpdateDocument = ( FOR comment IN post.comments FILTER comment.id == '"+commentID+"' LIMIT 1 RETURN 1) FILTER LENGTH(willUpdateDocument) > 0 LET alteredList = ( FOR comment IN post.comments LET newItem = (comment.id == '"+commentID+"' ? merge(comment, { 'comments' : append(comment.comments,"+commentReply.toString()+")}) : comment) RETURN newItem) UPDATE post WITH { comments:  alteredList } IN Posts";
         arangoDB.db(dbName).query(dbQuery,null,null,null);
     }
-
 
     public static void insertCommentOnPost(String postID, JSONObject comment) {
         JSONObject post = getPost(postID);
