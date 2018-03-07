@@ -1,7 +1,5 @@
 package persistence.sql.users;
 
-import com.sun.xml.internal.ws.api.message.ExceptionHasMessage;
-
 import static utilities.Main.isUUID;
 import java.util.regex.*;
 import java.util.List;
