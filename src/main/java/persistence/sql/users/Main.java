@@ -217,12 +217,12 @@ public class Main {
 
     public static List searchForUser(String userFullName, String searcher) {
 
-        List allResults = UsersModel.findBySQL("SELECT* FROM users WHERE full_name LIKE '%' || ? || '%'", userFullName);
+        List allResults = UsersModel.findBySQL("SELECT* FROM users WHERE LOWER(full_name) LIKE '%' || ? || '%' limit 10", userFullName.toLowerCase());
 
 
         //TODO exclude blocked user from the searcher's/blocker search result
         List blockedUsers = UsersBlockModel.findBySQL("SELECT* FROM users_blocks WHERE blocker_id = ?", searcher);
-        Base.findAll("SELECT* FROM users u FULL OUTTER JOIN users_blocks ub ON u.id = ub.blocked_id WHERE u.id IS NULL OR ub.blocked_id IS NULL AND ub.blocker_id = ?", searcher);
+        //Base.findAll("SELECT* FROM users u FULL OUTTER JOIN users_blocks ub ON u.id = ub.blocked_id WHERE u.id IS NULL OR ub.blocked_id IS NULL AND ub.blocker_id = ?", searcher);
 
         return allResults;
     }
