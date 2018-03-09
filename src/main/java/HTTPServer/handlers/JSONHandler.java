@@ -1,27 +1,21 @@
 package HTTPServer.handlers;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.util.CharsetUtil;
 import org.json.JSONObject;
 
 @ChannelHandler.Sharable
-public class JSONHandler extends SimpleChannelInboundHandler<Object> {
-
-
+public class JSONHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, Object o) throws Exception {
-        ByteBuf buffer = (ByteBuf) o;
-        JSONObject jsonObject = new JSONObject(buffer.toString(CharsetUtil.UTF_8));
-        ctx.fireChannelRead(jsonObject);
+    protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest httpRequest) {
+        ctx.fireChannelRead(new JSONObject(httpRequest.content().toString(CharsetUtil.UTF_8)));
     }
-
 
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) {
-
         ctx.close();
     }
 
@@ -30,5 +24,4 @@ public class JSONHandler extends SimpleChannelInboundHandler<Object> {
         cause.printStackTrace();
         ctx.close();
     }
-
 }
