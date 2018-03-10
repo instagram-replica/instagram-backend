@@ -15,7 +15,8 @@ public class AuthenticationHandler extends SimpleChannelInboundHandler<HTTPReque
         boolean isAuthenticAccessToken = isAuthenticAccessToken(accessToken);
         String userId = decodeAccessToken(accessToken);
 
-        if (accessToken != null && !isAuthenticAccessToken /* Access token exists & is inauthentic */) {
+        // If access token exists & is inauthentic
+        if (accessToken != null && !isAuthenticAccessToken) {
             // TODO: Respond eagerly with error
         }
 
