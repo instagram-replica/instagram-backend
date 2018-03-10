@@ -32,7 +32,6 @@ public class ServerInitializer extends ChannelInitializer<SocketChannel> {
 
         p.addLast(new HTTPHandler());
         p.addLast(new AuthenticationHandler());
-        p.addLast(new JSONHandler());
 
         p.addLast(new MQSenderHandler());
         p.addLast(new MQReceiverHandler());
