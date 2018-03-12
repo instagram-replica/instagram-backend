@@ -2,6 +2,7 @@ package services.posts;
 
 import org.json.JSONObject;
 import org.json.JSONArray;
+import persistence.cache.Cache;
 import persistence.nosql.ArangoInterfaceMethods;
 import persistence.sql.Post;
 import persistence.sql.Posts_Likes;
@@ -14,7 +15,11 @@ public class Team2 {
     //Tested
     public static JSONObject getPost(JSONObject paramsObject, String loggedInUserId, String methodName){
         String postId = paramsObject.getString("postId");
-        JSONObject post = ArangoInterfaceMethods.getPost(postId);
+        JSONObject post = Cache.getPostFromCache(postId);
+        if(post==null){
+            post = ArangoInterfaceMethods.getPost(postId);
+            Cache.insertPostIntoCache(post,postId);
+        }
         JSONObject response = new JSONObject();
         response.put("method", methodName);
         response.put("post", post);
@@ -25,7 +30,11 @@ public class Team2 {
         int pageSize = paramsObject.getInt("pageSize");
         int pageIndex = paramsObject.getInt("pageIndex");
         String ownerId = paramsObject.getString("userId");
-        JSONArray posts = ArangoInterfaceMethods.getPosts(ownerId);
+        JSONArray posts = Cache.getPostsFromCache(ownerId, pageIndex, pageSize);
+        if(posts==null) {
+             posts = ArangoInterfaceMethods.getPosts(ownerId);
+             Cache.insertPostsIntoCache(posts,ownerId,pageIndex,pageSize);
+        }
         JSONObject response = new JSONObject();
         response.put("method", methodName );
         response.put("posts", posts);
