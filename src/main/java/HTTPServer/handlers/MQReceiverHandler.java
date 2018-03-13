@@ -15,6 +15,4 @@ public class MQReceiverHandler extends SimpleChannelInboundHandler<MQHandlerPair
         JSONObject resJSON = blockAndSubscribe(Server.mqSubscriptions, mqPair.uuid, "netty", mqPair.serviceName);
         ctx.fireChannelRead(resJSON);
     }
-
-
 }
