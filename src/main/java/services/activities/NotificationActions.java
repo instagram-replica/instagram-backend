@@ -27,13 +27,14 @@ public class NotificationActions {
     }
 
     public static void handleFollowNotification(JSONObject params, String userId) {
-        String receiverId = params.getString("userId");
+        String senderId = params.getString("follower");
+        String receiverId = params.getString("followed");
 
         JSONObject notificationJSON = new JSONObject();
         JSONObject innerJSON = new JSONObject();
         innerJSON.put("type", "following");
         notificationJSON.put("activity_type",innerJSON);
-        notificationJSON.put("sender_id", userId);
+        notificationJSON.put("sender_id", senderId);
         notificationJSON.put("receiver_id", receiverId);
         notificationJSON.put("created_at",new java.util.Date());
         notificationJSON.put("blocked_at","null");

@@ -88,7 +88,7 @@ public class Authentication {
 
             } else {
 
-                //TODO set the following and followers flag based on the following/followers
+                // TODO set the following and followers flag based on the following/followers
                 // lists of the requested user
 
             }

@@ -6,6 +6,7 @@ import persistence.sql.users.Main;
 import persistence.sql.users.User;
 import shared.MQServer.Queue;
 
+import java.io.IOException;
 import java.sql.Date;
 import java.time.Instant;
 
@@ -13,9 +14,7 @@ import static shared.Helpers.createJSONError;
 
 public class UserActions {
     public static JSONObject CreateFollow(JSONObject paramsObject, String loggedInUserId) {
-        //TODO: Create activity (notification) @ACTIVITIES_TEAM for the user requested user
         //TODO: Migrate this to use NOSQL
-//        JSONObject jsonObject = controller.send(new Queue("activities"), new JSONObject());
         JSONObject jObject = new JSONObject();
         String toBeFollowedUserId = paramsObject.getString("userId");
         boolean followDone = Main.createFollow(loggedInUserId, toBeFollowedUserId);
@@ -23,6 +22,7 @@ public class UserActions {
         if (followDone) {
             inner.put("success", "true");
             inner.put("error", "null");
+            SendFollowToActivities(loggedInUserId, toBeFollowedUserId);
         } else {
             inner.put("success", "false");
             //TODO: Better error handling
@@ -31,6 +31,20 @@ public class UserActions {
         jObject.put("response", inner);
 
         return jObject;
+    }
+
+    private static void SendFollowToActivities(String follower, String followed){
+        JSONObject activitiesJSON = new JSONObject();
+        activitiesJSON.put("method", "createFollow");
+        JSONObject innerActivities = new JSONObject();
+        innerActivities.put("follower", follower);
+        innerActivities.put("followed", followed);
+        activitiesJSON.put("params", innerActivities);
+        try {
+            Controller.send(new Queue("activities_users"), new JSONObject());
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     public static JSONObject CreateUnfollow(JSONObject paramsObject, String loggedInUserId) {
@@ -103,8 +117,6 @@ public class UserActions {
         //TODO: Test this via postman
         JSONObject jObject = new JSONObject();
         String userIdToBeBlocked = paramsObject.getString("userId");
-
-        // insert into table user_blocks as blocker_id: loggedInUserId, as blocked_id: userIdToBeBlocked
         try {
             Main.blockUser(loggedInUserId, userIdToBeBlocked);
             jObject.put("success", true);
@@ -134,15 +146,4 @@ public class UserActions {
 
         return jsonObject;
     }
-//    public static JSONObject CreateUserDeactivate(JSONObject paramsObject, String loggedInUserId)
-//    {
-//        JSONObject jsonObject = new JSONObject();
-//        boolean deactivated = Main.deactivateAccount(loggedInUserId);
-//        jsonObject.put("success",deactivated);
-//        if(deactivated)
-//            jsonObject.put("error","null");
-//        else jsonObject.put("error","cannot deactivate account");
-//        return jsonObject;
-//    }
-
 }
