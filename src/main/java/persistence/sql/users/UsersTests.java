@@ -117,7 +117,7 @@ public class UsersTests {
     public void TestBlock() throws Exception {
         openConnection();
 
-        User user1 = getUserByUsername("AhmedAsh");
+        User user1 = getAllUsers().get(0);
         User user2 = getAllUsers().get(1);
         boolean blocked = blockUser(user1.getId(), user2.getId());
 //        Assert.assertEquals(true, blocked);

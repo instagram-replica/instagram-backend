@@ -3,6 +3,6 @@
   "params": {
     "pageSize": 5,
     "pageIndex": 1,
-    "userId": 1
+    "userId": "1"
   }
 }
