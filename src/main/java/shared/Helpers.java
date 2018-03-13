@@ -6,9 +6,12 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.*;
 import io.netty.util.CharsetUtil;
 import org.json.JSONObject;
-import shared.MQServer.Queue;
+import shared.MQServer.Controller;
+import shared.MQSubscriptions.ExecutionPair;
+import shared.MQSubscriptions.MQSubscriptions;
 
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class Helpers {
     public static JSONObject getJSONFromByteBuf(ChannelHandlerContext ctx, Object o) {
@@ -29,7 +32,7 @@ public class Helpers {
         return res;
     }
 
-    public static boolean getAuthJSON(String viewerId, String toBeViewedId) throws IOException {
+    public static boolean getAuthJSON(String serviceName, String viewerId, String toBeViewedId) throws IOException, InterruptedException {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("method", "authorizedToView");
 
@@ -39,7 +42,35 @@ public class Helpers {
 
         jsonObject.put("params", paramsObj);
 
-        JSONObject authorizationJSONObj = Controller.send(new Queue("users"), jsonObject);
+        JSONObject authorizationJSONObj = Controller.send(serviceName, "users", jsonObject);
         return authorizationJSONObj.getBoolean("authorized");
+    }
+
+    public static String getResponseQueue(String senderServiceName, String receiverServiceName) {
+        return senderServiceName + "_" + receiverServiceName;
+    }
+
+    public static synchronized JSONObject blockAndSubscribe(MQSubscriptions mqSubscriptions, String uuid, String serviceName, String receiverName) throws IOException, InterruptedException {
+        String queueName = getResponseQueue(serviceName, receiverName);
+
+        final AtomicReference<JSONObject> resJson = new AtomicReference<>();
+
+        ExecutionPair pair = new ExecutionPair(uuid, jsonObject -> {
+            resJson.set(jsonObject);
+            synchronized (resJson) {
+                resJson.notify();
+            }
+        });
+
+
+        mqSubscriptions.addListener(queueName, pair);
+
+        synchronized (resJson) {
+            while (resJson.get() == null) {
+                resJson.wait();
+                break;
+            }
+        }
+        return resJson.get();
     }
 }

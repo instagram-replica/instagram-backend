@@ -119,7 +119,7 @@ public class UsersTests {
     public void TestBlock() throws Exception {
         openConnection();
 
-       User dummy = new User();
+        User dummy = new User();
         dummy.setId(generateUUID());
         dummy.setUsername("SosoA");
         dummy.setPhoneNumber("010123456789");

@@ -48,7 +48,7 @@ public class Posts {
         int pageIndex = paramsObject.getInt("pageIndex");
         String ownerId = paramsObject.getString("userId");
         try {
-            if (getAuthJSON(loggedInUserId, ownerId)) {
+            if (getAuthJSON("posts", loggedInUserId, ownerId)) {
                 //@TODO: Check if the user exists
                 JSONArray posts = ArangoInterfaceMethods.getPosts(ownerId);
                 JSONObject response = new JSONObject();
@@ -58,7 +58,7 @@ public class Posts {
                 return response;
             }
             return createJSONError("Not authorized to view");
-        } catch (IOException e) {
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
         return null;
