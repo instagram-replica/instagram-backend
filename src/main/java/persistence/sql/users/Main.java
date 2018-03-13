@@ -160,6 +160,10 @@ public class Main {
         return block != null;
     }
 
+    public static void deleteBlockUser(String blockerId, String blockedId) {
+        UsersBlockModel.delete("blocker_id = ? AND blocked_id = ?", blockerId, blockedId);
+    }
+
     public static boolean reportUser(String reporterId, String reportedId) throws Exception {
         if (!isValidUserId(reporterId) || !isValidUserId(reportedId)) {
             throw new Exception(
@@ -261,5 +265,4 @@ public class Main {
 
         return user;
     }
-
 }

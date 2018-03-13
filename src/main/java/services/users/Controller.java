@@ -46,6 +46,9 @@ public class Controller extends shared.Controller {
             case "createBlockUser":
                 resJSON = UserActions.CreateBlockUser(paramsObject, userId);
                 break;
+            case "deleteBlockUser":
+                resJSON = UserActions.DeleteBlockUser(paramsObject, userId);
+                break;
             case "createUserReport":
                 resJSON = UserActions.CreateUserReport(paramsObject, userId);
                 break;

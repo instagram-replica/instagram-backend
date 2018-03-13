@@ -1,22 +1,22 @@
 package services.users;
 
 import org.json.JSONObject;
-import persistence.sql.users.Gender;
 import persistence.sql.users.Main;
 import persistence.sql.users.User;
 import shared.MQServer.Queue;
 
 import java.io.IOException;
-import java.sql.Date;
-import java.time.Instant;
-
+import static persistence.nosql.ArangoInterfaceMethods.followUser;
+import static persistence.nosql.ArangoInterfaceMethods.unFollowUser;
 import static shared.Helpers.createJSONError;
 
 public class UserActions {
     public static JSONObject CreateFollow(JSONObject paramsObject, String loggedInUserId) {
-        //TODO: Migrate this to use NOSQL
         JSONObject jObject = new JSONObject();
         String toBeFollowedUserId = paramsObject.getString("userId");
+
+        // migrate with NoSQL
+        followUser(loggedInUserId, toBeFollowedUserId);
         boolean followDone = Main.createFollow(loggedInUserId, toBeFollowedUserId);
         JSONObject inner = new JSONObject();
         if (followDone) {
@@ -25,7 +25,6 @@ public class UserActions {
             SendFollowToActivities(loggedInUserId, toBeFollowedUserId);
         } else {
             inner.put("success", "false");
-            //TODO: Better error handling
             inner.put("error", "0");
         }
         jObject.put("response", inner);
@@ -51,6 +50,7 @@ public class UserActions {
         //TODO: Migrate this to use NOSQL
         JSONObject jObject = new JSONObject();
         String toBeUnfollowedUserId = paramsObject.getString("userId");
+        unFollowUser(loggedInUserId, toBeUnfollowedUserId);
         boolean unfollowDone = Main.deleteFollow(loggedInUserId, toBeUnfollowedUserId);
 
         JSONObject inner = new JSONObject();
@@ -93,7 +93,7 @@ public class UserActions {
         String phone = paramsObject.getString("phone");
         String gender = paramsObject.getString("gender");
 
-        User user = null; //or session id
+        User user; //or session id
         try {
             user = Main.getUserById(loggedInUserId);
             user.setFullName(name);
@@ -128,8 +128,19 @@ public class UserActions {
         return jObject;
     }
 
-    //TODO delete blocks
-    //TODO check blocks
+    public static JSONObject DeleteBlockUser(JSONObject paramsObject, String userId) {
+        JSONObject jObject = new JSONObject();
+        String userIdToBeBlocked = paramsObject.getString("userId");
+        try {
+            Main.deleteBlockUser(userId, userIdToBeBlocked);
+            jObject.put("success", true);
+            jObject.put("error", "null");
+        } catch (Exception e) {
+            return createJSONError(e.getMessage());
+        }
+
+        return jObject;
+    }
 
     public static JSONObject CreateUserReport(JSONObject paramsObject, String loggedInUserId) {
         //TODO: Test this via postman
