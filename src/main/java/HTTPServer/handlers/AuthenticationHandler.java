@@ -6,16 +6,14 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
-import java.io.IOException;
-
 import static auth.JWT.verifyJWT;
 
 @ChannelHandler.Sharable
 public class AuthenticationHandler extends SimpleChannelInboundHandler<HTTPRequest> {
-    private final String ACCESS_TOKEN_HEADER = "x-access-token";
+    private static final String ACCESS_TOKEN_HEADER = "x-access-token";
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, HTTPRequest httpRequest) throws IOException {
+    protected void channelRead0(ChannelHandlerContext ctx, HTTPRequest httpRequest) {
         String accessToken = httpRequest.headers.get(ACCESS_TOKEN_HEADER);
         JWTPayload jwtPayload = null;
 
@@ -39,6 +37,7 @@ public class AuthenticationHandler extends SimpleChannelInboundHandler<HTTPReque
 
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) {
+        ctx.flush();
         ctx.close();
     }
 

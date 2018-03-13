@@ -1,15 +1,12 @@
 package HTTPServer;
 
 import HTTPServer.handlers.*;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.http.*;
 import io.netty.handler.codec.http.cors.CorsConfig;
 import io.netty.handler.codec.http.cors.CorsConfigBuilder;
 import io.netty.handler.codec.http.cors.CorsHandler;
-import io.netty.util.CharsetUtil;
 
 @ChannelHandler.Sharable
 public class ServerInitializer extends ChannelInitializer<SocketChannel> {
@@ -23,14 +20,13 @@ public class ServerInitializer extends ChannelInitializer<SocketChannel> {
 
         ChannelPipeline p = arg0.pipeline();
 
-
-        p.addLast("decoder", new HttpRequestDecoder());
-        p.addLast("encoder", new HttpResponseEncoder());
+        p.addLast ("codec", new HttpServerCodec());
+        p.addLast("aggregator", new HttpObjectAggregator(Short.MAX_VALUE));
 
         p.addLast(new CorsHandler(corsConfig));
 
         p.addLast(new HTTPHandler());
-        p.addLast(new JSONHandler());
+        p.addLast(new AuthenticationHandler());
 
         p.addLast(new MQSenderHandler());
         p.addLast(new MQReceiverHandler());
