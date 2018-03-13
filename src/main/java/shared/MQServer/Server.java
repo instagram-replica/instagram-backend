@@ -69,7 +69,7 @@ public class Server {
 
                         channel.basicPublish("", queueName, null, resObj.toString().getBytes("UTF-8"));
 
-                    } catch (IOException e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
                     } finally {
                         try {

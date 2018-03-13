@@ -15,7 +15,7 @@ import static utilities.Main.generateUUID;
 public abstract class Controller {
     private static MQSubscriptions mqSubscriptions = new MQSubscriptions(RMQConnection.getSingleton());
 
-    public abstract JSONObject execute(JSONObject jsonObject, String userId) throws IOException;
+    public abstract JSONObject execute(JSONObject jsonObject, String userId) throws Exception;
 
     public synchronized static JSONObject send(String serviceName, String receiverName, JSONObject jsonObject) throws IOException, InterruptedException {
         String uuid = generateUUID();

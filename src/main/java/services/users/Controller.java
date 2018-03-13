@@ -16,7 +16,7 @@ public class Controller extends shared.MQServer.Controller {
     }
 
     @Override
-    public JSONObject execute(JSONObject jsonObject, String userId) throws IOException {
+    public JSONObject execute(JSONObject jsonObject, String userId) throws Exception {
         //TODO: @MAGDY Find a better way of opening and closing db connection
         openConnection();
 
