@@ -1,12 +1,14 @@
 package services.users;
 
 import org.json.JSONObject;
-import shared.MQServer.Queue;
 
 import java.io.IOException;
 
+import static persistence.sql.Main.closeConnection;
+import static persistence.sql.Main.openConnection;
 
-public class Controller extends shared.Controller {
+
+public class Controller extends shared.MQServer.Controller {
 
 
     public Controller() {
@@ -14,21 +16,36 @@ public class Controller extends shared.Controller {
     }
 
     @Override
-    public JSONObject execute(JSONObject jsonObject, String userId) {
+    public JSONObject execute(JSONObject jsonObject, String userId) throws IOException {
+        //TODO: @MAGDY Find a better way of opening and closing db connection
+        openConnection();
+
         String methodName = jsonObject.getString("method");
         JSONObject paramsObject = jsonObject.getJSONObject("params");
+        JSONObject resJSON = new JSONObject();
         switch (methodName) {
             case "signUp":
-                return Authentication.SignUp(paramsObject, userId);
+                resJSON = Authentication.SignUp(paramsObject);
+                break;
             case "getUserInfo":
-                return Authentication.GetUserInfo(paramsObject, userId);
+                resJSON = Authentication.GetUserInfo(paramsObject, userId);
+                break;
             case "createFollow":
-                return UserActions.CreateFollow(paramsObject, userId);
+                resJSON = UserActions.CreateFollow(paramsObject, userId);
+                break;
+            case "udpateProfile":
+                resJSON = UserActions.UpdateProfile(paramsObject, userId);
+                break;
             case "createUnfollow":
-                return UserActions.CreateUnfollow(paramsObject, userId);
+                resJSON = UserActions.CreateUnfollow(paramsObject, userId);
+                break;
             case "deleteUser":
-                return UserActions.DeleteUser(paramsObject, userId);
+                resJSON = UserActions.DeleteUser(paramsObject, userId);
+                break;
+            case "authorizedToView":
+                resJSON = Authentication.authorizedToView(paramsObject.getString("viewerId"), paramsObject.getString("toBeViewedId"));
         }
-        return new JSONObject();
+        closeConnection();
+        return resJSON;
     }
 }

@@ -12,44 +12,50 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Team1 {
+import static shared.Helpers.createJSONError;
 
-    //Tested
+public class Comments {
+
     public static JSONObject createComment(JSONObject paramsObject, String loggedInUserId, String methodName) {
+        //TODO: Create activity for the post's owner, and check for mentions @ACTIVITIES_TEAM
+        //TODO: Check if the user has permission to view the post
         String postId = paramsObject.getString("postId");
         String comment = paramsObject.getString("text");
 
         JSONObject commentJSON = createCommentJSON(comment, 0, loggedInUserId, postId);
 
 
-        ArangoInterfaceMethods.insertCommentOnPost(postId, commentJSON);
-        JSONObject jsonValue = new JSONObject();
-        JSONObject response = new JSONObject();
-        JSONObject data = new JSONObject();
-        JSONObject newComment = new JSONObject();
-        newComment.put("postId", postId);
-        newComment.put("text", comment);
-        newComment.put("id", commentJSON.get("id"));
-        data.put("newComment", newComment);
-        response.put("data", data);
-        response.put("error", "0");
-        jsonValue.put("method", methodName);
-        jsonValue.put("response", response);
-        return jsonValue;
+        try {
+            ArangoInterfaceMethods.insertCommentOnPost(postId, commentJSON);
+            JSONObject jsonValue = new JSONObject();
+            JSONObject response = new JSONObject();
+            JSONObject data = new JSONObject();
+            JSONObject newComment = new JSONObject();
+            newComment.put("postId", postId);
+            newComment.put("text", comment);
+            newComment.put("id", commentJSON.get("id"));
+            data.put("newComment", newComment);
+            response.put("data", data);
+            response.put("error", "null");
+            jsonValue.put("method", methodName);
+            jsonValue.put("response", response);
+            return jsonValue;
+        } catch (Exception e) {
+            return createJSONError(e.getMessage());
+        }
     }
 
-    //tested
     public static JSONObject getCommentsOnPost(JSONObject paramsObject, String userId, String methodName) {
+        //TODO: Check if the user has permission to view the post
         String postId = paramsObject.getString("postId");
         JSONArray comments = ArangoInterfaceMethods.getCommentsOnPost(postId);
         JSONObject jsonValue = new JSONObject();
         jsonValue.put("method", methodName);
         jsonValue.put("comments", comments);
-        jsonValue.put("error", "0");
+        jsonValue.put("error", "null");
         return jsonValue;
     }
 
-    //Tested
     private static JSONObject createCommentJSON(String text, int depth, String userId, String postId) {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("id", Main.generateUUID());
@@ -65,9 +71,9 @@ public class Team1 {
         return jsonObject;
     }
 
-    //Tested
     public static JSONObject createCommentReply(JSONObject paramsObject, String userId, String methodname) {
-
+        //TODO: Create activity for the post's owner, and check for mentions @ACTIVITIES_TEAM
+        //TODO: Check if the user has permission to view the post
         String commentId = paramsObject.getString("commentId");
         String reply = paramsObject.getString("text");
 
@@ -90,7 +96,7 @@ public class Team1 {
         data.put("newReply", newReply);
 
         response.put("data", data);
-        response.put("error", "0");
+        response.put("error", "null");
 
         jsonValue.put("method", methodname);
         jsonValue.put("response", response);
