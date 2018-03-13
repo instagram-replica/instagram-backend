@@ -1,5 +1,5 @@
 {
-  "method": "getPost",
+  "method": "getPostLikers",
   "params": {
     "postId": "12"
   }
