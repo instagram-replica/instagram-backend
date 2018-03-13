@@ -1,6 +1,5 @@
 package HTTPServer.handlers;
 
-import shared.MQServer.Queue;
 import HTTPServer.RMQConnection;
 import com.rabbitmq.client.*;
 import io.netty.channel.ChannelHandler;
@@ -25,21 +24,21 @@ public class MQSenderHandler extends SimpleChannelInboundHandler<JSONObject> {
         Channel channel = connection.createChannel();
 
         String methodName = jsonObject.getString("method");
-        String queueName = props.getProperty(methodName);
-        Queue queue = new Queue(queueName);
+        String serviceName = props.getProperty(methodName);
+
 
         String uuid = UUID.randomUUID().toString();
-        jsonObject.put("uuid", uuid);
+        jsonObject
+                .put("uuid", uuid)
+                .put("sender", "netty");
 
-        channel.queueDeclare(queue.getRequestQueueName(), true, false, false, null);
-        channel.basicPublish("", queue.getRequestQueueName(), null, jsonObject.toString().getBytes("UTF-8"));
 
-        ctx.fireChannelRead(new MQHandlerPair(uuid, queue));
+        channel.queueDeclare(serviceName, true, false, false, null);
+        channel.basicPublish("", serviceName, null, jsonObject.toString().getBytes("UTF-8"));
+
+        ctx.fireChannelRead(new MQHandlerPair(uuid, serviceName));
 
         channel.close();
-
-        //FEDERATEDQS
-
 
     }
 }

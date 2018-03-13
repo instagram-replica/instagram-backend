@@ -1,13 +1,11 @@
 package HTTPServer.handlers;
 
-import shared.MQServer.Queue;
-
 public class MQHandlerPair {
     public String uuid;
-    public Queue queue;
+    public String serviceName;
 
-    public MQHandlerPair(String uuid, Queue queue) {
+    public MQHandlerPair(String uuid, String serviceName) {
         this.uuid = uuid;
-        this.queue = queue;
+        this.serviceName = serviceName;
     }
 }
