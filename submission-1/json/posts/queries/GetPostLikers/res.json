@@ -1,0 +1,13 @@
+{
+  "method": "getPostLikers",
+  "users": [
+    {
+      "id": "1234",
+      "username": "ahmedlhanafy",
+      ...
+    },
+    {
+      ...
+    }
+  ]
+}

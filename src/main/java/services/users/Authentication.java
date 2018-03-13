@@ -11,9 +11,9 @@ public class Authentication {
 
     public static JSONObject authorizedToView(String viewerId, String toBeViewedId) {
         //TODO:
-        JSONObject resJSONOb = new JSONObject();
-        resJSONOb.put("authorized", true);
-        return resJSONOb;
+        JSONObject resJSONObj = new JSONObject();
+        resJSONObj.put("authorized", true);
+        return resJSONObj;
     }
 
     public static JSONObject SignUp(JSONObject params) {

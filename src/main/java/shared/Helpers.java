@@ -32,7 +32,7 @@ public class Helpers {
         return res;
     }
 
-    public static boolean getAuthJSON(String serviceName, String viewerId, String toBeViewedId) throws IOException, InterruptedException {
+    public static boolean isAuthorizedToView(String serviceName, String viewerId, String toBeViewedId) throws IOException, InterruptedException {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("method", "authorizedToView");
 
