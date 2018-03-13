@@ -32,7 +32,7 @@ public class Authentication {
         newUser.setUsername(params.getString("username"));
         newUser.setFullName(params.getString("fullname"));
         newUser.setEmail(params.getString("email"));
-//        newUser.setGender(params.getString("gender"));
+        newUser.setGender(params.getString("gender"));
         //TODO: Add dateOfBirth to users' table
 //        newUser.setDateOfBirth((Date)params.get("dateOfBirth"));
         //TODO: @Maged send avatar param from the media server handler
