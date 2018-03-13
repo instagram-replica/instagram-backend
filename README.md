@@ -23,10 +23,10 @@ Each service consists of an RMQ consumer, RMQ producer & an `ExecutorService`. E
 - [Postman](https://www.getpostman.com/apps) _(for testing)_
 
 ## Getting started
-- Install PostgreSQL _(todo)_
-- Install ArangoDB _(todo)_
-- Install Redis
-- Install RabbitMQ
+- Run `dropdb --if-exists instagram_development` in the terminal
+- Run `createdb instagram_development`
+- Change directory to repository folder `cd <path/to/repo>` 
+- Run `psql instagram_development --file ./submission-1/sql/tables.sql --quiet` 
 - Clone the repo & open in IntelliJ
 - Open Maven Projects tab, expand `Lifecycle` & click `compile`
 - Open Maven Projects tab, expand `Plugins`, expand `activejdbc-instrumentation` & click `activejdbc-instrumentation:instrument`
