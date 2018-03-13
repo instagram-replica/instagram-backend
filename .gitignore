@@ -17,6 +17,5 @@ buildNumber.properties
 .mvn/timing.properties
 !/.mvn/wrapper/maven-wrapper.jar
 .project
-config.properties
 # Mac
 .DS_Store

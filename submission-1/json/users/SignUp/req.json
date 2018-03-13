@@ -1,12 +1,12 @@
 {
 	"method" : "signUp",
 	"params": {
-		"userName" : "sawahel",
-		"fullName" : "Ahmed Sawahel",
+		"username" : "sawahel",
+		"fullname" : "Ahmed Sawahel",
 		"passwordHash" : "!@#!@$C!",
 		"email" : "sawahel@magdy.com",
 		"gender" : "male",
-		"dateOfBirth" : "27/11/1994",
+		"dateOfBirth" : "Sun Mar 04 23:05:25 EET 2018",
 		"phone" : "+20 100 977 5576",
 		"avatar" : "https://..."
 	}
