@@ -1,4 +1,5 @@
 package services.users;
+import auth.JWTPayload;
 import persistence.sql.users.Main;
 import persistence.sql.users.User;
 import netscape.javascript.JSObject;
@@ -9,12 +10,21 @@ import org.json.JSONObject;
 import org.json.JSONObject;
 import persistence.sql.users.*;
 
+import java.io.IOException;
 import java.sql.Date;
+
+import static auth.JWT.signJWT;
+import static persistence.sql.Main.closeConnection;
+import static persistence.sql.Main.openConnection;
+import static utilities.Main.generateUUID;
 
 public class Authentication {
 
-    public static JSONObject SignUp(JSONObject params, String userId){
+    public static JSONObject SignUp(JSONObject params, String userId) throws IOException {
+        openConnection();
+
         User newUser = new User();
+        newUser.setId(generateUUID());
         newUser.setUsername(params.getString("username"));
         newUser.setFullName(params.getString("fullname"));
         newUser.setEmail(params.getString("email"));
@@ -25,10 +35,15 @@ public class Authentication {
         newUser.setPasswordHash(params.getString("passwordHash"));
 
         boolean created = Main.createUser(newUser);
+        closeConnection();
 
            if(created) {
                JSONObject session = new JSONObject();
-               session.put("sessionId", 20);
+               session.put("token", signJWT(
+                       new JWTPayload.Builder()
+                        .userId(newUser.getId())
+                        .build()
+               ));
                JSONObject res = new JSONObject();
                res.put("response",session);
 
@@ -37,11 +52,18 @@ public class Authentication {
         return null;
     }
 
-    public static JSONObject SignIn(JSONObject params, String userId){
+    public static JSONObject SignIn(JSONObject params, String userId) throws IOException {
+        openConnection();
         User user = Main.getUserById(params.getString("username"));
+        closeConnection();
+
         if(user.getPasswordHash().equals(params.getString("password"))){
             JSONObject session = new JSONObject();
-            session.put("sessionId", 12);
+            session.put("token", signJWT(
+                    new JWTPayload.Builder()
+                            .userId(user.getId())
+                            .build()
+            ));
             JSONObject response = new JSONObject();
             response.put("response", session);
             return response;

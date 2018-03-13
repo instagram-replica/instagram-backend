@@ -5,6 +5,7 @@ import shared.MQServer.Queue;
 
 import java.io.IOException;
 
+import static persistence.sql.Main.openConnection;
 
 public class Controller extends shared.Controller {
 
@@ -14,7 +15,7 @@ public class Controller extends shared.Controller {
     }
 
     @Override
-    public JSONObject execute(JSONObject jsonObject, String userId) {
+    public JSONObject execute(JSONObject jsonObject, String userId) throws IOException {
         String methodName = jsonObject.getString("method");
         JSONObject paramsObject = jsonObject.getJSONObject("params");
         switch (methodName) {
