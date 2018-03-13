@@ -23,15 +23,14 @@ public class ServerInitializer extends ChannelInitializer<SocketChannel> {
 
         ChannelPipeline p = arg0.pipeline();
 
-        p.addLast ("codec", new HttpServerCodec ());
+
         p.addLast("decoder", new HttpRequestDecoder());
         p.addLast("encoder", new HttpResponseEncoder());
-        p.addLast("aggregator", new HttpObjectAggregator(Short.MAX_VALUE));
 
         p.addLast(new CorsHandler(corsConfig));
 
         p.addLast(new HTTPHandler());
-        p.addLast(new AuthenticationHandler());
+        p.addLast(new JSONHandler());
 
         p.addLast(new MQSenderHandler());
         p.addLast(new MQReceiverHandler());
