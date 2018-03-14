@@ -51,7 +51,7 @@ Each service consists of an RMQ consumer, RMQ producer & an `ExecutorService`. E
     "params": {
         "username" : "john.doe",
         "fullname" : "John Doe",
-        "passwordHash" : "@xQ7HndX$8",
+        "password" : "123456",
         "email" : "john.doe@user.com",
         "gender" : "male",
         "dateOfBirth" : "Sun Mar 04 23:05:25 EET 2018",

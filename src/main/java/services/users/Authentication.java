@@ -11,6 +11,9 @@ import persistence.sql.users.*;
 
 import java.io.IOException;
 import java.sql.Date;
+
+import static auth.BCrypt.comparePassword;
+import static auth.BCrypt.hashPassword;
 import static shared.Helpers.createJSONError;
 
 import static auth.JWT.signJWT;
@@ -38,7 +41,7 @@ public class Authentication {
         //TODO: @Maged send avatar param from the media server handler
 //        newUser.setProfilePictureUrl(params.getString("avatar"));
         newUser.setPhoneNumber(params.getString("phone"));
-        newUser.setPasswordHash(params.getString("passwordHash"));
+        newUser.setPasswordHash(hashPassword(params.getString("password")));
 
         boolean created = Main.createUser(newUser);
 
@@ -59,7 +62,7 @@ public class Authentication {
 
     public static JSONObject SignIn(JSONObject params, String userId) throws Exception {
         User user = Main.getUserById(params.getString("username"));
-        if(user.getPasswordHash().equals(params.getString("password"))){
+        if (comparePassword(params.getString("password"), user.getPasswordHash())) {
             JSONObject session = new JSONObject();
             session.put("token", signJWT(
                     new JWTPayload.Builder()

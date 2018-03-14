@@ -72,7 +72,7 @@ public class Main {
     public static boolean createUser(User user) throws Exception {
         if (isValidUser(user)) {
             UsersModel usersModel = new UsersModel();
-            usersModel.set("id", generateUUID());
+            usersModel.set("id", user.getId());
             usersModel.set("username", user.getUsername());
             usersModel.set("email", user.getEmail());
             usersModel.set("password_hash", user.getPasswordHash());
