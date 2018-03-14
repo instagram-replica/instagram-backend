@@ -2,7 +2,7 @@ package services.posts;
 
 import org.json.JSONObject;
 
-public class Controller extends shared.Controller {
+public class Controller extends shared.MQServer.Controller {
 
 
     public Controller() {
@@ -25,14 +25,16 @@ public class Controller extends shared.Controller {
                 return Posts.deletePost(paramsObject, userId, methodName);
             case "createPostLike":
                 return Posts.createPostLike(paramsObject, userId, methodName);
-            case "deletePostLike":
-                return Posts.deletePostLike(paramsObject,userId,methodName);
+//            case "deletePostLike":
+//                return Posts.deletePostLike(paramsObject,userId,methodName);
             case "createComment":
                 return Comments.createComment(paramsObject, userId, methodName);
             case "getComments":
                 return Comments.getCommentsOnPost(paramsObject, userId, methodName);
             case "createCommentReply":
                 return Comments.createCommentReply(paramsObject, userId, methodName);
+            case "getPostLikers":
+                return Posts.getPostLikers(paramsObject, userId, methodName);
         }
 
         JSONObject newJsonObj = new JSONObject();

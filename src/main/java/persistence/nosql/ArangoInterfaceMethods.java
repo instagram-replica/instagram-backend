@@ -478,6 +478,7 @@ public class ArangoInterfaceMethods {
                 throw new Exception("Post with ID: " + id + " Not Found");
             }
             JSONObject postJSON = new JSONObject(postDoc.getProperties());
+            postJSON.put("id", postDoc.getKey());
             return reformatJSON(postJSON);
         } catch (ArangoDBException e) {
             System.err.println("Failed to get Post: " + e.getMessage());
@@ -494,6 +495,7 @@ public class ArangoInterfaceMethods {
             JSONArray result = new JSONArray();
             cursor.forEachRemaining(aDocument -> {
                 JSONObject postJSON = new JSONObject(aDocument.getProperties());
+                postJSON.put("id", aDocument.getKey());
                 result.put(postJSON);
             });
             return result;

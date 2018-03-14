@@ -7,7 +7,7 @@ import persistence.nosql.ArangoInterfaceMethods;
 import java.io.IOException;
 
 import static shared.Helpers.createJSONError;
-import static shared.Helpers.getAuthJSON;
+import static shared.Helpers.isAuthorizedToView;
 
 public class Posts {
 
@@ -18,9 +18,19 @@ public class Posts {
     }
 
     //TODO: Returns list of users (actual users not ids) who liked a post
-    //TODO: create JSON req and res for this method in submission1 folder
     public static JSONObject getPostLikers(JSONObject paramsObject, String loggedInUserId, String methodName) {
-        return null;
+        String postId = paramsObject.getString("postId");
+        JSONObject post = null;
+        try {
+            post = ArangoInterfaceMethods.getPost(postId);
+            String ownerId = post.getString("user_id");
+            if (isAuthorizedToView("posts", loggedInUserId, ownerId)) {
+                //TODO: @USERS_TEAM `getUsers`
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new JSONObject();
     }
 
     public static JSONObject getPost(JSONObject paramsObject, String loggedInUserId, String methodName) {
@@ -41,7 +51,7 @@ public class Posts {
                 String ownerId= post.getString("user_id");
             System.out.println(loggedInUserId+" :LOGGEDIN");
             System.out.println(ownerId+" :OWNER");
-                if (getAuthJSON(loggedInUserId, ownerId) || loggedInUserId.equals(ownerId)) {
+                if (isAuthorizedToView("posts", loggedInUserId, ownerId) || loggedInUserId.equals(ownerId)) {
                     return response;
                }
             return createJSONError("Not authorized to view");
@@ -59,7 +69,7 @@ public class Posts {
         int pageIndex = paramsObject.getInt("pageIndex");
         String ownerId = paramsObject.getString("userId");
         try {
-            if (getAuthJSON(loggedInUserId, ownerId)) {
+            if (isAuthorizedToView("posts", loggedInUserId, ownerId)) {
                 //@TODO: Check if the user exists
                 JSONArray posts = ArangoInterfaceMethods.getPosts(ownerId);
                 /// replacing likes array with no of likes instead
@@ -77,7 +87,7 @@ public class Posts {
                 return response;
             }
             return createJSONError("Not authorized to view");
-        } catch (IOException e) {
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
         return null;
@@ -160,28 +170,28 @@ public class Posts {
         }
     }
 
-    public static JSONObject deletePostLike(JSONObject paramsObject, String loggedInUserId, String methodName){
-        String postId = paramsObject.getString("postId");
-        try {
-            JSONObject post = ArangoInterfaceMethods.getPost(postId);
-            JSONArray likes = post.getJSONArray("likes");
-            for (int i = 0; i < likes.length(); i++) {
-                if (likes.get(i).equals(loggedInUserId)) {
-                ArangoInterfaceMethods.unlikePost(postId, loggedInUserId);
-                JSONObject res = new JSONObject();
-                JSONObject response = new JSONObject();
-                response.put("method", methodName);
-                res.put("postID", postId);
-                res.put("error", "null");
-                response.put("response", res);
-                    return response;
-            }
-        }
-            return createJSONError("You have not liked this post");
-        } catch (Exception e) {
-            return createJSONError(e.getMessage());
-        }
-    }
+//    public static JSONObject deletePostLike(JSONObject paramsObject, String loggedInUserId, String methodName){
+//        String postId = paramsObject.getString("postId");
+//        try {
+//            JSONObject post = ArangoInterfaceMethods.getPost(postId);
+//            JSONArray likes = post.getJSONArray("likes");
+//            for (int i = 0; i < likes.length(); i++) {
+//                if (likes.get(i).equals(loggedInUserId)) {
+//                ArangoInterfaceMethods.unlikePost(postId, loggedInUserId);
+//                JSONObject res = new JSONObject();
+//                JSONObject response = new JSONObject();
+//                response.put("method", methodName);
+//                res.put("postID", postId);
+//                res.put("error", "null");
+//                response.put("response", res);
+//                    return response;
+//            }
+//        }
+//            return createJSONError("You have not liked this post");
+//        } catch (Exception e) {
+//            return createJSONError(e.getMessage());
+//        }
+//    }
 
     //TODO:
     public static JSONObject getTaggedPosts(JSONObject paramsObject, String loggedInUserId) {

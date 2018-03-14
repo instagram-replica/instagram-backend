@@ -1,13 +1,8 @@
 package services.users;
 
 import org.json.JSONObject;
-import persistence.sql.users.Gender;
 import persistence.sql.users.Main;
 import persistence.sql.users.User;
-import shared.MQServer.Queue;
-
-import java.sql.Date;
-import java.time.Instant;
 
 import static shared.Helpers.createJSONError;
 

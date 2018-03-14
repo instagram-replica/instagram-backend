@@ -1,7 +1,6 @@
 package services.users;
 
 import org.json.JSONObject;
-import shared.MQServer.Queue;
 
 import java.io.IOException;
 
@@ -9,7 +8,7 @@ import static persistence.sql.Main.closeConnection;
 import static persistence.sql.Main.openConnection;
 
 
-public class Controller extends shared.Controller {
+public class Controller extends shared.MQServer.Controller {
 
 
     public Controller() {
@@ -17,7 +16,7 @@ public class Controller extends shared.Controller {
     }
 
     @Override
-    public JSONObject execute(JSONObject jsonObject, String userId) throws IOException {
+    public JSONObject execute(JSONObject jsonObject, String userId) throws Exception {
         //TODO: @MAGDY Find a better way of opening and closing db connection
         openConnection();
 

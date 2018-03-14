@@ -59,7 +59,7 @@ public class Main {
     }
 
 
-    public static List getUserByUsername(String username) {
+    public static List<UsersModel> getUserByUsername(String username) {
 
         return UsersModel.findBySQL("SELECT user FROM users WHERE username=?", username);
     }
@@ -72,7 +72,7 @@ public class Main {
     public static boolean createUser(User user) throws Exception {
         if (isValidUser(user)) {
             UsersModel usersModel = new UsersModel();
-            usersModel.set("id", generateUUID());
+            usersModel.set("id", user.getId());
             usersModel.set("username", user.getUsername());
             usersModel.set("email", user.getEmail());
             usersModel.set("password_hash", user.getPasswordHash());
@@ -215,14 +215,16 @@ public class Main {
     }
 
 
-    public static List searchForUser(String userFullName, String searcher) {
+    public static List searchForUser(String userFullName, String searcher) throws Exception {
 
-        List allResults = UsersModel.findBySQL("SELECT* FROM users WHERE LOWER(full_name) LIKE '%' || ? || '%' limit 10", userFullName.toLowerCase());
+        List<UsersModel> allResults = UsersModel.findBySQL("SELECT* FROM users WHERE LOWER(full_name) LIKE '%' || ? || '%' limit 10", userFullName.toLowerCase());
 
-
-        //TODO exclude blocked user from the searcher's/blocker search result
-        List blockedUsers = UsersBlockModel.findBySQL("SELECT* FROM users_blocks WHERE blocker_id = ?", searcher);
-        //Base.findAll("SELECT* FROM users u FULL OUTTER JOIN users_blocks ub ON u.id = ub.blocked_id WHERE u.id IS NULL OR ub.blocked_id IS NULL AND ub.blocker_id = ?", searcher);
+        for(int i=0; i<allResults.size(); i++){
+          User user1 = mapModelToUser(allResults.get(i));
+           if(blocks(searcher,user1.getId())){
+               allResults.remove(i);
+           }
+        }
 
         return allResults;
     }

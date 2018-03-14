@@ -1,23 +1,37 @@
 package services.users;
+import auth.JWTPayload;
 
 import persistence.sql.users.Main;
 import persistence.sql.users.User;
 import org.json.JSONObject;
 
 
+import org.json.JSONObject;
+import persistence.sql.users.*;
+
+import java.io.IOException;
+import java.sql.Date;
+
+import static auth.BCrypt.comparePassword;
+import static auth.BCrypt.hashPassword;
 import static shared.Helpers.createJSONError;
 
-public class Authentication {
+import static auth.JWT.signJWT;
+import static persistence.sql.Main.closeConnection;
+import static persistence.sql.Main.openConnection;
+import static utilities.Main.generateUUID;
 
+public class Authentication {
     public static JSONObject authorizedToView(String viewerId, String toBeViewedId) {
         //TODO:
-        JSONObject resJSONOb = new JSONObject();
-        resJSONOb.put("authorized", true);
-        return resJSONOb;
+        JSONObject resJSONObj = new JSONObject();
+        resJSONObj.put("authorized", true);
+        return resJSONObj;
     }
 
-    public static JSONObject SignUp(JSONObject params) {
+    public static JSONObject SignUp(JSONObject params) throws Exception {
         User newUser = new User();
+        newUser.setId(generateUUID());
         newUser.setUsername(params.getString("username"));
         newUser.setFullName(params.getString("fullname"));
         newUser.setEmail(params.getString("email"));
@@ -27,33 +41,39 @@ public class Authentication {
         //TODO: @Maged send avatar param from the media server handler
 //        newUser.setProfilePictureUrl(params.getString("avatar"));
         newUser.setPhoneNumber(params.getString("phone"));
-        newUser.setPasswordHash(params.getString("passwordHash"));
-        try {
-            Main.createUser(newUser);
-            JSONObject session = new JSONObject();
-            session.put("sessionId", 20);
-            JSONObject res = new JSONObject();
-            res.put("response", session);
-            return res;
-        } catch (Exception e) {
-            return createJSONError(e.getMessage());
-        }
+        newUser.setPasswordHash(hashPassword(params.getString("password")));
+
+        boolean created = Main.createUser(newUser);
+
+           if(created) {
+               JSONObject session = new JSONObject();
+               session.put("token", signJWT(
+                       new JWTPayload.Builder()
+                        .userId(newUser.getId())
+                        .build()
+               ));
+               JSONObject res = new JSONObject();
+               res.put("response",session);
+
+               return res;
+           }
+        return null;
     }
 
-    public static JSONObject SignIn(JSONObject params, String userId) {
-        User user = null;
-        try {
-            user = Main.getUserById(params.getString("username"));
-            if (user.getPasswordHash().equals(params.getString("password"))) {
-                JSONObject session = new JSONObject();
-                session.put("sessionId", 12);
-                JSONObject response = new JSONObject();
-                response.put("response", session);
-                return response;
-            } else return new JSONObject().put("error", "Password doesn't match");
-        } catch (Exception e) {
-            return createJSONError(e.getMessage());
+    public static JSONObject SignIn(JSONObject params, String userId) throws Exception {
+        User user = Main.getUserById(params.getString("username"));
+        if (comparePassword(params.getString("password"), user.getPasswordHash())) {
+            JSONObject session = new JSONObject();
+            session.put("token", signJWT(
+                    new JWTPayload.Builder()
+                            .userId(user.getId())
+                            .build()
+            ));
+            JSONObject response = new JSONObject();
+            response.put("response", session);
+            return response;
         }
+        return null;
     }
 
     public static JSONObject GetUserInfo(JSONObject jsonObject, String userID) {

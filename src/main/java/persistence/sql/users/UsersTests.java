@@ -2,6 +2,8 @@ package persistence.sql.users;
 
 import org.junit.Assert;
 import org.junit.Test;
+import persistence.sql.users.Models.UsersBlockModel;
+import persistence.sql.users.Models.UsersModel;
 
 import java.io.IOException;
 import java.util.Date;
@@ -113,19 +115,58 @@ public class UsersTests {
 //
 //    }
 
-   @Test
-    public void TestBlock() throws Exception {
-        openConnection();
+        @Test
+        public void TestBlock() throws Exception {
+                openConnection();
 
-        User user1 = getAllUsers().get(0);
-        User user2 = getAllUsers().get(1);
-        boolean blocked = blockUser(user1.getId(), user2.getId());
-//        Assert.assertEquals(true, blocked);
+                User dummy = new User();
+                dummy.setId(generateUUID());
+                dummy.setUsername("SosoA");
+                dummy.setPhoneNumber("010123456789");
+                dummy.setPrivate(true);
+                dummy.setGender("female");
+                dummy.setDateOfBirth(new Date(311294));
+                dummy.setPasswordHash("12!@#RF1wd1@#");
+                dummy.setEmail("sosoA@gmail.com");
+                dummy.setBio("7ob gamed");
+                dummy.setFullName("Soso A");
+                dummy.setCreatedAt(new java.util.Date());
+//
+                User dummy2 = new User();
+                dummy2.setId(generateUUID());
+                dummy2.setUsername("SosoB");
+                dummy2.setPhoneNumber("010123456789");
+                dummy2.setPrivate(true);
+                dummy2.setGender("female");
+                dummy2.setDateOfBirth(new Date(311294));
+                dummy2.setPasswordHash("12!@#RF1wd1@#");
+                dummy2.setEmail("sosob@gmail.com");
+                dummy2.setBio("7ob gamed");
+                dummy2.setFullName("Soso B");
+                dummy2.setCreatedAt(new java.util.Date());
+//
+//
+                User dummy3 = new User();
+                dummy3.setId(generateUUID());
+                dummy3.setUsername("SosoC");
+                dummy3.setPhoneNumber("010123456789");
+                dummy3.setPrivate(true);
+                dummy3.setGender("male");
+                dummy3.setDateOfBirth(new Date(311294));
+                dummy3.setPasswordHash("12!@#RF1wd1@#");
+                dummy3.setEmail("sosoc@gmail.com");
+                dummy3.setBio("7ob gamed");
+                dummy3.setFullName("Soso C");
+                dummy3.setCreatedAt(new java.util.Date());
+
+
+                boolean blocked = blockUser(dummy.getId(),dummy2.getId());
+                Assert.assertEquals(true, blocked);
 //        Assert.assertEquals(true, blocks(user1.getId(), user2.getId()));
 //        Assert.assertEquals(false, blocks(user2.getId(), user1.getId()));
 
-        closeConnection();
-    }
+                closeConnection();
+        }
 //
 //    @Test
 //    public void TestReport() throws Exception {
