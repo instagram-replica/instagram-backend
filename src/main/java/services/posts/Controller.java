@@ -25,6 +25,8 @@ public class Controller extends shared.Controller {
                 return Posts.deletePost(paramsObject, userId, methodName);
             case "createPostLike":
                 return Posts.createPostLike(paramsObject, userId, methodName);
+            case "deletePostLike":
+                return Posts.deletePostLike(paramsObject,userId,methodName);
             case "createComment":
                 return Comments.createComment(paramsObject, userId, methodName);
             case "getComments":

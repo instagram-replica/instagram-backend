@@ -136,11 +136,17 @@ public class Posts {
     }
 
     public static JSONObject createPostLike(JSONObject paramsObject, String loggedInUserId, String methodName) {
-        //TODO: User cannot like a post more than once
+        //DONE: User cannot like a post more than once
         //TODO: Add unlike method and create JSON req and res
         //TODO: Create activity for the post owner @ACTIVITIES_TEAM, except if he is a retard who likes his own image
         String postId = paramsObject.getString("postId");
         try {
+            JSONObject post = ArangoInterfaceMethods.getPost(postId);
+            JSONArray likes = post.getJSONArray("likes");
+            for(int i=0; i<likes.length();i++){
+                if(likes.get(i).equals(loggedInUserId))
+                    return createJSONError("You already liked this post");
+            }
             ArangoInterfaceMethods.likePost(postId, loggedInUserId);
             JSONObject res = new JSONObject();
             JSONObject response = new JSONObject();
@@ -149,6 +155,29 @@ public class Posts {
             res.put("error", "null");
             response.put("response", res);
             return response;
+        } catch (Exception e) {
+            return createJSONError(e.getMessage());
+        }
+    }
+
+    public static JSONObject deletePostLike(JSONObject paramsObject, String loggedInUserId, String methodName){
+        String postId = paramsObject.getString("postId");
+        try {
+            JSONObject post = ArangoInterfaceMethods.getPost(postId);
+            JSONArray likes = post.getJSONArray("likes");
+            for (int i = 0; i < likes.length(); i++) {
+                if (likes.get(i).equals(loggedInUserId)) {
+                ArangoInterfaceMethods.unlikePost(postId, loggedInUserId);
+                JSONObject res = new JSONObject();
+                JSONObject response = new JSONObject();
+                response.put("method", methodName);
+                res.put("postID", postId);
+                res.put("error", "null");
+                response.put("response", res);
+                    return response;
+            }
+        }
+            return createJSONError("You have not liked this post");
         } catch (Exception e) {
             return createJSONError(e.getMessage());
         }
