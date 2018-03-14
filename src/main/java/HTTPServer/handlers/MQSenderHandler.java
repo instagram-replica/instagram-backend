@@ -15,12 +15,13 @@ import static utilities.Main.cloneJSONObject;
 import static utilities.Main.readPropertiesFile;
 
 @ChannelHandler.Sharable
-public class MQSenderHandler extends SimpleChannelInboundHandler<JSONObject> {
+public class MQSenderHandler extends SimpleChannelInboundHandler<HTTPRequest> {
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, JSONObject jsonObject) throws Exception {
+    protected void channelRead0(ChannelHandlerContext ctx, HTTPRequest httpRequest) throws Exception {
 
         // TODO: This might be costly, maybe we shouldn't read the file every time a request is received
         Properties props = readPropertiesFile("src/main/resources/requests_mapping.properties");
+        JSONObject jsonObject = cloneJSONObject(httpRequest.content);
 
         Connection connection = RMQConnection.getSingleton();
         Channel channel = connection.createChannel();
