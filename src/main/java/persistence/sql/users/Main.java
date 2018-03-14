@@ -59,9 +59,9 @@ public class Main {
     }
 
 
-    public static List<UsersModel> getUserByUsername(String username) {
-
-        return UsersModel.findBySQL("SELECT user FROM users WHERE username=?", username);
+    public static User getUserByUsername(String username) {
+        List<UsersModel> l = UsersModel.findBySQL("SELECT * FROM users WHERE username=?", username);
+        return mapModelToUser(l.get(0));
     }
 
     public static List getUserByEmail(String email) {

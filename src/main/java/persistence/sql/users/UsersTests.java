@@ -146,26 +146,33 @@ public class UsersTests {
         dummy2.setCreatedAt(new java.util.Date());
 //
 //
-        User dummy3 = new User();
-        dummy3.setId(generateUUID());
-        dummy3.setUsername("SosoC");
-        dummy3.setPhoneNumber("010123456789");
-        dummy3.setPrivate(true);
-        dummy3.setGender("male");
-        dummy3.setDateOfBirth(new Date(311294));
-        dummy3.setPasswordHash("12!@#RF1wd1@#");
-        dummy3.setEmail("sosoc@gmail.com");
-        dummy3.setBio("7ob gamed");
-        dummy3.setFullName("Soso C");
-        dummy3.setCreatedAt(new java.util.Date());
+//        User dummy3 = new User();
+//        dummy3.setId(generateUUID());
+//        dummy3.setUsername("SosoC");
+//        dummy3.setPhoneNumber("010123456789");
+//        dummy3.setPrivate(true);
+//        dummy3.setGender("male");
+//        dummy3.setDateOfBirth(new Date(311294));
+//        dummy3.setPasswordHash("12!@#RF1wd1@#");
+//        dummy3.setEmail("sosoc@gmail.com");
+//        dummy3.setBio("7ob gamed");
+//        dummy3.setFullName("Soso C");
+//        dummy3.setCreatedAt(new java.util.Date());
 
+//       User user = getUserByUsername("SosoA");
+//       System.out.println(user.toString());
 
-        boolean blocked = blockUser(dummy.getId(),dummy2.getId());
-       Assert.assertEquals(true, blocked);
+//       Assert.assertEquals();
+
+      //  boolean blocked = blockUser(getUserByUsername("SosoA").getId(),getUserByUsername("SosoB").getId());
+       List l = searchForUser("Soso B",getUserByUsername("SosoA").getId());
+       System.out.println(l);
+  //     boolean blocked = blockUser("b1634279-61e2-43ae-acd7-031d9178c5c2", "169b6120-dd78-4cb3-ade1-3a11f28b3c1f");
+//         Assert.assertEquals(true, blocked);
 //        Assert.assertEquals(true, blocks(user1.getId(), user2.getId()));
 //        Assert.assertEquals(false, blocks(user2.getId(), user1.getId()));
 
-        closeConnection();
+         closeConnection();
     }
 //
 //    @Test
