@@ -35,6 +35,8 @@ public class Controller extends shared.MQServer.Controller {
                 return Comments.createCommentReply(paramsObject, userId, methodName);
             case "getPostLikers":
                 return Posts.getPostLikers(paramsObject, userId, methodName);
+            case "updatePost":
+                return Posts.updatePost(paramsObject,userId,methodName);
         }
 
         JSONObject newJsonObj = new JSONObject();

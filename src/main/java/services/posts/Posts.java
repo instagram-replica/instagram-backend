@@ -12,8 +12,39 @@ import static shared.Helpers.isAuthorizedToView;
 public class Posts {
 
     //TODO: Updates a post, take care of permissions
-    //TODO: create JSON req and res for this method in submission1 folder
+    //Done: create JSON req and res for this method in submission1 folder
     public static JSONObject updatePost(JSONObject paramsObject, String loggedInUserId, String methodName) {
+        String postId = paramsObject.getString("postId");
+        JSONObject post=null;
+        JSONObject updatedPost=null;
+        System.out.println(paramsObject);
+        try {
+            post = ArangoInterfaceMethods.getPost(postId);
+            String ownerId = post.getString("user_id");
+            if (loggedInUserId.equals(ownerId)) {
+                ArangoInterfaceMethods.updatePost(postId,paramsObject);
+                updatedPost =  ArangoInterfaceMethods.getPost(postId);
+                JSONObject response = new JSONObject();
+                /// Replacing likes array with no of likes instead
+            //    JSONArray likes = updatedPost.getJSONArray("likes");
+             //   int noOfLikes= likes.length();
+             //   updatedPost.remove("likes");
+             //   updatedPost.put("likes",noOfLikes);
+
+                JSONObject postResponse = new JSONObject();
+                postResponse.put("post", updatedPost);
+                postResponse.put("error", "null");
+
+                response.put("method", methodName);
+                response.put("postId",postId);
+                response.put("response", postResponse);
+
+                return response;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         return null;
     }
 
@@ -34,7 +65,7 @@ public class Posts {
     }
 
     public static JSONObject getPost(JSONObject paramsObject, String loggedInUserId, String methodName) {
-        //TODO: Get the post if the logged in user has permission to view it, otherwise return error
+        //DONE LOGICALLY: Get the post if the logged in user has permission to view it, otherwise return error
         //DONE: Calculate number of likes and return it, instead of the likes array
         String postId = paramsObject.getString("postId");
         JSONObject post = null;
@@ -69,9 +100,10 @@ public class Posts {
         int pageIndex = paramsObject.getInt("pageIndex");
         String ownerId = paramsObject.getString("userId");
         try {
-            if (isAuthorizedToView("posts", loggedInUserId, ownerId)) {
+            if (isAuthorizedToView("posts", loggedInUserId, ownerId) || loggedInUserId.equals(ownerId)) {
                 //@TODO: Check if the user exists
                 JSONArray posts = ArangoInterfaceMethods.getPosts(ownerId);
+
                 /// replacing likes array with no of likes instead
                 for(int i=0; i<posts.length();i++){
                     JSONObject post= posts.getJSONObject(i);
@@ -121,7 +153,9 @@ public class Posts {
         try {
             //TODO: Parse tags in media and @ACTIVITIES_TEAM create activities for their users
             //DONE: Return the newly created post instead of the ID only
-            postId = ArangoInterfaceMethods.insertPost(paramsObject.getJSONObject("post"), loggedInUserId);
+
+        //    if(paramsObject.getJSONObject("post").get("user_id").toString().equals(loggedInUserId))
+            postId = ArangoInterfaceMethods.insertPost(paramsObject.getJSONObject("post"),loggedInUserId);
             JSONObject response = new JSONObject();
             JSONObject postCreated = ArangoInterfaceMethods.getPost(postId);
 
@@ -191,7 +225,7 @@ public class Posts {
 //        } catch (Exception e) {
 //            return createJSONError(e.getMessage());
 //        }
-//    }
+//    }s
 
     //TODO:
     public static JSONObject getTaggedPosts(JSONObject paramsObject, String loggedInUserId) {

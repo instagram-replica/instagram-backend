@@ -319,7 +319,7 @@ public class ArangoInterfaceTest {
 
     @Test
     public void updateAndDeleteStory() {
-         utilities.Main.generateUUID();
+        utilities.Main.generateUUID();
         JSONObject obj = new JSONObject();
         obj.put("user_id",utilities.Main.generateUUID());
         obj.put("is_featured",false);

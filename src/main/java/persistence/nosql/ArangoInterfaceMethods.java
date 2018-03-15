@@ -46,7 +46,6 @@ public class ArangoInterfaceMethods {
     public static void main(String[] args) throws Exception {
 //        arangoDB.db(dbName).drop();
         initializeDB();
-
 //        initializeGraphCollections();
 //        String id1 = utilities.Main.generateUUID();
 //        String id2 = utilities.Main.generateUUID();
@@ -515,6 +514,7 @@ public class ArangoInterfaceMethods {
     }
 
     public static void updatePost(String id, JSONObject postJSON) {
+        System.out.println(postJSON);
         try {
             BaseDocument myObject = new BaseDocument();
             myObject.addAttribute("user_id", postJSON.get("user_id").toString());
