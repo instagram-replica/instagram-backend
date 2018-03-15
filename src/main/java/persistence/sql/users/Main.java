@@ -71,7 +71,6 @@ public class Main {
     }
 
     public static List<User> getUsersByIds(String[] usersIds) {
-        /* Input to query is manually sanitized for safety */
         for (String userId : usersIds) {
             if (!isValidUserId(userId)) {
                 throw new RuntimeException(
@@ -92,6 +91,22 @@ public class Main {
         return results
                 .stream()
                 .map(Main::mapModelToUser)
+                .collect(Collectors.toList());
+    }
+
+    public static List<String> getUsersIdsByUsernames(String[] usernames) {
+        /*
+         * Query looks unsafe, but here's the source:
+         * http://javalite.io/in_clause
+         */
+        List<UsersModel> results = UsersModel.where(
+                "username IN (" + constructList(usernames) + ")"
+        );
+
+        return results
+                .stream()
+                .map(Main::mapModelToUser)
+                .map(User::getId)
                 .collect(Collectors.toList());
     }
 
