@@ -25,11 +25,11 @@ public class Posts {
                 ArangoInterfaceMethods.updatePost(postId,paramsObject);
                 updatedPost =  ArangoInterfaceMethods.getPost(postId);
                 JSONObject response = new JSONObject();
-                /// Replacing likes array with no of likes instead
-            //    JSONArray likes = updatedPost.getJSONArray("likes");
-             //   int noOfLikes= likes.length();
-             //   updatedPost.remove("likes");
-             //   updatedPost.put("likes",noOfLikes);
+
+                //Replacing likes array with no of likes instead
+//                JSONArray likes = updatedPost.getJSONArray("likes");
+//                int noOfLikes= likes.length();
+//                updatedPost.put("likes",noOfLikes);
 
                 JSONObject postResponse = new JSONObject();
                 postResponse.put("post", updatedPost);
@@ -75,13 +75,14 @@ public class Posts {
                 JSONArray likes = post.getJSONArray("likes");
                 int noOfLikes= likes.length();
                 JSONObject response = new JSONObject();
-                post.remove("likes");
                 post.put("likes",noOfLikes);
+
                 response.put("method", methodName);
                 response.put("post", post);
+
                 String ownerId= post.getString("user_id");
-            System.out.println(loggedInUserId+" :LOGGEDIN");
-            System.out.println(ownerId+" :OWNER");
+                System.out.println(loggedInUserId+" :LOGGEDIN");
+                System.out.println(ownerId+" :OWNER");
                 if (isAuthorizedToView("posts", loggedInUserId, ownerId) || loggedInUserId.equals(ownerId)) {
                     return response;
                }
@@ -94,7 +95,7 @@ public class Posts {
 
     public static JSONObject getPosts(JSONObject paramsObject, String loggedInUserId, String methodName) {
 
-        //TODO: Calculate number of likes and return it, instead of the likes array
+        //DONE: Calculate number of likes and return it, instead of the likes array
         //TODO: Make use of the pagination params (do not spend much time on this)
         int pageSize = paramsObject.getInt("pageSize");
         int pageIndex = paramsObject.getInt("pageIndex");
@@ -107,15 +108,16 @@ public class Posts {
                 /// replacing likes array with no of likes instead
                 for(int i=0; i<posts.length();i++){
                     JSONObject post= posts.getJSONObject(i);
-                    JSONArray likes=post.getJSONArray("likes");
+                    System.out.println(post);
+                    JSONArray likes = post.getJSONArray("likes");
                     int noOfLikes= likes.length();
-                    post.remove("likes");
                     post.put("likes",noOfLikes);
                 }
+
                 JSONObject response = new JSONObject();
                 response.put("method", methodName);
                 response.put("posts", posts);
-                System.out.println(response);
+
                 return response;
             }
             return createJSONError("Not authorized to view");
@@ -162,7 +164,6 @@ public class Posts {
             /// Replacing likes array with no of likes instead
             JSONArray likes = postCreated.getJSONArray("likes");
             int noOfLikes= likes.length();
-            postCreated.remove("likes");
             postCreated.put("likes",noOfLikes);
 
             JSONObject postResponse = new JSONObject();
