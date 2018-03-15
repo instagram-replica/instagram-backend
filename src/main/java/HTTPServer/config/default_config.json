@@ -1,6 +1,0 @@
-{
-  "name": "InstagramBackend",
-  "port": 8080,
-  "numberOfThreads": 10,
-  "version": "0.1.0"
-}

@@ -33,7 +33,7 @@ Each service consists of an RMQ consumer, RMQ producer & an `ExecutorService`. E
 - Navigate to `persistence` package, expand `nosql`, click & run `ArangoInterfaceMethods.java`. This file creates the NoSQL tables & graphs.
 
 ## Running the app
-- Run `src/main/java/HTTPServer/Server.java`, this makes sure that the server is running on port 8080 & ready to accept HTTP requests
+- Run `src/main/java/http_server/Server.java`, this makes sure that the server is running on port 8080 & ready to accept HTTP requests
 - Run `src/main/java/services/users/Server.java`, this file initializes an RMQ consumer for the users service that will be later used to authenticate requests
 - Run `src/main/java/services/activities/Server.java`, this file initializes an RMQ consumer for activities that will be later used by other services
 - Run `src/main/java/services/<your-service>/Server.java`, this also initializes an RMQ consumer for the specified service

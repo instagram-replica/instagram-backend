@@ -2,13 +2,11 @@ package services.users;
 
 import org.json.JSONObject;
 
-import java.io.IOException;
-
 import static persistence.sql.Main.closeConnection;
 import static persistence.sql.Main.openConnection;
 
 
-public class Controller extends shared.MQServer.Controller {
+public class Controller extends shared.mq_server.Controller {
 
 
     public Controller() {

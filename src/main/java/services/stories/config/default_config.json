@@ -1,0 +1,7 @@
+{
+  "name": "stories1",
+  "application": "stories",
+  "port": 8003,
+  "numberOfThreads": 10,
+  "version": "0.1.0"
+}

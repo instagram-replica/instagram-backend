@@ -1,13 +1,19 @@
 package services.activities;
 
+import shared.Settings;
 
 
 public class Server {
-    public static void main(String[] args) {
-            Controller controller = new Controller();
-            shared.MQServer.Server server = new shared.MQServer.Server("activities");
+    private static final String DEFAULT_CONFIG_URI_LOC = "src/main/java/services/activities/config/default_config.json";
 
-            server.run(controller);
+    public static void main(String[] args) {
+        String fileUri = args.length == 1 ? args[0] : DEFAULT_CONFIG_URI_LOC;
+
+        Controller controller = new Controller();
+
+        shared.mq_server.Server server = new shared.mq_server.Server(Settings.readSettingsFromFile(fileUri));
+
+        server.run(controller);
 
     }
 }

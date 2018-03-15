@@ -1,0 +1,7 @@
+{
+  "name": "chats1",
+  "application": "chats",
+  "port": 8001,
+  "numberOfThreads": 10,
+  "version": "0.1.0"
+}
