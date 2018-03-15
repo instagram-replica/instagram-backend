@@ -53,7 +53,7 @@ public class Controller extends shared.MQServer.Controller {
             case "getUsersByIds":
                 // TODO @maged: Refactor logic into dedicated file
                 List<User> users = getUsersByIds(
-                        new String[] {"000b332b-cd4e-afef-b58e-af7feab727eb"} // TODO @magdy: Swap with data from params object
+                        new String[] {} // TODO @magdy: Swap with data from params object
                 );
                 resJSON = new JSONObject()
                         .put("response", new JSONObject().put("data", new JSONArray(users)));
