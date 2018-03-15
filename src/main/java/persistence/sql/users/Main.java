@@ -12,6 +12,7 @@ import persistence.sql.users.Models.UsersReportModel;
 
 import java.io.IOException;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -71,6 +72,10 @@ public class Main {
     }
 
     public static List<User> getUsersByIds(String[] usersIds) {
+        if (usersIds.length == 0) {
+            return new ArrayList<>();
+        }
+
         for (String userId : usersIds) {
             if (!isValidUserId(userId)) {
                 throw new RuntimeException(
@@ -95,6 +100,10 @@ public class Main {
     }
 
     public static List<String> getUsersIdsByUsernames(String[] usernames) {
+        if (usernames.length == 0) {
+            return new ArrayList<>();
+        }
+
         /*
          * Query looks unsafe, but here's the source:
          * http://javalite.io/in_clause
