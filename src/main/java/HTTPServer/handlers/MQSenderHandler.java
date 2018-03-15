@@ -2,6 +2,7 @@ package HTTPServer.handlers;
 
 import HTTPServer.HTTPRequest;
 import HTTPServer.RMQConnection;
+import HTTPServer.Server;
 import com.rabbitmq.client.*;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -33,8 +34,7 @@ public class MQSenderHandler extends SimpleChannelInboundHandler<HTTPRequest> {
         String uuid = UUID.randomUUID().toString();
         jsonObject
                 .put("uuid", uuid)
-                .put("sender", "netty");
-
+                .put("sender", Server.settings.getName());
 
         channel.queueDeclare(serviceName, true, false, false, null);
         channel.basicPublish("", serviceName, null, jsonObject.toString().getBytes("UTF-8"));

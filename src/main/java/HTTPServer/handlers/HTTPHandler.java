@@ -19,6 +19,7 @@ public class HTTPHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
                 .method(decodeHTTPMethod(fullHttpRequest))
                 .headers(decodeHTTPHeaders(fullHttpRequest))
                 .content(decodeHTTPContent(fullHttpRequest))
+                .uri(decodeHTTPUri(fullHttpRequest))
                 .build();
 
         ctx.fireChannelRead(httpRequest);
@@ -38,6 +39,10 @@ public class HTTPHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
 
     private static String decodeHTTPMethod(FullHttpRequest fullHttpRequest) {
         return fullHttpRequest.method().name();
+    }
+
+    private static String decodeHTTPUri(FullHttpRequest fullHttpRequest) {
+        return fullHttpRequest.uri();
     }
 
     private static HashMap<String, String> decodeHTTPHeaders(FullHttpRequest fullHttpRequest) {

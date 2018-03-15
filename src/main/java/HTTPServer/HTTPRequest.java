@@ -9,17 +9,20 @@ public class HTTPRequest {
     public final HashMap<String, String> headers;
     public final JSONObject content;
     public final String userId;
+    public final String uri;
 
     private HTTPRequest(
             String method,
             HashMap<String, String> headers,
             JSONObject content,
-            String userId
+            String userId,
+            String uri
     ) {
         this.method = method;
         this.headers = headers;
         this.content = content;
         this.userId = userId;
+        this.uri = uri;
     }
 
     public boolean isAuthenticated() {
@@ -31,6 +34,7 @@ public class HTTPRequest {
         private HashMap<String, String> headers;
         private JSONObject content;
         private String userId;
+        public String uri = "/";
 
         public Builder method(String method) {
             this.method = method;
@@ -52,12 +56,18 @@ public class HTTPRequest {
             return this;
         }
 
+        public Builder uri(String uri) {
+            this.uri = uri;
+            return this;
+        }
+
         public HTTPRequest build() {
             return new HTTPRequest(
                     this.method,
                     this.headers,
                     this.content,
-                    this.userId
+                    this.userId,
+                    this.uri
             );
         }
     }

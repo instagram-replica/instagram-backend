@@ -12,7 +12,7 @@ import static shared.Helpers.blockAndSubscribe;
 public class MQReceiverHandler extends SimpleChannelInboundHandler<MQHandlerPair> {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, MQHandlerPair mqPair) throws Exception {
-        JSONObject resJSON = blockAndSubscribe(Server.mqSubscriptions, mqPair.uuid, "netty", mqPair.serviceName);
+        JSONObject resJSON = blockAndSubscribe(Server.mqSubscriptions, mqPair.uuid, Server.settings.getName(), mqPair.serviceName);
         ctx.fireChannelRead(resJSON);
     }
 }

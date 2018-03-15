@@ -26,6 +26,8 @@ public class ServerInitializer extends ChannelInitializer<SocketChannel> {
         p.addLast(new CorsHandler(corsConfig));
 
         p.addLast(new HTTPHandler());
+        p.addLast(new URIHandler());
+
         p.addLast(new AuthenticationHandler());
 
         p.addLast(new MQSenderHandler());
