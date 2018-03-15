@@ -68,7 +68,6 @@ public class Controller extends shared.MQServer.Controller {
                 break;
         }
         closeConnection();
-        System.out.println(resJSON);
         return resJSON;
     }
 }
