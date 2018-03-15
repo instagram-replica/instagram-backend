@@ -10,7 +10,7 @@ import java.util.concurrent.TimeoutException;
 import static utilities.Main.readPropertiesFile;
 
 public class RMQConnection {
-    static Connection connection;
+    private static Connection connection;
 
     private RMQConnection() {
 

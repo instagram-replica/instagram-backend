@@ -14,15 +14,10 @@ import shared.Settings;
 
 @ChannelHandler.Sharable
 public class ServerInitializer extends ChannelInitializer<SocketChannel> {
-    private final Settings settings;
-
-    public ServerInitializer(Settings settings) {
-        super();
-        this.settings = settings;
-    }
-
     @Override
     protected void initChannel(SocketChannel arg0) {
+        Settings settings = Settings.getInstance();
+
         CorsConfig corsConfig = CorsConfigBuilder.forAnyOrigin()
                 .allowedRequestHeaders("X-Requested-With", "Content-Type", "Content-Length")
                 .allowedRequestMethods(HttpMethod.GET, HttpMethod.POST, HttpMethod.PUT, HttpMethod.DELETE, HttpMethod.OPTIONS)

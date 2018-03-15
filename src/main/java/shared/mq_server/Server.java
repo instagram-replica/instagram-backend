@@ -22,19 +22,13 @@ import java.util.concurrent.*;
 import static shared.Helpers.getResponseQueue;
 
 public class Server {
-    private Settings settings;
-
-    public Server(Settings settings) {
-        this.settings = settings;
-    }
-
-    public void run(Controller controller) {
-        _run(controller, settings.getNumberOfThreads());
+    public static void run(Controller controller) {
+        _run(controller, Settings.getInstance().getNumberOfThreads());
         initHTTPServer();
     }
 
-    private void initHTTPServer() {
-        shared.http_server.Server.start(settings, new ChannelInitializer() {
+    private static void initHTTPServer() {
+        shared.http_server.Server.start(new ChannelInitializer() {
             @Override
             protected void initChannel(io.netty.channel.Channel ch) throws Exception {
                 CorsConfig corsConfig = CorsConfigBuilder.forAnyOrigin()
@@ -50,7 +44,7 @@ public class Server {
                 p.addLast(new CorsHandler(corsConfig));
 
                 p.addLast(new HTTPHandler());
-                p.addLast(new URIHandler(settings));
+                p.addLast(new URIHandler(Settings.getInstance()));
 
                 p.addLast(new JSONHandler());
 
@@ -60,18 +54,19 @@ public class Server {
         });
     }
 
-    private void _run(Controller controller, int numberOfThreads) {
+    private static void _run(Controller controller, int numberOfThreads) {
         try {
             Connection connection = RMQConnection.getSingleton();
+
             final Channel channel = connection.createChannel();
             ExecutorService executor = Executors.newFixedThreadPool(numberOfThreads);
 
-            channel.queueDeclare(settings.getApplication(), true, false, false, null);
+            channel.queueDeclare(Settings.getInstance().getApplication(), true, false, false, null);
             channel.basicQos(numberOfThreads);
 
-            Consumer consumer = handleDelivery(channel, settings.getApplication(), executor, controller);
+            Consumer consumer = handleDelivery(channel, Settings.getInstance().getApplication(), executor, controller);
 
-            channel.basicConsume(settings.getApplication(), false, consumer);
+            channel.basicConsume(Settings.getInstance().getApplication(), false, consumer);
 
             System.out.println(" [*] Waiting for messages. To exit press CTRL+C");
 

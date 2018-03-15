@@ -11,12 +11,6 @@ import static shared.Helpers.createJSONError;
 import static shared.Helpers.isAuthorizedToView;
 
 public class Posts {
-    private Settings settings;
-
-    public Posts(Settings settings) {
-        this.settings = settings;
-    }
-
     //TODO: Updates a post, take care of permissions
     //TODO: create JSON req and res for this method in submission1 folder
     public JSONObject updatePost(JSONObject paramsObject, String loggedInUserId, String methodName) {
@@ -24,13 +18,13 @@ public class Posts {
     }
 
     //TODO: Returns list of users (actual users not ids) who liked a post
-    public JSONObject getPostLikers(JSONObject paramsObject, String loggedInUserId, String methodName) {
+    public static JSONObject getPostLikers(JSONObject paramsObject, String loggedInUserId, String methodName) {
         String postId = paramsObject.getString("postId");
         JSONObject post = null;
         try {
             post = ArangoInterfaceMethods.getPost(postId);
             String ownerId = post.getString("user_id");
-            if (isAuthorizedToView(settings.getName(), loggedInUserId, ownerId)) {
+            if (isAuthorizedToView(Settings.getInstance().getName(), loggedInUserId, ownerId)) {
                 //TODO: @USERS_TEAM `getUsers`
             }
         } catch (Exception e) {
@@ -39,7 +33,7 @@ public class Posts {
         return new JSONObject();
     }
 
-    public JSONObject getPost(JSONObject paramsObject, String loggedInUserId, String methodName) {
+    public static JSONObject getPost(JSONObject paramsObject, String loggedInUserId, String methodName) {
         //TODO: Get the post if the logged in user has permission to view it, otherwise return error
         //TODO: Calculate number of likes and return it, instead of the likes array
         String postId = paramsObject.getString("postId");
@@ -56,7 +50,7 @@ public class Posts {
     }
 
 
-    public JSONObject getPosts(JSONObject paramsObject, String loggedInUserId, String methodName) {
+    public static JSONObject getPosts(JSONObject paramsObject, String loggedInUserId, String methodName) {
 
         //TODO: Calculate number of likes and return it, instead of the likes array
         //TODO: Make use of the pagination params (do not spend much time on this)
@@ -64,13 +58,12 @@ public class Posts {
         int pageIndex = paramsObject.getInt("pageIndex");
         String ownerId = paramsObject.getString("userId");
         try {
-            if (isAuthorizedToView(settings.getName(), loggedInUserId, ownerId)) {
+            if (isAuthorizedToView(Settings.getInstance().getName(), loggedInUserId, ownerId)) {
                 //@TODO: Check if the user exists
                 JSONArray posts = ArangoInterfaceMethods.getPosts(ownerId);
                 JSONObject response = new JSONObject();
                 response.put("method", methodName);
                 response.put("posts", posts);
-                System.out.println(response);
                 return response;
             }
             return createJSONError("Not authorized to view");
@@ -80,7 +73,7 @@ public class Posts {
         return null;
     }
 
-    public JSONObject deletePost(JSONObject paramsObject, String loggedInUserId, String methodName) {
+    public static JSONObject deletePost(JSONObject paramsObject, String loggedInUserId, String methodName) {
         //TODO: Delete the post iff the creator of the post is the logged in user
         String postId = paramsObject.getString("postId");
         ArangoInterfaceMethods.deletePost(postId);
@@ -94,7 +87,7 @@ public class Posts {
 
     }
 
-    public JSONObject createPost(JSONObject paramsObject, String loggedInUserId, String methodName) {
+    public static JSONObject createPost(JSONObject paramsObject, String loggedInUserId, String methodName) {
         String postId = null;
         try {
             //TODO: Parse tags in media and @ACTIVITIES_TEAM create activities for their users
@@ -112,7 +105,7 @@ public class Posts {
         }
     }
 
-    public JSONObject createPostLike(JSONObject paramsObject, String loggedInUserId, String methodName) {
+    public static JSONObject createPostLike(JSONObject paramsObject, String loggedInUserId, String methodName) {
         //TODO: User cannot like a post more than once
         //TODO: Add unlike method and create JSON req and res
         //TODO: Create activity for the post owner @ACTIVITIES_TEAM, except if he is a retard who likes his own image
@@ -132,7 +125,7 @@ public class Posts {
     }
 
     //TODO:
-    public JSONObject getTaggedPosts(JSONObject paramsObject, String loggedInUserId, String methodName) {
+    public static JSONObject getTaggedPosts(JSONObject paramsObject, String loggedInUserId, String methodName) {
         //@TODO: Check if the user has permission to view the other user's profile
         int pageSize = paramsObject.getInt("pageSize");
         int pageIndex = paramsObject.getInt("pageIndex");
@@ -153,14 +146,14 @@ public class Posts {
     }
 
     //TODO:
-    public JSONObject getDiscoverFeed(JSONObject paramsObject, String loggedInUserId) {
+    public static JSONObject getDiscoverFeed(JSONObject paramsObject, String loggedInUserId) {
         int pageSize = paramsObject.getInt("pageSize");
         int pageIndex = paramsObject.getInt("pageIndex");
         return new JSONObject();
     }
 
     //TODO:
-    public JSONObject getHashtagPosts(JSONObject paramsObject, String loggedInUserId) {
+    public static JSONObject getHashtagPosts(JSONObject paramsObject, String loggedInUserId) {
         int pageSize = paramsObject.getInt("pageSize");
         int pageIndex = paramsObject.getInt("pageIndex");
         return new JSONObject();

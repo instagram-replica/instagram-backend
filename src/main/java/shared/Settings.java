@@ -9,6 +9,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 public class Settings {
+    private static Settings settings;
     private String name;
     private String application;
     private int port;
@@ -52,12 +53,23 @@ public class Settings {
                 .put("version", version);
     }
 
-    public static Settings readSettingsFromFile(String fileUri) {
+    public static Settings getInstance() {
+        if (settings == null) init(null);
+        return settings;
+    }
+
+    public static void init(String fileUri) {
         JSONParser parser = new JSONParser();
         Settings.Builder builder = new Settings.Builder();
+
+        if (fileUri == null) {
+            settings = builder.build();
+            return;
+        }
+
         try {
             org.json.simple.JSONObject jsonObject = (org.json.simple.JSONObject) parser.parse(new FileReader(fileUri));
-            return builder
+            settings = builder
                     .name((String) jsonObject.get("name"))
                     .application((String) jsonObject.get("application"))
                     .port(((Long) jsonObject.get("port")).intValue())
@@ -67,7 +79,7 @@ public class Settings {
         } catch (IOException | ParseException e) {
             e.printStackTrace();
         }
-        return builder.build();
+        settings = builder.build();
     }
 
 

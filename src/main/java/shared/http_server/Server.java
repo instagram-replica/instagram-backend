@@ -7,12 +7,17 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import shared.mq_server.RMQConnection;
+
+import java.io.IOException;
 
 public class Server {
+    private static EventLoopGroup bossGroup;
+    private static EventLoopGroup workerGroup;
 
-    public static void start(Settings settings, ChannelInitializer channelInitializer) {
-        EventLoopGroup bossGroup = new NioEventLoopGroup((settings.getNumberOfThreads()));
-        EventLoopGroup workerGroup = new NioEventLoopGroup();
+    public static void start(ChannelInitializer channelInitializer) {
+        bossGroup = new NioEventLoopGroup(Settings.getInstance().getNumberOfThreads());
+        workerGroup = new NioEventLoopGroup();
 
         try {
             ServerBootstrap b = new ServerBootstrap();
@@ -20,18 +25,23 @@ public class Server {
                     .channel(NioServerSocketChannel.class)
                     .childHandler(channelInitializer);
 
-            Channel ch = b.bind(settings.getPort()).sync().channel();
+            Channel ch = b.bind(Settings.getInstance().getPort()).sync().channel();
 
-            System.out.println("Server is listening on http://127.0.0.1:" + settings.getPort() + '/');
+            System.out.println("Server is listening on http://127.0.0.1:" + Settings.getInstance().getPort() + '/');
 
             ch.closeFuture().sync();
 
         } catch (InterruptedException e) {
             e.printStackTrace();
-
         } finally {
             workerGroup.shutdownGracefully();
             bossGroup.shutdownGracefully();
         }
+    }
+
+    public static void close() throws IOException {
+        workerGroup.shutdownGracefully();
+        bossGroup.shutdownGracefully();
+        RMQConnection.getSingleton().close();
     }
 }

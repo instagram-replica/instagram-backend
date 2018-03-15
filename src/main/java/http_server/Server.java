@@ -10,8 +10,8 @@ public class Server {
     public static void main(String[] args) {
         String fileUri = args.length == 1 ? args[0] : DEFAULT_CONFIG_URI_LOC;
 
-        Settings settings = Settings.readSettingsFromFile(fileUri);
+        Settings.init(fileUri);
 
-        shared.http_server.Server.start(settings, new ServerInitializer(settings));
+        shared.http_server.Server.start(new ServerInitializer());
     }
 }
