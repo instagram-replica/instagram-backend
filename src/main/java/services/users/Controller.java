@@ -23,37 +23,37 @@ public class Controller extends shared.MQServer.Controller {
         String method = payload.getString("method");
         JSONObject params = payload.getJSONObject("params");
 
-        JSONObject response = new JSONObject();
+        JSONObject response;
 
         switch (method) {
-            case "signUp":
+            case "signup":
                 response = Authentication.SignUp(params);
                 break;
-            case "getUserInfo":
+            case "login":
+                response = new JSONObject();
+                break;
+            case "getProfile":
                 response = Authentication.GetUserInfo(params, viewerId);
                 break;
-            case "createFollow":
-                response = UserActions.CreateFollow(params, viewerId);
-                break;
-            case "udpateProfile":
+            case "updateProfile":
                 response = UserActions.UpdateProfile(params, viewerId);
                 break;
-            case "createUnfollow":
+            case "followUser":
+                response = UserActions.CreateFollow(params, viewerId);
+                break;
+            case "unfollowUser":
                 response = UserActions.CreateUnfollow(params, viewerId);
                 break;
-            case "deleteUser":
-                response = UserActions.DeleteUser(params, viewerId);
-                break;
-            case "createBlockUser":
+            case "blockUser":
                 response = UserActions.CreateBlockUser(params, viewerId);
                 break;
-            case "deleteBlockUser":
+            case "unblockUser":
                 response = UserActions.DeleteBlockUser(params, viewerId);
                 break;
-            case "createUserReport":
+            case "reportUser":
                 response = UserActions.CreateUserReport(params, viewerId);
                 break;
-            case "authorizedToView":
+            case "isUserAuthorizedToView":
                 response = Authentication.authorizedToView(params.getString("viewerId"), params.getString("toBeViewedId"));
                 break;
             case "getUsersByIds":
@@ -72,6 +72,11 @@ public class Controller extends shared.MQServer.Controller {
                 response = new JSONObject()
                         .put("response", new JSONObject().put("data", new JSONArray(ids)));
                 break;
+            case "searchUsers":
+                response = new JSONObject();
+                break;
+            default:
+                response = new JSONObject();
         }
 
         closeConnection();
