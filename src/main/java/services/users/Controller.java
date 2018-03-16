@@ -11,59 +11,57 @@ import static persistence.sql.Main.openConnection;
 import static persistence.sql.users.Main.getUsersByIds;
 import static persistence.sql.users.Main.getUsersIdsByUsernames;
 
-
 public class Controller extends shared.MQServer.Controller {
-
-
     public Controller() {
         super();
     }
 
     @Override
-    public JSONObject execute(JSONObject jsonObject, String userId) throws Exception {
-        //TODO: @MAGDY Find a better way of opening and closing db connection
+    public JSONObject execute(JSONObject payload, String viewerId) throws Exception {
         openConnection();
 
-        String methodName = jsonObject.getString("method");
-        JSONObject paramsObject = jsonObject.getJSONObject("params");
-        JSONObject resJSON = new JSONObject();
-        switch (methodName) {
+        String method = payload.getString("method");
+        JSONObject params = payload.getJSONObject("params");
+
+        JSONObject response = new JSONObject();
+
+        switch (method) {
             case "signUp":
-                resJSON = Authentication.SignUp(paramsObject);
+                response = Authentication.SignUp(params);
                 break;
             case "getUserInfo":
-                resJSON = Authentication.GetUserInfo(paramsObject, userId);
+                response = Authentication.GetUserInfo(params, viewerId);
                 break;
             case "createFollow":
-                resJSON = UserActions.CreateFollow(paramsObject, userId);
+                response = UserActions.CreateFollow(params, viewerId);
                 break;
             case "udpateProfile":
-                resJSON = UserActions.UpdateProfile(paramsObject, userId);
+                response = UserActions.UpdateProfile(params, viewerId);
                 break;
             case "createUnfollow":
-                resJSON = UserActions.CreateUnfollow(paramsObject, userId);
+                response = UserActions.CreateUnfollow(params, viewerId);
                 break;
             case "deleteUser":
-                resJSON = UserActions.DeleteUser(paramsObject, userId);
+                response = UserActions.DeleteUser(params, viewerId);
                 break;
             case "createBlockUser":
-                resJSON = UserActions.CreateBlockUser(paramsObject, userId);
+                response = UserActions.CreateBlockUser(params, viewerId);
                 break;
             case "deleteBlockUser":
-                resJSON = UserActions.DeleteBlockUser(paramsObject, userId);
+                response = UserActions.DeleteBlockUser(params, viewerId);
                 break;
             case "createUserReport":
-                resJSON = UserActions.CreateUserReport(paramsObject, userId);
+                response = UserActions.CreateUserReport(params, viewerId);
                 break;
             case "authorizedToView":
-                resJSON = Authentication.authorizedToView(paramsObject.getString("viewerId"), paramsObject.getString("toBeViewedId"));
+                response = Authentication.authorizedToView(params.getString("viewerId"), params.getString("toBeViewedId"));
                 break;
             case "getUsersByIds":
                 // TODO @maged: Refactor logic into dedicated file
                 List<User> users = getUsersByIds(
                         new String[]{} // TODO @magdy: Swap with data from params object
                 );
-                resJSON = new JSONObject()
+                response = new JSONObject()
                         .put("response", new JSONObject().put("data", new JSONArray(users)));
                 break;
             case "getUsersIdsByUsernames":
@@ -71,11 +69,12 @@ public class Controller extends shared.MQServer.Controller {
                 List<String> ids = getUsersIdsByUsernames(
                         new String[]{} // TODO @magdy: Swap with data from params object
                 );
-                resJSON = new JSONObject()
+                response = new JSONObject()
                         .put("response", new JSONObject().put("data", new JSONArray(ids)));
                 break;
         }
+
         closeConnection();
-        return resJSON;
+        return response;
     }
 }
