@@ -5,12 +5,14 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.*;
 import io.netty.util.CharsetUtil;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import shared.MQServer.Controller;
 import shared.MQSubscriptions.ExecutionPair;
 import shared.MQSubscriptions.MQSubscriptions;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class Helpers {
@@ -73,4 +75,22 @@ public class Helpers {
         }
         return resJson.get();
     }
+
+    public static JSONArray getUsersByIds(String serviceName, JSONArray jsonArray) throws IOException, InterruptedException {
+        JSONObject usersJsonObject = new JSONObject().put("ids", jsonArray);
+        JSONObject jsonObject = new JSONObject()
+                .put("params", usersJsonObject)
+                .put("method", "getUsersByIds");
+        return Controller.send(serviceName, "users", jsonObject).getJSONObject("data").getJSONArray("users");
+    }
+
+    public static JSONArray getUsersIdsByUsernames(String serviceName, ArrayList<String> usernames) throws IOException, InterruptedException {
+        JSONObject usersJsonObject = new JSONObject().put("usernames", usernames);
+        JSONObject jsonObject = new JSONObject()
+                .put("params", usersJsonObject)
+                .put("method", "getUsersIdsByUsernames");
+        return Controller.send(serviceName, "users", jsonObject).getJSONObject("data").getJSONArray("ids");
+    }
+
+
 }

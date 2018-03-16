@@ -9,6 +9,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 
 import static shared.Helpers.createJSONError;
+import static shared.Helpers.getUsersIdsByUsernames;
 import static shared.Helpers.isAuthorizedToView;
 
 public class Comments {
@@ -33,8 +34,8 @@ public class Comments {
 
             String comment = paramsObject.getString("text");
 
-            //@TODO: @USERS_TEAM send usernames to the user service and get array of user ids back
             ArrayList<String> mentionsUserNames = getMentions(comment);
+            JSONArray mentionedUserIds = getUsersIdsByUsernames("posts", mentionsUserNames);
 
             JSONObject commentJSON = createCommentJSON(comment, 0, loggedInUserId, postId);
             if (isAuthorizedToView("posts", loggedInUserId, post.getString("user_id"))) {

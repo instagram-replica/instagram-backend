@@ -1,0 +1,22 @@
+{
+  "method": "getUsersByIds",
+  "data": {
+    "users": [
+      {
+        "id": 1,
+        "username": "omartag",
+        "name": "Omar Tag",
+        "avatar": "https://...",
+        "bio": "Hi, salamo 3aleko. Khod gazara",
+        "website": "https:///...",
+        "noOfPosts": 160,
+        "noOfFollowers": 200,
+        "noOfFollowing": 400,
+        "following": true,
+        "follower": true,
+        "privacy": "public",
+        "updatedAt": "2012-04-23T18:25:43.511Z"
+      }
+    ]
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "method": "getUsersIdsByUsernames",
+  "params": {
+    "usernames": [
+      "ahmedlhanafy",
+      "maged"
+    ]
+  }
+}

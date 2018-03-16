@@ -7,6 +7,7 @@ import persistence.nosql.ArangoInterfaceMethods;
 import java.io.IOException;
 
 import static shared.Helpers.createJSONError;
+import static shared.Helpers.getUsersByIds;
 import static shared.Helpers.isAuthorizedToView;
 
 public class Posts {
@@ -24,8 +25,12 @@ public class Posts {
         try {
             post = ArangoInterfaceMethods.getPost(postId);
             String ownerId = post.getString("user_id");
+            JSONArray userIds = post.getJSONArray("likes");
             if (isAuthorizedToView("posts", loggedInUserId, ownerId)) {
-                //TODO: @USERS_TEAM `getUsers`
+                JSONObject response = new JSONObject();
+                response.put("method", methodName);
+                response.put("users", getUsersByIds("posts", userIds));
+                return response;
             }
         } catch (Exception e) {
             e.printStackTrace();

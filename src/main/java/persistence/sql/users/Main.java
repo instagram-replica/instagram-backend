@@ -36,7 +36,7 @@ public class Main {
     }
 
     public static List<String> getAllUsersIds() {
-        List<UsersModel> results =  UsersModel.findBySQL("SELECT id FROM users");
+        List<UsersModel> results = UsersModel.findBySQL("SELECT id FROM users");
         return results
                 .stream()
                 .map(Main::mapModelToUser)
@@ -71,24 +71,24 @@ public class Main {
         return UsersModel.findBySQL("SELECT user FROM users WHERE email=?", email);
     }
 
-    public static List<User> getUsersByIds(String[] usersIds) {
-        if (usersIds.length == 0) {
+    public static List<User> getUsersByIds(ArrayList<String> usersIds) throws Exception {
+        if (usersIds.size() == 0) {
             return new ArrayList<>();
         }
 
         for (String userId : usersIds) {
             if (!isValidUserId(userId)) {
-                throw new RuntimeException(
+                throw new Exception(
                         "Cannot fetch user: Invalid user ID: "
-                        + userId
+                                + userId
                 );
             }
         }
 
         /*
-        * Query looks unsafe, but here's the source:
-        * http://javalite.io/in_clause
-        */
+         * Query looks unsafe, but here's the source:
+         * http://javalite.io/in_clause
+         */
         List<UsersModel> results = UsersModel.where(
                 "id IN (" + constructList(usersIds) + ")"
         );
@@ -99,8 +99,8 @@ public class Main {
                 .collect(Collectors.toList());
     }
 
-    public static List<String> getUsersIdsByUsernames(String[] usernames) {
-        if (usernames.length == 0) {
+    public static List<String> getUsersIdsByUsernames(ArrayList<String> usernames) {
+        if (usernames.size() == 0) {
             return new ArrayList<>();
         }
 
@@ -169,7 +169,7 @@ public class Main {
             );
         }
         UsersModel userModel = UsersModel.findFirst("id = ?", userId);
-        if(userModel == null) throw new Exception("User was not found");
+        if (userModel == null) throw new Exception("User was not found");
         return userModel.delete();
     }
 
@@ -269,11 +269,11 @@ public class Main {
 
         List<UsersModel> allResults = UsersModel.findBySQL("SELECT* FROM users WHERE LOWER(full_name) LIKE '%' || ? || '%' limit 10", userFullName.toLowerCase());
 
-        for(int i=0; i<allResults.size(); i++){
-          User user1 = mapModelToUser(allResults.get(i));
-           if(blocks(searcher,user1.getId())){
-               allResults.remove(i);
-           }
+        for (int i = 0; i < allResults.size(); i++) {
+            User user1 = mapModelToUser(allResults.get(i));
+            if (blocks(searcher, user1.getId())) {
+                allResults.remove(i);
+            }
         }
 
         return allResults;
