@@ -4,23 +4,26 @@ import org.json.JSONObject;
 import persistence.sql.users.Main;
 import persistence.sql.users.User;
 
+import java.io.IOException;
+import static persistence.nosql.ArangoInterfaceMethods.followUser;
+import static persistence.nosql.ArangoInterfaceMethods.unFollowUser;
 import static shared.Helpers.createJSONError;
 
 public class UserActions {
     public static JSONObject CreateFollow(JSONObject paramsObject, String loggedInUserId) {
-        //TODO: Create activity (notification) @ACTIVITIES_TEAM for the user requested user
-        //TODO: Migrate this to use NOSQL
-//        JSONObject jsonObject = controller.send(new Queue("activities"), new JSONObject());
         JSONObject jObject = new JSONObject();
         String toBeFollowedUserId = paramsObject.getString("userId");
+
+        // migrate with NoSQL
+        followUser(loggedInUserId, toBeFollowedUserId);
         boolean followDone = Main.createFollow(loggedInUserId, toBeFollowedUserId);
         JSONObject inner = new JSONObject();
         if (followDone) {
             inner.put("success", "true");
             inner.put("error", "null");
+            SendFollowToActivities(loggedInUserId, toBeFollowedUserId);
         } else {
             inner.put("success", "false");
-            //TODO: Better error handling
             inner.put("error", "0");
         }
         jObject.put("response", inner);
@@ -28,10 +31,25 @@ public class UserActions {
         return jObject;
     }
 
+    private static void SendFollowToActivities(String follower, String followed){
+        JSONObject activitiesJSON = new JSONObject();
+        activitiesJSON.put("method", "createFollow");
+        JSONObject innerActivities = new JSONObject();
+        innerActivities.put("follower", follower);
+        innerActivities.put("followed", followed);
+        activitiesJSON.put("params", innerActivities);
+//        try {
+//            Controller.send(new Queue("activities_users"), new JSONObject());
+//        } catch (IOException e) {
+//            System.out.println(e.getMessage());
+//        }
+    }
+
     public static JSONObject CreateUnfollow(JSONObject paramsObject, String loggedInUserId) {
         //TODO: Migrate this to use NOSQL
         JSONObject jObject = new JSONObject();
         String toBeUnfollowedUserId = paramsObject.getString("userId");
+        unFollowUser(loggedInUserId, toBeUnfollowedUserId);
         boolean unfollowDone = Main.deleteFollow(loggedInUserId, toBeUnfollowedUserId);
 
         JSONObject inner = new JSONObject();
@@ -74,7 +92,7 @@ public class UserActions {
         String phone = paramsObject.getString("phone");
         String gender = paramsObject.getString("gender");
 
-        User user = null; //or session id
+        User user; //or session id
         try {
             user = Main.getUserById(loggedInUserId);
             user.setFullName(name);
@@ -98,10 +116,22 @@ public class UserActions {
         //TODO: Test this via postman
         JSONObject jObject = new JSONObject();
         String userIdToBeBlocked = paramsObject.getString("userId");
-
-        // insert into table user_blocks as blocker_id: loggedInUserId, as blocked_id: userIdToBeBlocked
         try {
             Main.blockUser(loggedInUserId, userIdToBeBlocked);
+            jObject.put("success", true);
+            jObject.put("error", "null");
+        } catch (Exception e) {
+            return createJSONError(e.getMessage());
+        }
+
+        return jObject;
+    }
+
+    public static JSONObject DeleteBlockUser(JSONObject paramsObject, String userId) {
+        JSONObject jObject = new JSONObject();
+        String userIdToBeBlocked = paramsObject.getString("userId");
+        try {
+            Main.deleteBlockUser(userId, userIdToBeBlocked);
             jObject.put("success", true);
             jObject.put("error", "null");
         } catch (Exception e) {
@@ -126,15 +156,4 @@ public class UserActions {
 
         return jsonObject;
     }
-//    public static JSONObject CreateUserDeactivate(JSONObject paramsObject, String loggedInUserId)
-//    {
-//        JSONObject jsonObject = new JSONObject();
-//        boolean deactivated = Main.deactivateAccount(loggedInUserId);
-//        jsonObject.put("success",deactivated);
-//        if(deactivated)
-//            jsonObject.put("error","null");
-//        else jsonObject.put("error","cannot deactivate account");
-//        return jsonObject;
-//    }
-
 }

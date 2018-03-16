@@ -2,6 +2,7 @@ package services.users;
 import auth.JWTPayload;
 
 import persistence.sql.users.Main;
+import persistence.sql.users.Models.UsersModel;
 import persistence.sql.users.User;
 import org.json.JSONObject;
 
@@ -14,6 +15,10 @@ import java.sql.Date;
 
 import static auth.BCrypt.comparePassword;
 import static auth.BCrypt.hashPassword;
+import java.util.ArrayList;
+import java.util.List;
+
+import static persistence.nosql.ArangoInterfaceMethods.*;
 import static shared.Helpers.createJSONError;
 
 import static auth.JWT.signJWT;
@@ -23,10 +28,20 @@ import static utilities.Main.generateUUID;
 
 public class Authentication {
     public static JSONObject authorizedToView(String viewerId, String toBeViewedId) {
-        //TODO:
-        JSONObject resJSONObj = new JSONObject();
-        resJSONObj.put("authorized", true);
-        return resJSONObj;
+        User user;
+        try {
+            user = Main.getUserById(toBeViewedId);
+        } catch (Exception e) {
+            return createJSONError(e.getMessage());
+        }
+
+        boolean isPublic = user != null && !user.isPrivate();
+
+        boolean isFollowing = isFollowing(viewerId, toBeViewedId);
+
+        JSONObject resJSONOb = new JSONObject();
+        resJSONOb.put("authorized", isPublic || isFollowing);
+        return resJSONOb;
     }
 
     public static JSONObject SignUp(JSONObject params) throws Exception {
@@ -77,11 +92,20 @@ public class Authentication {
     }
 
     public static JSONObject GetUserInfo(JSONObject jsonObject, String userID) {
-        //TODO: If the user is private and userId is not following requested user return meaningful json with private user as message
+        //TODO: test number of posts, followers and followings
+
         JSONObject userData = new JSONObject();
+        String requestedUserId = jsonObject.getString("userId");
         User requestedUser = null;
+        ArrayList<String> followersIds = getAllfollowersIDs(requestedUserId);
+        ArrayList<String> followingsIds = getAllfollowingIDs(requestedUserId);
+
         try {
-            requestedUser = Main.getUserById(jsonObject.getString("userId"));
+            requestedUser = Main.getUserById(requestedUserId);
+
+            if(!authorizedToView(userID, requestedUserId).getBoolean("authorized"))
+                return new JSONObject().put("error", "User not authorized to view account");
+
             JSONObject userProfile = new JSONObject();
 
             userProfile.put("userId", requestedUser.getId());
@@ -90,10 +114,9 @@ public class Authentication {
             userProfile.put("avatar", requestedUser.getProfilePictureUrl());
             userProfile.put("bio", requestedUser.getBio());
             userProfile.put("website", requestedUser.getWebsiteUrl());
-            // TODO: Connect with the nosql
-            userProfile.put("noOfPosts", 100);
-            userProfile.put("noOfFollowers", 100);
-            userProfile.put("noOfFollowing", 100);
+            userProfile.put("noOfPosts", getPosts(requestedUserId).length());
+            userProfile.put("noOfFollowers", followersIds.size());
+            userProfile.put("noOfFollowing", followingsIds.size());
 
             if (requestedUser.isPrivate())
                 userProfile.put("privacy", "private");
@@ -107,10 +130,8 @@ public class Authentication {
                 userProfile.put("followers", true);
 
             } else {
-
-                //TODO set the following and followers flag based on the following/followers
-                // lists of the requested user
-
+                userProfile.put("following", followingsIds.contains(userID));
+                userProfile.put("followers", followersIds.contains(userID));
             }
 
             userData.put("method", "getUserInfo");

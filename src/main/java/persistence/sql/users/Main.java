@@ -34,7 +34,7 @@ public class Main {
     }
 
     public static List<String> getAllUsersIds() {
-        List<UsersModel> results =  UsersModel.findBySQL("SELECT id FROM users");
+        List<UsersModel> results = UsersModel.findBySQL("SELECT id FROM users");
         return results
                 .stream()
                 .map(Main::mapModelToUser)
@@ -160,6 +160,10 @@ public class Main {
         return block != null;
     }
 
+    public static void deleteBlockUser(String blockerId, String blockedId) {
+        UsersBlockModel.delete("blocker_id = ? AND blocked_id = ?", blockerId, blockedId);
+    }
+
     public static boolean reportUser(String reporterId, String reportedId) throws Exception {
         if (!isValidUserId(reporterId) || !isValidUserId(reportedId)) {
             throw new Exception(
@@ -214,6 +218,10 @@ public class Main {
         return (UsersFollowModel.delete("follower_id = ? AND followed_id = ?", followerId, followedId) == 1);
     }
 
+    public static String getUserIdFromUsername(String username){
+        return UsersModel.findFirst("username = ?", username).get("id").toString();
+    }
+
 
     public static List searchForUser(String userFullName, String searcher) throws Exception {
 
@@ -259,5 +267,4 @@ public class Main {
 
         return user;
     }
-
 }
