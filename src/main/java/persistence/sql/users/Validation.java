@@ -23,12 +23,12 @@ class Validation {
             throw new Exception(
                     "invalid phone"
             );
-        if (!Main.getUserByUsername(user.getUsername()).isEmpty()) {
+        if (Main.getUserByUsername(user.getUsername()) != null) {
             throw new Exception(
                     "username exists"
             );
         }
-        if (!Main.getUserByEmail(user.getEmail()).isEmpty()) {
+        if (Main.getUserByEmail(user.getEmail())!= null) {
             throw new Exception(
                     "email exists"
             );

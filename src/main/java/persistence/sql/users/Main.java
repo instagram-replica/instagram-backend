@@ -61,14 +61,20 @@ public class Main {
     }
 
 
-    public static List<UsersModel> getUserByUsername(String username) {
-
-        return UsersModel.findBySQL("SELECT user FROM users WHERE username=?", username);
+    public static User getUserByUsername(String username) {
+        List<UsersModel> l = UsersModel.findBySQL("SELECT* FROM users WHERE username=?", username);
+        if(!l.isEmpty()) {
+            return mapModelToUser(l.get(0));
+        }
+        return null;
     }
 
-    public static List getUserByEmail(String email) {
-
-        return UsersModel.findBySQL("SELECT user FROM users WHERE email=?", email);
+    public static User getUserByEmail(String email) {
+        List<UsersModel> l = UsersModel.findBySQL("SELECT* FROM users WHERE email=?", email);
+        if(!l.isEmpty()) {
+            return mapModelToUser(l.get(0));
+        }
+        return null;
     }
 
     public static List<User> getUsersByIds(String[] usersIds) {
@@ -173,17 +179,6 @@ public class Main {
         return userModel.delete();
     }
 
-//    public static boolean deactivateAccount(String userId) {
-//        if(!isValidUserId(userId)) {
-//            throw new Exception(
-//                    "Cannot deactivate account: Invalid user ID"
-//            );
-//        }
-//
-//        // TODO: deactivate account
-//
-//        return true;
-//    }
 
     public static boolean blockUser(String blockerId, String blockedId) throws Exception {
         if (!isValidUserId(blockerId) || !isValidUserId(blockedId)) {

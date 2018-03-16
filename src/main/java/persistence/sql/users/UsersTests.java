@@ -121,7 +121,7 @@ public class UsersTests {
 
         User dummy = new User();
         dummy.setId(generateUUID());
-        dummy.setUsername("SosoA");
+        dummy.setUsername("SossoA");
         dummy.setPhoneNumber("010123456789");
         dummy.setPrivate(true);
         dummy.setGender("female");
@@ -160,12 +160,12 @@ public class UsersTests {
         dummy3.setCreatedAt(new java.util.Date());
 
 
-        boolean blocked = blockUser(dummy.getId(),dummy2.getId());
-       Assert.assertEquals(true, blocked);
-//        Assert.assertEquals(true, blocks(user1.getId(), user2.getId()));
-//        Assert.assertEquals(false, blocks(user2.getId(), user1.getId()));
-
-        closeConnection();
+      //  boolean blocked = blockUser(getUserByUsername("SosoA").getId(),getUserByUsername("SosoB").getId());
+      //   Assert.assertEquals(true, createUser(dummy));
+      //  Assert.assertEquals(true, blocks(getUserByUsername("SosoA").getId(), getUserByUsername("SosoB").getId()));
+       List l = searchForUser("Soso",getUserByUsername("SosoA").getId());
+      System.out.println(l);
+         closeConnection();
     }
 //
 //    @Test
