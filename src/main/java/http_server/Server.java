@@ -4,7 +4,7 @@ import shared.mq_subscriptions.MQSubscriptions;
 import shared.Settings;
 
 public class Server {
-    private static final String DEFAULT_CONFIG_URI_LOC = "src/main/java/http_server/config/default_config.json";
+    private static final String DEFAULT_CONFIG_URI_LOC = "src/main/configs/http_server/default_config.json";
     public static MQSubscriptions mqSubscriptions = new MQSubscriptions(RMQConnection.getSingleton());
 
     public static void main(String[] args) {

@@ -7,7 +7,7 @@ import shared.http_server.Server;
 import java.io.IOException;
 
 public class ServerController {
-    public static JSONObject shutdown(Object param) {
+    public static JSONObject shutdown() {
         try {
             Server.close();
             System.out.println("Server was shutdown by external signal!");
@@ -17,7 +17,8 @@ public class ServerController {
         }
     }
 
-    public static JSONObject getInfo(Object param) {
+    public static JSONObject getInfo() {
         return Settings.getInstance().toJSON();
     }
+
 }

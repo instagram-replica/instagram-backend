@@ -12,15 +12,19 @@ import static utilities.Main.readPropertiesFile;
 public class Controller {
 
     public static JSONObject execute(String methodName) {
-        Object[] parameters = {new Object()};
 
         try {
-            Properties props = readPropertiesFile("src/main/resources/http_routes.properties");
-            Method method = ServerController.class.getMethod(props.getProperty(methodName), Object.class);
 
-            Object res = method.invoke(null, new Object[]{parameters});
+            ClassLoader classLoader = ServerController.class.getClassLoader();
+            Class controllerClass = classLoader.loadClass("shared.http_server.routes.ServerController");
+
+
+            Properties props = readPropertiesFile("src/main/resources/http_routes.properties");
+
+            Method method = controllerClass.getMethod(props.getProperty(methodName));
+            Object res = method.invoke(null);
             return (JSONObject) res;
-        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException | IOException e) {
+        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException | IOException | ClassNotFoundException e) {
             return new JSONObject().put("error", e.getMessage());
         }
     }
