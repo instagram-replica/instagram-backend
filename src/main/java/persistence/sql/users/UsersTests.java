@@ -1,18 +1,14 @@
 package persistence.sql.users;
 
-import org.junit.Assert;
 import org.junit.Test;
-import persistence.sql.users.Models.UsersBlockModel;
-import persistence.sql.users.Models.UsersModel;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+
 import static persistence.sql.Main.closeConnection;
 import static persistence.sql.Main.openConnection;
-
-import static persistence.sql.users.Main.*;
-
+import static persistence.sql.users.Main.getUserByUsername;
+import static persistence.sql.users.Main.searchForUser;
 import static utilities.Main.generateUUID;
 
 public class UsersTests {
@@ -115,7 +111,7 @@ public class UsersTests {
 //
 //    }
 
-   @Test
+    @Test
     public void TestBlock() throws Exception {
         openConnection();
 
@@ -160,12 +156,12 @@ public class UsersTests {
         dummy3.setCreatedAt(new java.util.Date());
 
 
-      //  boolean blocked = blockUser(getUserByUsername("SosoA").getId(),getUserByUsername("SosoB").getId());
-      //   Assert.assertEquals(true, createUser(dummy));
-      //  Assert.assertEquals(true, blocks(getUserByUsername("SosoA").getId(), getUserByUsername("SosoB").getId()));
-       List l = searchForUser("Soso",getUserByUsername("SosoA").getId());
-      System.out.println(l);
-         closeConnection();
+        //  boolean blocked = blockUser(getUserByUsername("SosoA").getId(),getUserByUsername("SosoB").getId());
+        //   Assert.assertEquals(true, createUser(dummy));
+        //  Assert.assertEquals(true, blocks(getUserByUsername("SosoA").getId(), getUserByUsername("SosoB").getId()));
+        List l = searchForUser("Soso", getUserByUsername("SosoA").getId());
+        System.out.println(l);
+        closeConnection();
     }
 //
 //    @Test

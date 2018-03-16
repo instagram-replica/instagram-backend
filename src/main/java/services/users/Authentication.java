@@ -1,29 +1,17 @@
 package services.users;
+
 import auth.JWTPayload;
-
+import org.json.JSONObject;
 import persistence.sql.users.Main;
-import persistence.sql.users.Models.UsersModel;
 import persistence.sql.users.User;
-import org.json.JSONObject;
 
-
-import org.json.JSONObject;
-import persistence.sql.users.*;
-
-import java.io.IOException;
-import java.sql.Date;
+import java.util.ArrayList;
 
 import static auth.BCrypt.comparePassword;
 import static auth.BCrypt.hashPassword;
-import java.util.ArrayList;
-import java.util.List;
-
+import static auth.JWT.signJWT;
 import static persistence.nosql.ArangoInterfaceMethods.*;
 import static shared.Helpers.createJSONError;
-
-import static auth.JWT.signJWT;
-import static persistence.sql.Main.closeConnection;
-import static persistence.sql.Main.openConnection;
 import static utilities.Main.generateUUID;
 
 public class Authentication {
@@ -60,18 +48,18 @@ public class Authentication {
 
         boolean created = Main.createUser(newUser);
 
-           if(created) {
-               JSONObject session = new JSONObject();
-               session.put("token", signJWT(
-                       new JWTPayload.Builder()
-                        .userId(newUser.getId())
-                        .build()
-               ));
-               JSONObject res = new JSONObject();
-               res.put("response",session);
+        if (created) {
+            JSONObject session = new JSONObject();
+            session.put("token", signJWT(
+                    new JWTPayload.Builder()
+                            .userId(newUser.getId())
+                            .build()
+            ));
+            JSONObject res = new JSONObject();
+            res.put("response", session);
 
-               return res;
-           }
+            return res;
+        }
         return null;
     }
 
@@ -103,7 +91,7 @@ public class Authentication {
         try {
             requestedUser = Main.getUserById(requestedUserId);
 
-            if(!authorizedToView(userID, requestedUserId).getBoolean("authorized"))
+            if (!authorizedToView(userID, requestedUserId).getBoolean("authorized"))
                 return new JSONObject().put("error", "User not authorized to view account");
 
             JSONObject userProfile = new JSONObject();

@@ -1,27 +1,15 @@
 package persistence.sql.users;
 
-
-import org.javalite.activejdbc.Base;
-import org.json.JSONObject;
-
-import org.javalite.activejdbc.Model;
 import persistence.sql.users.Models.UsersBlockModel;
 import persistence.sql.users.Models.UsersFollowModel;
 import persistence.sql.users.Models.UsersModel;
 import persistence.sql.users.Models.UsersReportModel;
 
-import java.io.IOException;
-
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.postgresql.core.types.*;
-
 import static persistence.sql.Helpers.constructList;
-import static persistence.sql.Main.closeConnection;
-import static persistence.sql.Main.openConnection;
 import static persistence.sql.users.Validation.isValidUser;
 import static persistence.sql.users.Validation.isValidUserId;
 import static utilities.Main.generateUUID;
@@ -63,17 +51,21 @@ public class Main {
 
     public static User getUserByUsername(String username) {
         List<UsersModel> l = UsersModel.findBySQL("SELECT* FROM users WHERE username=?", username);
-        if(!l.isEmpty()) {
+
+        if (!l.isEmpty()) {
             return mapModelToUser(l.get(0));
         }
+
         return null;
     }
 
     public static User getUserByEmail(String email) {
         List<UsersModel> l = UsersModel.findBySQL("SELECT* FROM users WHERE email=?", email);
-        if(!l.isEmpty()) {
+
+        if (!l.isEmpty()) {
             return mapModelToUser(l.get(0));
         }
+
         return null;
     }
 
@@ -86,15 +78,15 @@ public class Main {
             if (!isValidUserId(userId)) {
                 throw new RuntimeException(
                         "Cannot fetch user: Invalid user ID: "
-                        + userId
+                                + userId
                 );
             }
         }
 
         /*
-        * Query looks unsafe, but here's the source:
-        * http://javalite.io/in_clause
-        */
+         * Query looks unsafe, but here's the source:
+         * http://javalite.io/in_clause
+         */
         List<UsersModel> results = UsersModel.where(
                 "id IN (" + constructList(usersIds) + ")"
         );
@@ -141,8 +133,8 @@ public class Main {
             usersModel.set("website_url", user.getWebsiteUrl());
             usersModel.set("verified_at", user.getVerifiedAt());
             return usersModel.insert();
-
         }
+
         return false;
     }
 
@@ -165,6 +157,7 @@ public class Main {
             boolean set8 = usersModel.set("updated_at", new java.util.Date()).saveIt();
             return set1 && set2 && set3 && set4 && set5 && set6 && set7 && set8;
         }
+
         return false;
     }
 
@@ -174,11 +167,15 @@ public class Main {
                     "Cannot delete user: Invalid user ID"
             );
         }
+
         UsersModel userModel = UsersModel.findFirst("id = ?", userId);
-        if(userModel == null) throw new Exception("User was not found");
+
+        if (userModel == null) {
+            throw new Exception("User was not found");
+        }
+
         return userModel.delete();
     }
-
 
     public static boolean blockUser(String blockerId, String blockedId) throws Exception {
         if (!isValidUserId(blockerId) || !isValidUserId(blockedId)) {
@@ -186,12 +183,14 @@ public class Main {
                     "Cannot block user: Invalid user ID"
             );
         }
+
         UsersBlockModel newBlock = UsersBlockModel.create();
         long nextId = (long) UsersBlockModel.findAll().get(UsersBlockModel.findAll().size() - 1).get("id") + 1;
 
         newBlock.set("id", nextId);
         newBlock.set("blocker_id", blockerId);
         newBlock.set("blocked_id", blockedId);
+
         return newBlock.insert();
     }
 
@@ -201,6 +200,7 @@ public class Main {
                     "Cannot block user: Invalid user ID"
             );
         }
+
         UsersBlockModel block = UsersBlockModel.findFirst("blocker_id = ? AND blocked_id = ?", blockerId, blockedId);
         return block != null;
     }
@@ -215,12 +215,14 @@ public class Main {
                     "Cannot report user: Invalid user ID"
             );
         }
+
         UsersReportModel newReport = UsersReportModel.create();
         long nextId = (long) UsersReportModel.findAll().get(UsersReportModel.findAll().size() - 1).get("id") + 1;
 
         newReport.set("id", nextId);
         newReport.set("reporter_id", reporterId);
         newReport.set("reported_id", reportedId);
+
         return newReport.insert();
     }
 
@@ -230,6 +232,7 @@ public class Main {
                     "Cannot block user: Invalid user ID"
             );
         }
+
         UsersReportModel report = UsersReportModel.findFirst("reporter_id = ? AND reported_id = ?", reporterId, reportedId);
         return report != null;
     }
@@ -252,10 +255,12 @@ public class Main {
 
     public static boolean createFollow(String followerId, String followedId) {
         UsersFollowModel usersFollowModel = UsersFollowModel.create();
+
         usersFollowModel.set("follower_id", followerId);
         usersFollowModel.set("followed_id", followedId);
         usersFollowModel.set("id", generateUUID());
         usersFollowModel.set("created_at", new java.util.Date());
+
         return usersFollowModel.insert();
     }
 
@@ -263,20 +268,20 @@ public class Main {
         return (UsersFollowModel.delete("follower_id = ? AND followed_id = ?", followerId, followedId) == 1);
     }
 
-    public static String getUserIdFromUsername(String username){
+    public static String getUserIdFromUsername(String username) {
         return UsersModel.findFirst("username = ?", username).get("id").toString();
     }
 
 
     public static List searchForUser(String userFullName, String searcher) throws Exception {
-
         List<UsersModel> allResults = UsersModel.findBySQL("SELECT* FROM users WHERE LOWER(full_name) LIKE '%' || ? || '%' limit 10", userFullName.toLowerCase());
 
-        for(int i=0; i<allResults.size(); i++){
-          User user1 = mapModelToUser(allResults.get(i));
-           if(blocks(searcher,user1.getId())){
-               allResults.remove(i);
-           }
+        for (int i = 0; i < allResults.size(); i++) {
+            User user1 = mapModelToUser(allResults.get(i));
+
+            if (blocks(searcher, user1.getId())) {
+                allResults.remove(i);
+            }
         }
 
         return allResults;
@@ -304,7 +309,6 @@ public class Main {
         user.setNumberOfFollowings("" + getFollowingsCount(user.getId()));
 
         String gender = model.getString("username");
-
 
         if (gender != null) {
             user.setGender(gender);

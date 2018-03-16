@@ -1,7 +1,7 @@
 package persistence.sql;
 
 public class Helpers {
-    /** *
+    /**
      * Constructs a list of string values that is usable in WHERE IN queries
      */
     public static String constructList(String[] values) {

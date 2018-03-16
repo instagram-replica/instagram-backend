@@ -25,9 +25,7 @@ public class User {
     private Date deletedAt;
     private Date dateOfBirth;
 
-
     public String getId() {
-
         return id;
     }
 
@@ -187,9 +185,13 @@ public class User {
         this.dateOfBirth = dateOfBirth;
     }
 
-    public List getFollowers(){ return Main.getFollowers(this.getId()); }
+    public List getFollowers() {
+        return Main.getFollowers(this.getId());
+    }
 
-    public List getFollowings(){ return Main.getFollowings(this.getId()); }
+    public List getFollowings() {
+        return Main.getFollowings(this.getId());
+    }
 
     @Override
     public String toString() {

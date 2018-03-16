@@ -4,7 +4,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import persistence.sql.users.User;
 
-import java.io.IOException;
 import java.util.List;
 
 import static persistence.sql.Main.closeConnection;
@@ -62,7 +61,7 @@ public class Controller extends shared.MQServer.Controller {
             case "getUsersByIds":
                 // TODO @maged: Refactor logic into dedicated file
                 List<User> users = getUsersByIds(
-                        new String[] {} // TODO @magdy: Swap with data from params object
+                        new String[]{} // TODO @magdy: Swap with data from params object
                 );
                 resJSON = new JSONObject()
                         .put("response", new JSONObject().put("data", new JSONArray(users)));
@@ -70,7 +69,7 @@ public class Controller extends shared.MQServer.Controller {
             case "getUsersIdsByUsernames":
                 // TODO @maged: Refactor logic into dedicated file
                 List<String> ids = getUsersIdsByUsernames(
-                        new String[] {} // TODO @magdy: Swap with data from params object
+                        new String[]{} // TODO @magdy: Swap with data from params object
                 );
                 resJSON = new JSONObject()
                         .put("response", new JSONObject().put("data", new JSONArray(ids)));

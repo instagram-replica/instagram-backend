@@ -4,7 +4,6 @@ import org.json.JSONObject;
 import persistence.sql.users.Main;
 import persistence.sql.users.User;
 
-import java.io.IOException;
 import static persistence.nosql.ArangoInterfaceMethods.followUser;
 import static persistence.nosql.ArangoInterfaceMethods.unFollowUser;
 import static shared.Helpers.createJSONError;
@@ -31,7 +30,7 @@ public class UserActions {
         return jObject;
     }
 
-    private static void SendFollowToActivities(String follower, String followed){
+    private static void SendFollowToActivities(String follower, String followed) {
         JSONObject activitiesJSON = new JSONObject();
         activitiesJSON.put("method", "createFollow");
         JSONObject innerActivities = new JSONObject();

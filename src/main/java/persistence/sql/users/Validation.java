@@ -1,7 +1,9 @@
 package persistence.sql.users;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import static utilities.Main.isUUID;
-import java.util.regex.*;
 
 class Validation {
     public static final Pattern VALID_EMAIL_ADDRESS_REGEX =
@@ -11,29 +13,32 @@ class Validation {
             Pattern.compile("[0-9]+");
 
     static boolean isValidUser(User user) throws Exception {
-
         Matcher emailMatcher = VALID_EMAIL_ADDRESS_REGEX.matcher(user.getEmail());
         Matcher phoneMatcher = VALID_PHONE_NUMBER.matcher(user.getPhoneNumber());
 
-        if (!emailMatcher.matches())
+        if (!emailMatcher.matches()) {
             throw new Exception(
                     "inavlid email"
             );
-        if (!phoneMatcher.matches())
+        }
+
+        if (!phoneMatcher.matches()) {
             throw new Exception(
                     "invalid phone"
             );
+        }
+
         if (Main.getUserByUsername(user.getUsername()) != null) {
             throw new Exception(
                     "username exists"
             );
         }
-        if (Main.getUserByEmail(user.getEmail())!= null) {
+
+        if (Main.getUserByEmail(user.getEmail()) != null) {
             throw new Exception(
                     "email exists"
             );
         }
-
 
         return true;
     }
