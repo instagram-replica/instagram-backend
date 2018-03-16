@@ -1,15 +1,9 @@
 package services.users;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
-import persistence.sql.users.User;
-
-import java.util.List;
 
 import static persistence.sql.Main.closeConnection;
 import static persistence.sql.Main.openConnection;
-import static persistence.sql.users.Main.getUsersByIds;
-import static persistence.sql.users.Main.getUsersIdsByUsernames;
 
 public class Controller extends shared.MQServer.Controller {
     public Controller() {
@@ -27,50 +21,40 @@ public class Controller extends shared.MQServer.Controller {
 
         switch (method) {
             case "signup":
-                response = Authentication.SignUp(params);
+                response = new JSONObject();
                 break;
             case "login":
                 response = new JSONObject();
                 break;
             case "getProfile":
-                response = Authentication.GetUserInfo(params, viewerId);
+                response = new JSONObject();
                 break;
             case "updateProfile":
-                response = UserActions.UpdateProfile(params, viewerId);
+                response = new JSONObject();
                 break;
             case "followUser":
-                response = UserActions.CreateFollow(params, viewerId);
+                response = new JSONObject();
                 break;
             case "unfollowUser":
-                response = UserActions.CreateUnfollow(params, viewerId);
+                response = new JSONObject();
                 break;
             case "blockUser":
-                response = UserActions.CreateBlockUser(params, viewerId);
+                response = new JSONObject();
                 break;
             case "unblockUser":
-                response = UserActions.DeleteBlockUser(params, viewerId);
+                response = new JSONObject();
                 break;
             case "reportUser":
-                response = UserActions.CreateUserReport(params, viewerId);
+                response = new JSONObject();
                 break;
             case "isUserAuthorizedToView":
-                response = Authentication.authorizedToView(params.getString("viewerId"), params.getString("toBeViewedId"));
+                response = new JSONObject();
                 break;
             case "getUsersByIds":
-                // TODO @maged: Refactor logic into dedicated file
-                List<User> users = getUsersByIds(
-                        new String[]{} // TODO @magdy: Swap with data from params object
-                );
-                response = new JSONObject()
-                        .put("response", new JSONObject().put("data", new JSONArray(users)));
+                response = new JSONObject();
                 break;
             case "getUsersIdsByUsernames":
-                // TODO @maged: Refactor logic into dedicated file
-                List<String> ids = getUsersIdsByUsernames(
-                        new String[]{} // TODO @magdy: Swap with data from params object
-                );
-                response = new JSONObject()
-                        .put("response", new JSONObject().put("data", new JSONArray(ids)));
+                response = new JSONObject();
                 break;
             case "searchUsers":
                 response = new JSONObject();
