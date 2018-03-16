@@ -11,7 +11,7 @@ import java.util.Set;
 public class Cache {
 
     public static final int EXPIRY_TIME = 3600;
-    
+
 
     public static void insertPostIntoCache(JSONObject post, String postId){
         System.out.println("INSERTING INTO CACHE");
@@ -73,8 +73,64 @@ public class Cache {
     }
 
 
+    public static void insertUserStoriesIntoCache(JSONArray stories, String userId){
+        System.out.println("INSERTING INTO CACHE");
+        JedisPool pool = new JedisPool(new JedisPoolConfig(), "localhost");
+        try (Jedis jedis = pool.getResource()) {
+            String key = "userstories$"+userId;
+            jedis.set(key,stories.toString());
+            jedis.expire(key,EXPIRY_TIME);
+        }
+        pool.close();
+    }
+
+    public static JSONArray getUserStoriesFromCache(String userId){
+        System.out.println("READING FROM CACHE");
+        JedisPool pool = new JedisPool(new JedisPoolConfig(), "localhost");
+        try (Jedis jedis = pool.getResource()) {
+            String key = "userstories$"+userId;
+            String jsonStories = jedis.get(key);
+            pool.close();
+            if(jsonStories!=null){
+                System.out.println(new JSONArray(jsonStories));
+                return new JSONArray(jsonStories);
+            }
+            else{
+                System.out.println("NULL");
+                return null;
+            }
+        }
+    }
 
 
+    public static void insertStoryIntoCache(JSONObject story, String id){
+        System.out.println("INSERTING INTO CACHE");
+        JedisPool pool = new JedisPool(new JedisPoolConfig(), "localhost");
+        try (Jedis jedis = pool.getResource()) {
+            String key = "story$"+id;
+            jedis.set(key,story.toString());
+            jedis.expire(key,EXPIRY_TIME);
+        }
+        pool.close();
+    }
+
+    public static JSONObject getStoryFromCache(String id){
+        System.out.println("READING FROM CACHE");
+        JedisPool pool = new JedisPool(new JedisPoolConfig(), "localhost");
+        try (Jedis jedis = pool.getResource()) {
+            String key = "story$"+id;
+            String jsonStory = jedis.get(key);
+            pool.close();
+            if(jsonStory!=null){
+                System.out.println(new JSONObject(jsonStory));
+                return new JSONObject(jsonStory);
+            }
+            else{
+                System.out.println("NULL");
+                return null;
+            }
+        }
+    }
 
 
 }

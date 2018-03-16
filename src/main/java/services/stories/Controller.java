@@ -1,6 +1,8 @@
 package services.stories;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
+import persistence.cache.Cache;
 import persistence.nosql.ArangoInterfaceMethods;
 
 public class Controller extends shared.Controller {
@@ -36,7 +38,6 @@ public class Controller extends shared.Controller {
         if(!ArangoInterfaceMethods.insertStory(paramsObject).equals(null)){
             createStory.put("success","true");
             createStory.put("error","0");
-
         }else{
             createStory.put("success","false");
             createStory.put("error","Story not created");
@@ -59,14 +60,25 @@ public class Controller extends shared.Controller {
 
     public static JSONObject getStory(JSONObject paramsObject){
         JSONObject story = new JSONObject();
+        String storyID = paramsObject.getString("id");
+        JSONObject storyResponse = Cache.getStoryFromCache(storyID);
+        if(storyResponse==null) {
+            storyResponse = ArangoInterfaceMethods.getStory(storyID);
+            Cache.insertStoryIntoCache(storyResponse,storyID);
+        }
         story.put("error","0");
-        story.put("response",ArangoInterfaceMethods.getStory(paramsObject.getString("id")));
+        story.put("response",storyResponse);
         return story;
     }
     public static JSONObject getMyStories(String userId){
         JSONObject myStory = new JSONObject();
+        JSONArray stories = Cache.getUserStoriesFromCache(userId);
+        if(stories==null) {
+            stories = ArangoInterfaceMethods.getStories(userId);
+            Cache.insertUserStoriesIntoCache(stories,userId);
+        }
         myStory.put("error","0");
-        myStory.put("response",ArangoInterfaceMethods.getStories(userId));
+        myStory.put("response",stories);
         return myStory;
     }
 
