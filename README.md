@@ -7,7 +7,7 @@
 ## Architecture
 
 ### HTTP Server
-A Netty server accepts HTTP requests on port `8080`. This server receives an HTTP `POST` request, parses its JSON payload, makes sure the user is authenticated, uploads media file(s) _(if any)_ to a media server & injects the returned URL(s) into the JSON payload, stamps the payload with a UUID & forwards it to a RabbitMQ queue using the `requests_mapping.properties` file, and then it waits for a response with the same UUID & returns to the user when it gets a response with a matching UUID.
+A Netty server accepts HTTP requests on port `8080`. This server receives an HTTP `POST` request, parses its JSON payload, makes sure the user is authenticated, uploads media file(s) _(if any)_ to a media server & injects the returned URL(s) into the JSON payload, stamps the payload with a UUID & forwards it to a RabbitMQ queue using the `requests_mapping.properties` file, then it waits for a response with the same UUID and returns to the user when it gets a response with a matching UUID.
 
 ### Services
 Each service consists of an RMQ consumer, RMQ producer & an `ExecutorService`. Each service also has its own unique request & response queue.
@@ -17,19 +17,17 @@ Each service consists of an RMQ consumer, RMQ producer & an `ExecutorService`. E
 - **ExecutorService**: Initializes a thread pool & makes sure every incoming message gets allocated a thread from the thread pool
 
 ## Prerequisites
-- PostgreSQL
-- ArangoDB
-- RabbitMQ
+- Java (8 or higher)
+- [Docker](https://docs.docker.com/install/)
 - [Postman](https://www.getpostman.com/apps) _(for testing)_
 
 ## Getting started
-- Run `dropdb --if-exists instagram_development` in the terminal
-- Run `createdb instagram_development`
-- Change directory to repository folder `cd <path/to/repo>` 
-- Run `psql instagram_development --file ./submission-1/sql/tables.sql --quiet` 
 - Clone the repo & open in IntelliJ
+- Change directory to repository folder `cd <path/to/repo>` 
+- Run `docker-compose up` 
 - Open Maven Projects tab, expand `Lifecycle` & click `compile`
 - Open Maven Projects tab, expand `Plugins`, expand `activejdbc-instrumentation` & click `activejdbc-instrumentation:instrument`
+- Navigate to `persistence` package, expand `sql/users`, click & run `Migrations.java`. This file creates the SQL tables.
 - Navigate to `persistence` package, expand `nosql`, click & run `ArangoInterfaceMethods.java`. This file creates the NoSQL tables & graphs.
 
 ## Running the app
