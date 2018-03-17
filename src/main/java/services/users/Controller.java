@@ -44,7 +44,7 @@ public class Controller extends shared.MQServer.Controller {
                 response = handleUpdateProfile(params);
                 break;
             case "searchUsers":
-                response = new JSONObject();
+                response = handleSearchUsers(params);
                 break;
             case "getUsersByIds":
                 response = handleGetUsersByIds(params);
@@ -138,6 +138,20 @@ public class Controller extends shared.MQServer.Controller {
 
         User user = Logic.updateProfile(Helpers.mapJSONToUser(params));
         return Helpers.constructOKResponse(Helpers.mapUserToJSON(user));
+    }
+
+    // TODO: Generalize search criteria
+    private static JSONObject handleSearchUsers(JSONObject params) {
+        // TODO: Handle errors thrown
+
+        List<User> users = Logic.searchUsersByFullName(
+                params.getString("fullName"),
+                params.getInt("offset"),
+                params.getInt("limit")
+        );
+
+        JSONArray usersJSON = Helpers.convertUsersListToJSONArray(users);
+        return Helpers.constructOKResponse(usersJSON);
     }
 
     private static JSONObject handleGetUsersByIds(JSONObject params) {

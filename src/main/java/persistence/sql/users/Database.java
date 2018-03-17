@@ -60,12 +60,16 @@ public class Database {
                 .collect(Collectors.toList());
     }
 
-    public static List<User> searchUsersByFullName(int limit, String fullName) {
+    public static List<User> searchUsersByFullName(String fullName, int offset, int limit) {
         List<UserModel> models = UserModel
                 .findBySQL(
-                        "SELECT * FROM users WHERE LOWER(full_name) LIKE '%' || ? || '%'",
-                        fullName.toLowerCase()
-                ).limit(limit);
+                        "SELECT * FROM users WHERE LOWER(full_name) LIKE '%' || ? || '%'" +
+                                "OFFSET ? " +
+                                "LIMIT ?",
+                        fullName.toLowerCase(),
+                        offset,
+                        limit
+                );
 
         return models.parallelStream()
                 .map(Helpers::mapModelToUser)

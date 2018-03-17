@@ -83,13 +83,20 @@ public class Logic {
         return updateUser(user);
     }
 
+    // TODO: Generalize search criteria
+    public static List<User> searchUsersByFullName(String fullName, int offset, int limit) {
+        // TODO: Validate args
+
+        return Database.searchUsersByFullName(fullName, offset, limit);
+    }
+
     public static List<User> getUsersByIds(String[] ids) {
-        // TODO: Validate ids
+        // TODO: Validate args
         return Database.getUsersByIds(ids);
     }
 
     public static List<String> getUsersIdsByUsernames(String[] usernames) {
-        // TODO: Validate usernames
+        // TODO: Validate args
         return Database.getUsersIdsByUsernames(usernames);
     }
 }
