@@ -5,9 +5,14 @@ import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import shared.MQSubscriptions.MQSubscriptions;
+
+import java.util.Date;
 
 
 public class Server {
+    public static MQSubscriptions mqSubscriptions = new MQSubscriptions(RMQConnection.getSingleton());
+
     public static void start(int port) {
         EventLoopGroup bossGroup = new NioEventLoopGroup(1);
         EventLoopGroup workerGroup = new NioEventLoopGroup();
@@ -32,7 +37,7 @@ public class Server {
         }
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         Server.start(8080);
     }
 }

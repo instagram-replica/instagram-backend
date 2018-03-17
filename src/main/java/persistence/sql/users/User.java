@@ -8,7 +8,7 @@ public class User {
     private String username;
     private String email;
     private String passwordHash;
-    private boolean isPrivate;
+    private boolean isPrivate = false;
     private String fullName;
     private String gender;
     private String bio;

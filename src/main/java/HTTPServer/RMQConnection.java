@@ -16,14 +16,14 @@ public class RMQConnection {
 
     }
 
-    public static Connection getSingleton() {
+    public synchronized static Connection getSingleton() {
         if (RMQConnection.connection == null) {
             try {
                 Properties properties = readPropertiesFile("src/main/resources/config.properties");
                 ConnectionFactory factory = new ConnectionFactory();
                 factory.setHost("localhost");
                 factory.setPort(Integer.parseInt(properties.getProperty("NETTY_MQ_SERVER_PORT")));
-                return factory.newConnection();
+                RMQConnection.connection = factory.newConnection();
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (TimeoutException e) {

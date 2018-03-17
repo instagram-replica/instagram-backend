@@ -356,10 +356,9 @@ public class ArangoInterfaceTest {
 
     }
     @Test
-    public void insertAndGetPost() {
+    public void insertAndGetPost() throws Exception {
 
         JSONObject obj = new JSONObject();
-        obj.put("user_id",utilities.Main.generateUUID());
         obj.put("caption","Taken By MiSO EL Gen");
         obj.put("media", new ArrayList<String>());
         obj.put("likes", new ArrayList<String>());
@@ -371,7 +370,7 @@ public class ArangoInterfaceTest {
         obj.put("blocked_at",new Timestamp(System.currentTimeMillis()));
         obj.put("deleted_at",new Timestamp(System.currentTimeMillis()));
 
-        String id = ArangoInterfaceMethods.insertPost(obj);
+        String id = ArangoInterfaceMethods.insertPost(obj, utilities.Main.generateUUID());
         JSONObject readObj = ArangoInterfaceMethods.getPost(id);
         Iterator iterator = Objects.requireNonNull(readObj).keys();
         while(iterator.hasNext()){
@@ -385,7 +384,7 @@ public class ArangoInterfaceTest {
 
 
     @Test
-    public void updateAndDeletePost() {
+    public void updateAndDeletePost() throws Exception {
 
         utilities.Main.generateUUID();
         JSONObject obj = new JSONObject();
@@ -402,7 +401,6 @@ public class ArangoInterfaceTest {
         obj.put("deleted_at",new Timestamp(System.currentTimeMillis()));
 
         JSONObject updatedObj = new JSONObject();
-        updatedObj.put("user_id",utilities.Main.generateUUID());
         updatedObj.put("caption","Friends");
         updatedObj.put("media", new ArrayList<String>());
         updatedObj.put("likes", new ArrayList<String>());
@@ -415,7 +413,7 @@ public class ArangoInterfaceTest {
         updatedObj.put("deleted_at",new Timestamp(System.currentTimeMillis()));
 
 
-        String id = ArangoInterfaceMethods.insertPost(obj);
+        String id = ArangoInterfaceMethods.insertPost(obj, utilities.Main.generateUUID());
         ArangoInterfaceMethods.updatePost(id,updatedObj);
         JSONObject jsonNotification = ArangoInterfaceMethods.getPost(id);
 
@@ -481,10 +479,9 @@ public class ArangoInterfaceTest {
 
 
     @Test
-    public void insertCommentInPost(){
+    public void insertCommentInPost() throws Exception {
 
         JSONObject obj = new JSONObject();
-        obj.put("user_id",utilities.Main.generateUUID());
         obj.put("caption","Taken By MiSO EL Gen");
         obj.put("media", new ArrayList<String>());
         obj.put("likes", new ArrayList<String>());
@@ -496,7 +493,7 @@ public class ArangoInterfaceTest {
         obj.put("blocked_at",new Timestamp(System.currentTimeMillis()));
         obj.put("deleted_at",new Timestamp(System.currentTimeMillis()));
 
-        String id =ArangoInterfaceMethods.insertPost(obj);
+        String id =ArangoInterfaceMethods.insertPost(obj,utilities.Main.generateUUID());
         JSONObject comment = new JSONObject();
         comment.put("content","Hello");
 

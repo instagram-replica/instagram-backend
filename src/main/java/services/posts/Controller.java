@@ -2,7 +2,7 @@ package services.posts;
 
 import org.json.JSONObject;
 
-public class Controller extends shared.Controller {
+public class Controller extends shared.MQServer.Controller {
 
 
     public Controller() {
@@ -13,16 +13,26 @@ public class Controller extends shared.Controller {
     public JSONObject execute(JSONObject jsonObject, String userId) {
         String methodName = jsonObject.getString("method");
         JSONObject paramsObject = jsonObject.getJSONObject("params");
-        switch (methodName){
-            case "getPosts": return Team2.getPosts(paramsObject, userId, methodName);
-            case "getPost": return Team2.getPost(paramsObject, userId, methodName);
-            case "createPost": return Team2.createPost(paramsObject, userId, methodName);
-           // case "getTaggedPosts": return Team2.getTaggedPosts(paramsObject, userId);
-            case "deletePost": return Team2.deletePost(paramsObject, userId, methodName);
-            case "createPostLike": return Team2.createPostLike(paramsObject, userId, methodName);
-            case "createComment" : return Team1.createComment(paramsObject,userId,methodName);
-            case "getComments" : return Team1.getCommentsOnPost(paramsObject,userId,methodName);
-            case "createCommentReply": return Team1.createCommentReply(paramsObject,userId,methodName);
+        switch (methodName) {
+            case "getPosts":
+                return Posts.getPosts(paramsObject, userId, methodName);
+            case "getPost":
+                return Posts.getPost(paramsObject, userId, methodName);
+            case "createPost":
+                return Posts.createPost(paramsObject, userId, methodName);
+            // case "getTaggedPosts": return Posts.getTaggedPosts(paramsObject, userI);
+            case "deletePost":
+                return Posts.deletePost(paramsObject, userId, methodName);
+            case "createPostLike":
+                return Posts.createPostLike(paramsObject, userId, methodName);
+            case "createComment":
+                return Comments.createComment(paramsObject, userId, methodName);
+            case "getComments":
+                return Comments.getCommentsOnPost(paramsObject, userId, methodName);
+            case "createCommentReply":
+                return Comments.createCommentReply(paramsObject, userId, methodName);
+            case "getPostLikers":
+                return Posts.getPostLikers(paramsObject, userId, methodName);
         }
 
         JSONObject newJsonObj = new JSONObject();

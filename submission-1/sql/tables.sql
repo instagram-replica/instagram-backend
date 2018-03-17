@@ -1,6 +1,3 @@
-CREATE TYPE Gender AS ENUM ('male', 'female', 'undefined');
-
-
 CREATE TABLE users (
   id VARCHAR PRIMARY KEY,
   username VARCHAR UNIQUE NOT NULL,
@@ -8,7 +5,7 @@ CREATE TABLE users (
   password_hash VARCHAR NOT NULL,
   is_private BOOLEAN NOT NULL,
   full_name VARCHAR NOT NULL,
-  gender VARCHAR,
+  gender VARCHAR NOT NULL,
   bio VARCHAR,
   phone_number VARCHAR,
   profile_picture_url VARCHAR,

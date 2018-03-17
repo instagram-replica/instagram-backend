@@ -1,7 +1,7 @@
 {
   "method": "signIn",
   "response": {
-    "sessionId": 12
+    "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOiJiNmY3OTFkZC04ODYxLTQ2NzQtODUxMS0wMzA3MGNjM2E0ZDUifQ.5E5dvIlG0tqAssNMUQmFxhCPABWyK8AqzIBAK9f7crw"
   },
   "error": null
 }
