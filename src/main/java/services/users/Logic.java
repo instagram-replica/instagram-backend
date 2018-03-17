@@ -1,11 +1,15 @@
 package services.users;
 
 import auth.AuthenticationException;
+import persistence.sql.users.Database;
 import persistence.sql.users.DatabaseException;
 import persistence.sql.users.User;
 import services.users.validation.ValidationException;
 import services.users.validation.ValidationResult;
 import services.users.validation.ValidationResultType;
+
+import java.util.Arrays;
+import java.util.List;
 
 import static auth.BCrypt.comparePassword;
 import static auth.BCrypt.hashPassword;
@@ -77,5 +81,10 @@ public class Logic {
         }
 
         return updateUser(user);
+    }
+
+    public static List<User> getUsersByIds(String[] ids) {
+        // TODO: Validate ids
+        return Database.getUsersByIds(ids);
     }
 }

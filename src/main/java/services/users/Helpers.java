@@ -1,8 +1,12 @@
 package services.users;
 
 import org.joda.time.DateTime;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import persistence.sql.users.User;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Helpers {
     public static User mapJSONToUser(JSONObject json) {
@@ -51,17 +55,36 @@ public class Helpers {
                 .put("error", JSONObject.NULL);
     }
 
+    public static JSONObject constructOKResponse(JSONArray data) {
+        return new JSONObject()
+                .put("data", data)
+                .put("error", JSONObject.NULL);
+    }
+
     public static JSONObject constructErrorResponse(JSONObject error) {
         return new JSONObject()
                 .put("data", JSONObject.NULL)
                 .put("error", error);
     }
 
-    public static User nullifyCredentials(User user) {
-        return new User.Builder(user)
-                .password(null)
-                .passwordHash(null)
-                .build();
+    public static List<Object> convertJSONArrayToList(JSONArray jsonArray) {
+        List<Object> list = new ArrayList<>();
+
+        for (int i = 0; i < jsonArray.length(); i++) {
+            list.add(jsonArray.get(i));
+        }
+
+        return list;
+    }
+
+    public static JSONArray convertUsersListToJSONArray(List<User> list) {
+        JSONArray jsonArray = new JSONArray();
+
+        for (User element : list) {
+            jsonArray.put(mapUserToJSON(element));
+        }
+
+        return jsonArray;
     }
 
     private static Object mapJavaNullToJSONNull(Object object) {

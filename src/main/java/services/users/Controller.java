@@ -3,12 +3,14 @@ package services.users;
 import auth.AuthenticationException;
 import auth.JWT;
 import auth.JWTPayload;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import persistence.sql.users.DatabaseException;
 import persistence.sql.users.User;
 import services.users.validation.ValidationException;
 
 import java.io.IOException;
+import java.util.List;
 
 import static persistence.sql.Main.closeConnection;
 import static persistence.sql.Main.openConnection;
@@ -45,7 +47,7 @@ public class Controller extends shared.MQServer.Controller {
                 response = new JSONObject();
                 break;
             case "getUsersByIds":
-                response = new JSONObject();
+                response = handleGetUsersByIds(params);
                 break;
             case "getUsersIdsByUsernames":
                 response = new JSONObject();
@@ -136,5 +138,18 @@ public class Controller extends shared.MQServer.Controller {
 
         User user = Logic.updateProfile(Helpers.mapJSONToUser(params));
         return Helpers.constructOKResponse(Helpers.mapUserToJSON(user));
+    }
+
+    private static JSONObject handleGetUsersByIds(JSONObject params) {
+        // TODO: Handle errors thrown
+
+        String[] usersIds = Helpers.convertJSONArrayToList(
+                params.getJSONArray("usersIds")
+        ).stream().toArray(String[]::new);
+
+        List<User> users = Logic.getUsersByIds(usersIds);
+        JSONArray usersJSON = Helpers.convertUsersListToJSONArray(users);
+
+        return Helpers.constructOKResponse(usersJSON);
     }
 }
