@@ -9,10 +9,8 @@ import services.users.validation.ValidationResultType;
 
 import static auth.BCrypt.comparePassword;
 import static auth.BCrypt.hashPassword;
-import static persistence.sql.users.Main.createUser;
-import static persistence.sql.users.Main.getUserByEmail;
-import static services.users.validation.Validator.validateCredentials;
-import static services.users.validation.Validator.validateUser;
+import static persistence.sql.users.Database.*;
+import static services.users.validation.Validator.*;
 import static utilities.Main.generateUUID;
 
 public class Logic {
@@ -31,27 +29,24 @@ public class Logic {
         return createUser(modifiedUser);
     }
 
-    public static User signin(User inputUser)
-            throws ValidationException, DatabaseException, AuthenticationException {
-        ValidationResult validationResult = validateCredentials(
-                inputUser.email,
-                inputUser.password
-        );
+    public static User login(String email, String password)
+            throws ValidationException, AuthenticationException {
+        ValidationResult validationResult = validateCredentials(email, password);
 
         if (validationResult.type == ValidationResultType.FAILURE) {
             throw new ValidationException(validationResult.message);
         }
 
-        User matchedUser = getUserByEmail(inputUser.email);
+        User matchedUser = getUserByEmail(email);
 
         if (matchedUser == null) {
             throw new AuthenticationException(
-                    "Email provided cannot be found: " + inputUser.email
+                    "Email provided cannot be found: " + email
             );
         }
 
         boolean doPasswordsMatch = comparePassword(
-                inputUser.password,
+                password,
                 matchedUser.passwordHash
         );
 
@@ -62,5 +57,25 @@ public class Logic {
         }
 
         return matchedUser;
+    }
+
+    public static User getProfile(String userId) throws ValidationException {
+        ValidationResult validationResult = validateId(userId);
+
+        if (validationResult.type == ValidationResultType.FAILURE) {
+            throw new ValidationException(validationResult.message);
+        }
+
+        return getUserById(userId);
+    }
+
+    public static User updateProfile(User user) throws ValidationException, DatabaseException {
+        ValidationResult validationResult = validateUser(user);
+
+        if (validationResult.type == ValidationResultType.FAILURE) {
+            throw new ValidationException(validationResult.message);
+        }
+
+        return updateUser(user);
     }
 }

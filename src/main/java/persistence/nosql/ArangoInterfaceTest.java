@@ -17,7 +17,7 @@ import java.util.*;
 
 import static persistence.nosql.ArangoInterfaceMethods.*;
 import static persistence.sql.Main.openConnection;
-import static persistence.sql.users.Main.getAllUsersIds;
+import static persistence.sql.users.Database.getAllUsersIds;
 
 public class ArangoInterfaceTest {
 

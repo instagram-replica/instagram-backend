@@ -41,7 +41,18 @@ public class Validator {
         return new ValidationResult(ValidationResultType.SUCCESS);
     }
 
-    public static boolean isValidId(String id) {
+    public static ValidationResult validateId(String id) {
+        if (!isValidId(id)) {
+            return new ValidationResult(
+                    ValidationResultType.FAILURE,
+                    "Invalid user ID: " + id
+            );
+        }
+
+        return new ValidationResult(ValidationResultType.SUCCESS);
+    }
+
+    private static boolean isValidId(String id) {
         return isUUID(id);
     }
 

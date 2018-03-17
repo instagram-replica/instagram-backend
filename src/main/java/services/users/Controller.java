@@ -1,6 +1,14 @@
 package services.users;
 
+import auth.AuthenticationException;
+import auth.JWT;
+import auth.JWTPayload;
 import org.json.JSONObject;
+import persistence.sql.users.DatabaseException;
+import persistence.sql.users.User;
+import services.users.validation.ValidationException;
+
+import java.io.IOException;
 
 import static persistence.sql.Main.closeConnection;
 import static persistence.sql.Main.openConnection;
@@ -14,6 +22,7 @@ public class Controller extends shared.MQServer.Controller {
     public JSONObject execute(JSONObject payload, String viewerId) throws Exception {
         openConnection();
 
+        // TODO: Handle inability to find method or params
         String method = payload.getString("method");
         JSONObject params = payload.getJSONObject("params");
 
@@ -21,10 +30,10 @@ public class Controller extends shared.MQServer.Controller {
 
         switch (method) {
             case "signup":
-                response = new JSONObject();
+                response = handleSignup(params);
                 break;
             case "login":
-                response = new JSONObject();
+                response = handleLogin(params);
                 break;
             case "getProfile":
                 response = new JSONObject();
@@ -32,22 +41,7 @@ public class Controller extends shared.MQServer.Controller {
             case "updateProfile":
                 response = new JSONObject();
                 break;
-            case "followUser":
-                response = new JSONObject();
-                break;
-            case "unfollowUser":
-                response = new JSONObject();
-                break;
-            case "blockUser":
-                response = new JSONObject();
-                break;
-            case "unblockUser":
-                response = new JSONObject();
-                break;
-            case "reportUser":
-                response = new JSONObject();
-                break;
-            case "isUserAuthorizedToView":
+            case "searchUsers":
                 response = new JSONObject();
                 break;
             case "getUsersByIds":
@@ -56,7 +50,28 @@ public class Controller extends shared.MQServer.Controller {
             case "getUsersIdsByUsernames":
                 response = new JSONObject();
                 break;
-            case "searchUsers":
+            case "reportUser":
+                // TODO
+                response = new JSONObject();
+                break;
+            case "followUser":
+                // TODO: Insert follow edge between nodes in ArangoDB graph database
+                response = new JSONObject();
+                break;
+            case "unfollowUser":
+                // TODO: Remove follow edge between nodes in ArangoDB graph database
+                response = new JSONObject();
+                break;
+            case "blockUser":
+                // TODO: Insert block edge between nodes in ArangoDB graph database
+                response = new JSONObject();
+                break;
+            case "unblockUser":
+                // TODO: Remove block edge between nodes in ArangoDB graph database
+                response = new JSONObject();
+                break;
+            case "isUserAuthorizedToView":
+                // TODO
                 response = new JSONObject();
                 break;
             default:
@@ -65,5 +80,46 @@ public class Controller extends shared.MQServer.Controller {
 
         closeConnection();
         return response;
+    }
+
+    private static JSONObject handleSignup(JSONObject params)
+            throws DatabaseException, ValidationException, IOException {
+        // TODO: Handle errors thrown
+
+        User user = Logic.signup(Helpers.mapJSONToUser(params));
+
+        String token = JWT.signJWT(
+                new JWTPayload.Builder()
+                        .userId(user.id)
+                        .build()
+        );
+
+        return Helpers.constructOKResponse(
+                new JSONObject()
+                        .put("user", Helpers.mapUserToJSON(user))
+                        .put("token", token)
+        );
+    }
+
+    private static JSONObject handleLogin(JSONObject params)
+            throws ValidationException, AuthenticationException, IOException {
+        // TODO: Handle errors thrown
+
+        User user = Logic.login(
+                params.getString("email"),
+                params.getString("password")
+        );
+
+        String token = JWT.signJWT(
+                new JWTPayload.Builder()
+                        .userId(user.id)
+                        .build()
+        );
+
+        return Helpers.constructOKResponse(
+                new JSONObject()
+                        .put("user", Helpers.mapUserToJSON(user))
+                        .put("token", token)
+        );
     }
 }

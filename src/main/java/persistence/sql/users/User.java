@@ -1,6 +1,6 @@
 package persistence.sql.users;
 
-import java.util.Date;
+import org.joda.time.DateTime;
 
 public class User {
     public final String id;
@@ -8,18 +8,18 @@ public class User {
     public final String email;
     public final String password;
     public final String passwordHash;
-    public final boolean isPrivate;
+    public final Boolean isPrivate;
     public final String fullName;
     public final String gender;
     public final String bio;
     public final String phoneNumber;
     public final String profilePictureUrl;
     public final String websiteUrl;
-    public final Date verifiedAt;
-    public final Date createdAt;
-    public final Date updatedAt;
-    public final Date blockedAt;
-    public final Date deletedAt;
+    public final DateTime verifiedAt;
+    public final DateTime createdAt;
+    public final DateTime updatedAt;
+    public final DateTime blockedAt;
+    public final DateTime deletedAt;
 
     public User(
             String id,
@@ -27,18 +27,18 @@ public class User {
             String email,
             String password,
             String passwordHash,
-            boolean isPrivate,
+            Boolean isPrivate,
             String fullName,
             String gender,
             String bio,
             String phoneNumber,
             String profilePictureUrl,
             String websiteUrl,
-            Date verifiedAt,
-            Date createdAt,
-            Date updatedAt,
-            Date blockedAt,
-            Date deletedAt
+            DateTime verifiedAt,
+            DateTime createdAt,
+            DateTime updatedAt,
+            DateTime blockedAt,
+            DateTime deletedAt
     ) {
         this.id = id;
         this.username = username;
@@ -59,24 +59,28 @@ public class User {
         this.deletedAt = deletedAt;
     }
 
+    public String getId() {
+        return id;
+    }
+
     public static class Builder {
         private String id;
         private String username;
         private String email;
         private String password;
         private String passwordHash;
-        private boolean isPrivate;
+        private Boolean isPrivate;
         private String fullName;
         private String gender;
         private String bio;
         private String phoneNumber;
         private String profilePictureUrl;
         private String websiteUrl;
-        private Date verifiedAt;
-        private Date createdAt;
-        private Date updatedAt;
-        private Date blockedAt;
-        private Date deletedAt;
+        private DateTime verifiedAt;
+        private DateTime createdAt;
+        private DateTime updatedAt;
+        private DateTime blockedAt;
+        private DateTime deletedAt;
 
         public Builder() {}
 
@@ -125,7 +129,7 @@ public class User {
             return this;
         }
 
-        public Builder isPrivate(boolean isPrivate) {
+        public Builder isPrivate(Boolean isPrivate) {
             this.isPrivate = isPrivate;
             return this;
         }
@@ -160,27 +164,27 @@ public class User {
             return this;
         }
 
-        public Builder verifiedAt(Date verifiedAt) {
+        public Builder verifiedAt(DateTime verifiedAt) {
             this.verifiedAt = verifiedAt;
             return this;
         }
 
-        public Builder createdAt(Date createdAt) {
+        public Builder createdAt(DateTime createdAt) {
             this.createdAt = createdAt;
             return this;
         }
 
-        public Builder updatedAt(Date updatedAt) {
+        public Builder updatedAt(DateTime updatedAt) {
             this.updatedAt = updatedAt;
             return this;
         }
 
-        public Builder blockedAt(Date blockedAt) {
+        public Builder blockedAt(DateTime blockedAt) {
             this.blockedAt = blockedAt;
             return this;
         }
 
-        public Builder deletedAt(Date deletedAt) {
+        public Builder deletedAt(DateTime deletedAt) {
             this.deletedAt = deletedAt;
             return this;
         }
