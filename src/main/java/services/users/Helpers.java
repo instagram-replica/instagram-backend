@@ -1,6 +1,5 @@
 package services.users;
 
-import org.joda.time.DateTime;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import persistence.sql.users.User;
@@ -22,11 +21,6 @@ public class Helpers {
                 .phoneNumber((String) getSafely(json, "phoneNumber"))
                 .profilePictureUrl((String) getSafely(json, "profilePictureUrl"))
                 .websiteUrl((String) getSafely(json, "websiteUrl"))
-                .verifiedAt(new DateTime(getSafely(json, "verifiedAt")))
-                .createdAt(new DateTime(getSafely(json, "createdAt")))
-                .updatedAt(new DateTime(getSafely(json, "updatedAt")))
-                .blockedAt(new DateTime(getSafely(json, "blockedAt")))
-                .deletedAt(new DateTime(getSafely(json, "deletedAt")))
                 .build();
     }
 

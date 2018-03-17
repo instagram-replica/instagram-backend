@@ -86,7 +86,7 @@ public class Database {
             );
         }
 
-        return mapModelToUser(model);
+        return getUserById(user.id);
     }
 
     public static User updateUser(User user) throws DatabaseException {

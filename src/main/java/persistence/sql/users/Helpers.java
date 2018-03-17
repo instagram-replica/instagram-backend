@@ -4,6 +4,7 @@ import org.joda.time.DateTime;
 import persistence.sql.users.Models.UserModel;
 
 import java.sql.Timestamp;
+import java.util.Date;
 
 public class Helpers {
     public static UserModel mapUserToModel(User user) {
@@ -51,10 +52,6 @@ public class Helpers {
             model.set("verified_at", new Timestamp(user.verifiedAt.toInstant().getMillis()));
         }
 
-//        if (user.createdAt != null) {
-//            model.set("created_at", user.createdAt);
-//        }
-
         if (user.updatedAt != null) {
             model.set("updated_at", new Timestamp(user.updatedAt.toInstant().getMillis()));
         }
@@ -82,11 +79,15 @@ public class Helpers {
                 .phoneNumber(model.getString("phone_number"))
                 .profilePictureUrl(model.getString("profile_picture_url"))
                 .websiteUrl(model.getString("website_url"))
-                .verifiedAt(new DateTime(model.getDate("verified_at")))
-                .createdAt(new DateTime(model.getDate("created_at")))
-                .updatedAt(new DateTime(model.getDate("updated_at")))
-                .blockedAt(new DateTime(model.getDate("blocked_at")))
-                .deletedAt(new DateTime(model.getDate("deleted_at")))
+                .verifiedAt(mapJavaDateToJodaDateTime(model.getDate("verified_at")))
+                .createdAt(mapJavaDateToJodaDateTime(model.getDate("created_at")))
+                .updatedAt(mapJavaDateToJodaDateTime(model.getDate("updated_at")))
+                .blockedAt(mapJavaDateToJodaDateTime(model.getDate("blocked_at")))
+                .deletedAt(mapJavaDateToJodaDateTime(model.getDate("deleted_at")))
                 .build();
+    }
+
+    private static DateTime mapJavaDateToJodaDateTime(Date date) {
+        return date == null? null : new DateTime(date);
     }
 }

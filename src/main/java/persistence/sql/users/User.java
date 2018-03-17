@@ -21,7 +21,7 @@ public class User {
     public final DateTime blockedAt;
     public final DateTime deletedAt;
 
-    public User(
+    private User(
             String id,
             String username,
             String email,
