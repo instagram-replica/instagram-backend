@@ -50,11 +50,7 @@ public class Controller extends shared.MQServer.Controller {
                 response = handleGetUsersByIds(params);
                 break;
             case "getUsersIdsByUsernames":
-                response = new JSONObject();
-                break;
-            case "reportUser":
-                // TODO
-                response = new JSONObject();
+                response = handleGetUsersIdsByUsernames(params);
                 break;
             case "followUser":
                 // TODO: Insert follow edge between nodes in ArangoDB graph database
@@ -70,6 +66,10 @@ public class Controller extends shared.MQServer.Controller {
                 break;
             case "unblockUser":
                 // TODO: Remove block edge between nodes in ArangoDB graph database
+                response = new JSONObject();
+                break;
+            case "reportUser":
+                // TODO
                 response = new JSONObject();
                 break;
             case "isUserAuthorizedToView":
@@ -143,12 +143,25 @@ public class Controller extends shared.MQServer.Controller {
     private static JSONObject handleGetUsersByIds(JSONObject params) {
         // TODO: Handle errors thrown
 
-        String[] usersIds = Helpers.convertJSONArrayToList(
-                params.getJSONArray("usersIds")
+        String[] ids = Helpers.convertJSONArrayToList(
+                params.getJSONArray("ids")
         ).stream().toArray(String[]::new);
 
-        List<User> users = Logic.getUsersByIds(usersIds);
+        List<User> users = Logic.getUsersByIds(ids);
         JSONArray usersJSON = Helpers.convertUsersListToJSONArray(users);
+
+        return Helpers.constructOKResponse(usersJSON);
+    }
+
+    private static JSONObject handleGetUsersIdsByUsernames(JSONObject params) {
+        // TODO: Handle errors thrown
+
+        String[] usernames = Helpers.convertJSONArrayToList(
+                params.getJSONArray("usernames")
+        ).stream().toArray(String[]::new);
+
+        List<String> usersIds = Logic.getUsersIdsByUsernames(usernames);
+        JSONArray usersJSON = Helpers.convertStringsListToJSONArray(usersIds);
 
         return Helpers.constructOKResponse(usersJSON);
     }

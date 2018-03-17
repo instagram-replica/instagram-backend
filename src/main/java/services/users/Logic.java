@@ -87,4 +87,9 @@ public class Logic {
         // TODO: Validate ids
         return Database.getUsersByIds(ids);
     }
+
+    public static List<String> getUsersIdsByUsernames(String[] usernames) {
+        // TODO: Validate usernames
+        return Database.getUsersIdsByUsernames(usernames);
+    }
 }

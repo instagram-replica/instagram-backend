@@ -87,6 +87,16 @@ public class Helpers {
         return jsonArray;
     }
 
+    public static JSONArray convertStringsListToJSONArray(List<String> list) {
+        JSONArray jsonArray = new JSONArray();
+
+        for (String element : list) {
+            jsonArray.put(element);
+        }
+
+        return jsonArray;
+    }
+
     private static Object mapJavaNullToJSONNull(Object object) {
         return object == null ? JSONObject.NULL : object;
     }
