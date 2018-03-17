@@ -37,10 +37,10 @@ public class Controller extends shared.Controller {
 			NotificationActions.handleFollowNotification(paramsObject, userId);
 			break;
 		case "getNotifications":
-			NotificationActions.handleGettingNotifications(paramsObject, userId);
+			newJsonObj = NotificationActions.handleGettingNotifications(paramsObject, userId);
 			break;
 		case "getActivities":
-			ActivityActions.handleGettingActivities(userId);
+			newJsonObj = ActivityActions.handleGettingActivities(userId);
 			break;
 			
 		default:

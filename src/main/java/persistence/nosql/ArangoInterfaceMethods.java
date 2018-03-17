@@ -446,8 +446,30 @@ public class ArangoInterfaceMethods {
             String dbQuery = "For notification in " + notificationsCollectionName
                     + " FILTER notification.receiver_id == " + user_id
                     + " SORT notification.created_at"
-                    + " Limit "+start + ", " + limit
+                    + " Limit "+ start + ", " + limit
                     + " RETURN notification";
+            ArangoCursor<BaseDocument> cursor = arangoDB.db(dbName).query(dbQuery, null, null, BaseDocument.class);
+            JSONArray result = new JSONArray();
+            cursor.forEachRemaining(aDocument -> {
+                JSONObject postJSON = new JSONObject(aDocument.getProperties());
+                result.put(reformatJSON(postJSON));
+            });
+            return result;
+        } catch (ArangoDBException e) {
+            System.err.println("Failed to execute query. " + e.getMessage());
+            return null;
+        }
+
+    }
+
+    public static JSONArray getActivities(String[] followings, int start, int limit) {
+
+        try {
+            String dbQuery = "For activity in " + activitiesCollectionName
+                    + " FILTER activity.receiver_id IN " + followings.toString()
+                    + " SORT activity.created_at"
+                    + " Limit "+ start + ", " + limit
+                    + " RETURN activity";
             ArangoCursor<BaseDocument> cursor = arangoDB.db(dbName).query(dbQuery, null, null, BaseDocument.class);
             JSONArray result = new JSONArray();
             cursor.forEachRemaining(aDocument -> {

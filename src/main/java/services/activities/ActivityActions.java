@@ -1,8 +1,11 @@
 package services.activities;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import persistence.nosql.ArangoInterfaceMethods;
+
+import java.util.ArrayList;
 
 public class ActivityActions {
 	
@@ -64,8 +67,14 @@ public class ActivityActions {
 		ArangoInterfaceMethods.insertActivity(activityJSON);
 	}	
 
-	public static void handleGettingActivities(String userId){
-		JSONObject activities= ArangoInterfaceMethods.getActivity(userId);
+	public static JSONObject handleGettingActivities(JSONObject params, String userId){
+		int size = params.getInt("pageSize");
+		int start = params.getInt("pageIndex") * size;
+		String[] followings = ArangoInterfaceMethods.getAllfollowingIDs(userId).stream().toArray(String[]::new);
+		JSONArray activities= ArangoInterfaceMethods.getActivities(followings, start, size);
+		JSONObject result = new JSONObject();
+		result.put("activities", activities);
+		return result;
 		//missing returned object
 	}
 }

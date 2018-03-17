@@ -1,5 +1,5 @@
 {
-  "method": "getNotifications",
+  "method": "getActivities",
   "notifications": [
     {
       "type": "follow",
@@ -8,7 +8,7 @@
       "createAt": "2012-04-23T18:25:43.511Z"
     },
     {
-      "type": "comment",
+      "type": "like",
       "id": "123",
       "userId": "123444",
       "createAt": "2012-04-23T18:25:43.511Z"

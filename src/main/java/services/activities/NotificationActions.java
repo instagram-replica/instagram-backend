@@ -8,7 +8,7 @@ import persistence.sql.users.Main;
 import java.sql.Timestamp;
 
 public class NotificationActions {
-
+//TODO: insert in notifications table!!!
     public static void handlePostLikeNotification(JSONObject params, String userId) {
         String receiverId = params.getString("receiverId");
         String postID = params.getString("postID");
@@ -23,6 +23,7 @@ public class NotificationActions {
         notificationJSON.put("created_at",new java.util.Date());
         notificationJSON.put("blocked_at","null");
         notificationJSON.put("id",utilities.Main.generateUUID());
+        ArangoInterfaceMethods.insertNotification(notificationJSON);
         ArangoInterfaceMethods.insertActivity(notificationJSON);
     }
 
@@ -38,6 +39,7 @@ public class NotificationActions {
         notificationJSON.put("created_at",new java.util.Date());
         notificationJSON.put("blocked_at","null");
         notificationJSON.put("id",utilities.Main.generateUUID());
+        ArangoInterfaceMethods.insertNotification(notificationJSON);
         ArangoInterfaceMethods.insertActivity(notificationJSON);
     }
 
@@ -54,7 +56,7 @@ public class NotificationActions {
             notifyReceiver.put("sender_id", userId);
             notifyReceiver.put("created_at", new Timestamp(System.currentTimeMillis()));
             notifyReceiver.put("blocked_at",new Timestamp(System.currentTimeMillis()));
-            ArangoInterfaceMethods.insertActivity(notifyReceiver);
+            ArangoInterfaceMethods.insertNotification(notifyReceiver);
         }
 
         JSONObject notificationJSON =new JSONObject();
@@ -69,7 +71,7 @@ public class NotificationActions {
         notificationJSON.put("created_at",new java.util.Date());
         notificationJSON.put("blocked_at","null");
         notificationJSON.put("id",utilities.Main.generateUUID());
-        ArangoInterfaceMethods.insertActivity(notificationJSON);
+        ArangoInterfaceMethods.insertNotification(notificationJSON);
     }
 
 
@@ -87,7 +89,7 @@ public class NotificationActions {
         activityJSON.put("created_at",new java.util.Date());
         activityJSON.put("blocked_at","null");
         activityJSON.put("id",utilities.Main.generateUUID());
-        ArangoInterfaceMethods.insertActivity(activityJSON);
+        ArangoInterfaceMethods.insertNotification(activityJSON);
     }
 
     public static void handleCommentReplyNotification(JSONObject params, String userId) {
