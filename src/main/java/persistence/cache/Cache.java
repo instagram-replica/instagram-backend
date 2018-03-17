@@ -42,7 +42,6 @@ public class Cache {
         }
     }
 
-
     public static void insertPostsIntoCache(JSONArray post, String userId, int pageIndex, int pageSize){
         System.out.println("INSERTING INTO CACHE");
         JedisPool pool = new JedisPool(new JedisPoolConfig(), "localhost");
@@ -71,10 +70,33 @@ public class Cache {
             }
         }
     }
+    public static void insertCommentsIntoCache(JSONArray comment, String postId){
+        System.out.println("INSERTING INTO CACHE");
+        JedisPool pool = new JedisPool(new JedisPoolConfig(), "localhost");
+        try (Jedis jedis = pool.getResource()) {
+            String key = "comments$"+postId;
+            jedis.set(key,comment.toString());
+            jedis.expire(key,EXPIRY_TIME);
+        }
+        pool.close();
+    }
 
-
-
-
-
+    public static JSONArray getCommentsFromCache(String postId){
+        System.out.println("READING FROM CACHE");
+        JedisPool pool = new JedisPool(new JedisPoolConfig(), "localhost");
+        try (Jedis jedis = pool.getResource()) {
+            String key = "comments$"+postId;
+            String jsonComments = jedis.get(key);
+            pool.close();
+            if(jsonComments!=null){
+                System.out.println(new JSONObject(jsonComments));
+                return new JSONArray(jsonComments);
+            }
+            else{
+                System.out.println("NULL");
+                return null;
+            }
+        }
+    }
 
 }
