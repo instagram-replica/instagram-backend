@@ -2,6 +2,7 @@ package services.posts;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import persistence.cache.Cache;
 import persistence.nosql.ArangoInterfaceMethods;
 import persistence.sql.Post;
 import shared.Helpers;
@@ -20,7 +21,6 @@ public class Team1 {
         String comment = paramsObject.getString("text");
 
         JSONObject commentJSON = createCommentJSON(comment, 0, loggedInUserId, postId);
-
 
         ArangoInterfaceMethods.insertCommentOnPost(postId, commentJSON);
         JSONObject jsonValue = new JSONObject();
@@ -41,7 +41,12 @@ public class Team1 {
     //tested
     public static JSONObject getCommentsOnPost(JSONObject paramsObject, String userId, String methodName) {
         String postId = paramsObject.getString("postId");
-        JSONArray comments = ArangoInterfaceMethods.getCommentsOnPost(postId);
+        JSONArray comments = Cache.getCommentsFromCache(postId);
+
+        if(comments==null) {
+            comments = ArangoInterfaceMethods.getPosts(postId);
+            Cache.insertCommentsIntoCache(comments,postId);
+        }
         JSONObject jsonValue = new JSONObject();
         jsonValue.put("method", methodName);
         jsonValue.put("comments", comments);
