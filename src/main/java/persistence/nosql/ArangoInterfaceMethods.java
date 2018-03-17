@@ -440,6 +440,28 @@ public class ArangoInterfaceMethods {
 
     }
 
+    public static JSONArray getNotifications(String user_id, int start, int limit) {
+
+        try {
+            String dbQuery = "For notification in " + notificationsCollectionName
+                    + " FILTER notification.receiver_id == " + user_id
+                    + " SORT notification.created_at"
+                    + " Limit "+start + ", " + limit
+                    + " RETURN notification";
+            ArangoCursor<BaseDocument> cursor = arangoDB.db(dbName).query(dbQuery, null, null, BaseDocument.class);
+            JSONArray result = new JSONArray();
+            cursor.forEachRemaining(aDocument -> {
+                JSONObject postJSON = new JSONObject(aDocument.getProperties());
+                result.put(reformatJSON(postJSON));
+            });
+            return result;
+        } catch (ArangoDBException e) {
+            System.err.println("Failed to execute query. " + e.getMessage());
+            return null;
+        }
+
+    }
+
 
     //POSTS CRUD
     public static String insertPost(JSONObject postJSON, String userId) throws Exception {

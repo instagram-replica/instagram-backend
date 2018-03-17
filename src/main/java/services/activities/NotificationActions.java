@@ -107,8 +107,13 @@ public class NotificationActions {
         ArangoInterfaceMethods.insertActivity(activityJSON);
     }
 
-    public static void handleGettingNotifications(String userId){
-        JSONObject notifications= ArangoInterfaceMethods.getActivity(userId);
-        //TODO: handle notifications logic, followed userId, commented on userId post/comment, liked userId post/comment
+    public static JSONObject handleGettingNotifications(JSONObject params, String userId){
+        int size = params.getInt("pageSize");
+        int start = params.getInt("pageIndex") * size;
+        JSONArray notifications= ArangoInterfaceMethods.getNotifications(userId, start, size);
+
+        JSONObject result = new JSONObject();
+        result.put("notifications", notifications);
+        return result;
     }
 }

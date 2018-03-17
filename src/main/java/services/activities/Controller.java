@@ -34,10 +34,10 @@ public class Controller extends shared.Controller {
 			NotificationActions.handleCommentReplyNotification(paramsObject, userId);
 			break;
 		case "createFollow":
-			NotificationActions.handleFollowNotification(paramsObject,userId);
+			NotificationActions.handleFollowNotification(paramsObject, userId);
 			break;
 		case "getNotifications":
-			NotificationActions.handleGettingNotifications(userId);
+			NotificationActions.handleGettingNotifications(paramsObject, userId);
 			break;
 		case "getActivities":
 			ActivityActions.handleGettingActivities(userId);
