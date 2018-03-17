@@ -1,13 +1,14 @@
 package services.users;
 
-import auth.AuthenticationException;
+import exceptions.AuthenticationException;
 import auth.JWT;
 import auth.JWTPayload;
+import exceptions.CustomException;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import persistence.sql.users.DatabaseException;
+import exceptions.DatabaseException;
 import persistence.sql.users.User;
-import services.users.validation.ValidationException;
+import exceptions.ValidationException;
 
 import java.io.IOException;
 import java.util.List;
@@ -84,23 +85,26 @@ public class Controller extends shared.MQServer.Controller {
         return response;
     }
 
-    private static JSONObject handleSignup(JSONObject params)
-            throws DatabaseException, ValidationException, IOException {
-        // TODO: Handle errors thrown
+    private static JSONObject handleSignup(JSONObject params) {
+        try {
+            User user = Logic.signup(Helpers.mapJSONToUser(params));
 
-        User user = Logic.signup(Helpers.mapJSONToUser(params));
+            String token = JWT.signJWT(
+                    new JWTPayload.Builder()
+                            .userId(user.id)
+                            .build()
+            );
 
-        String token = JWT.signJWT(
-                new JWTPayload.Builder()
-                        .userId(user.id)
-                        .build()
-        );
-
-        return Helpers.constructOKResponse(
-                new JSONObject()
-                        .put("user", Helpers.mapUserToJSON(user))
-                        .put("token", token)
-        );
+            return Helpers.constructOKResponse(
+                    new JSONObject()
+                            .put("user", Helpers.mapUserToJSON(user))
+                            .put("token", token)
+            );
+        } catch (CustomException e) {
+            return Helpers.constructErrorResponse(e.getMessage());
+        } catch (Exception e) {
+            return Helpers.constructErrorResponse();
+        }
     }
 
     private static JSONObject handleLogin(JSONObject params)

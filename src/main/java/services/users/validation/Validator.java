@@ -6,14 +6,63 @@ import static utilities.Main.isUUID;
 
 public class Validator {
     public static ValidationResult validateUser(User user) {
-        if (user.id != null && !isValidId(user.id)) {
+        if (user.id == null) {
+            return new ValidationResult(
+                    ValidationResultType.FAILURE,
+                    "User's ID cannot be undefined"
+            );
+        }
+
+        if (user.username == null) {
+            return new ValidationResult(
+                    ValidationResultType.FAILURE,
+                    "User's username cannot be undefined"
+            );
+        }
+
+        if (user.email == null) {
+            return new ValidationResult(
+                    ValidationResultType.FAILURE,
+                    "User's email cannot be undefined"
+            );
+        }
+
+        if (user.password == null) {
+            return new ValidationResult(
+                    ValidationResultType.FAILURE,
+                    "User's password cannot be undefined"
+            );
+        }
+
+        if (user.isPrivate == null) {
+            return new ValidationResult(
+                    ValidationResultType.FAILURE,
+                    "User's privacy flag cannot be undefined"
+            );
+        }
+
+        if (user.fullName == null) {
+            return new ValidationResult(
+                    ValidationResultType.FAILURE,
+                    "User's full name cannot be undefined"
+            );
+        }
+
+        if (user.gender == null) {
+            return new ValidationResult(
+                    ValidationResultType.FAILURE,
+                    "User's gender cannot be undefined"
+            );
+        }
+
+        if (!isValidId(user.id)) {
             return new ValidationResult(
                     ValidationResultType.FAILURE,
                     "Invalid user ID: " + user.id
             );
         }
 
-        if (user.password != null && !isValidPassword(user.password)) {
+        if (!isValidPassword(user.password)) {
             return new ValidationResult(
                     ValidationResultType.FAILURE,
                     "Invalid user password"

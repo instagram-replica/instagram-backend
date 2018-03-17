@@ -55,7 +55,13 @@ public class Helpers {
                 .put("error", JSONObject.NULL);
     }
 
-    public static JSONObject constructErrorResponse(JSONObject error) {
+    public static JSONObject constructErrorResponse() {
+        String GENERIC_ERROR_MESSAGE = "Internal server error";
+        return constructErrorResponse(GENERIC_ERROR_MESSAGE);
+    }
+
+    public static JSONObject constructErrorResponse(String message) {
+        JSONObject error = new JSONObject().put("message", message);
         return new JSONObject()
                 .put("data", JSONObject.NULL)
                 .put("error", error);

@@ -1,5 +1,6 @@
 package persistence.sql.users;
 
+import exceptions.DatabaseException;
 import persistence.sql.users.Models.UserModel;
 
 import java.util.List;

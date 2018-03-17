@@ -1,14 +1,13 @@
 package services.users;
 
-import auth.AuthenticationException;
+import exceptions.AuthenticationException;
 import persistence.sql.users.Database;
-import persistence.sql.users.DatabaseException;
+import exceptions.DatabaseException;
 import persistence.sql.users.User;
-import services.users.validation.ValidationException;
+import exceptions.ValidationException;
 import services.users.validation.ValidationResult;
 import services.users.validation.ValidationResultType;
 
-import java.util.Arrays;
 import java.util.List;
 
 import static auth.BCrypt.comparePassword;

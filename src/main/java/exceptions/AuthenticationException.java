@@ -1,6 +1,6 @@
-package auth;
+package exceptions;
 
-public class AuthenticationException extends Exception {
+public class AuthenticationException extends CustomException {
     public AuthenticationException(String message) {
         super(message);
     }
