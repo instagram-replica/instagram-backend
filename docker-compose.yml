@@ -1,0 +1,23 @@
+version: '3'
+
+services:
+  arangodb:
+    image: arangodb
+    environment:
+      - ARANGO_NO_AUTH=1
+    ports:
+      - "32807:8529"
+  postgres:
+    image: orchardup/postgresql
+    environment:
+        - POSTGRESQL_DB=instagram_development
+        - POSTGRESQL_USER=postgres
+        - POSTGRESQL_PASS=postgres
+    ports:
+      - "32806:5432"
+  rabbitmq:
+    image: rabbitmq
+    ports:
+      - "32810:5671"
+      - "32809:5672"
+      - "32808:25672"
