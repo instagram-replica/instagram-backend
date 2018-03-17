@@ -95,6 +95,6 @@ public class Database {
             );
         }
 
-        return mapModelToUser(model);
+        return getUserById(user.id);
     }
 }

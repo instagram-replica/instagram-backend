@@ -6,14 +6,14 @@ import static utilities.Main.isUUID;
 
 public class Validator {
     public static ValidationResult validateUser(User user) {
-        if (!isValidId(user.id)) {
+        if (user.id != null && !isValidId(user.id)) {
             return new ValidationResult(
                     ValidationResultType.FAILURE,
                     "Invalid user ID: " + user.id
             );
         }
 
-        if (!isValidPassword(user.password)) {
+        if (user.password != null && !isValidPassword(user.password)) {
             return new ValidationResult(
                     ValidationResultType.FAILURE,
                     "Invalid user password"

@@ -39,7 +39,7 @@ public class Controller extends shared.MQServer.Controller {
                 response = handleGetProfile(params);
                 break;
             case "updateProfile":
-                response = new JSONObject();
+                response = handleUpdateProfile(params);
                 break;
             case "searchUsers":
                 response = new JSONObject();
@@ -124,7 +124,17 @@ public class Controller extends shared.MQServer.Controller {
     }
 
     private static JSONObject handleGetProfile(JSONObject params) throws ValidationException {
+        // TODO: Handle errors thrown
+
         User user = Logic.getProfile(params.getString("userId"));
+        return Helpers.constructOKResponse(Helpers.mapUserToJSON(user));
+    }
+
+    private static JSONObject handleUpdateProfile(JSONObject params)
+            throws DatabaseException, ValidationException {
+        // TODO: Handle errors thrown
+
+        User user = Logic.updateProfile(Helpers.mapJSONToUser(params));
         return Helpers.constructOKResponse(Helpers.mapUserToJSON(user));
     }
 }
