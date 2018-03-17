@@ -47,14 +47,7 @@ public class Controller extends shared.MQServer.Controller {
 
     public static void createStory(JSONObject paramsObject) {
         JSONObject createStory = new JSONObject();
-<<<<<<< HEAD
-        if(!ArangoInterfaceMethods.insertStory(paramsObject).equals(null)){
-            createStory.put("success","true");
-            createStory.put("error","0");
-        }else{
-            createStory.put("success","false");
-            createStory.put("error","Story not created");
-=======
+
         if (!ArangoInterfaceMethods.insertStory(paramsObject).equals(null)) {
             createStory.put("success", "true");
             createStory.put("error", "0");
@@ -62,7 +55,6 @@ public class Controller extends shared.MQServer.Controller {
         } else {
             createStory.put("success", "false");
             createStory.put("error", "Story not created");
->>>>>>> 8a1384face36bbbdf8699da8d4b6e79a78a903c2
         }
     }
 
@@ -82,7 +74,6 @@ public class Controller extends shared.MQServer.Controller {
 
     public static JSONObject getStory(JSONObject paramsObject) {
         JSONObject story = new JSONObject();
-<<<<<<< HEAD
         String storyID = paramsObject.getString("id");
         JSONObject storyResponse = Cache.getStoryFromCache(storyID);
         if(storyResponse==null) {
@@ -91,17 +82,12 @@ public class Controller extends shared.MQServer.Controller {
         }
         story.put("error","0");
         story.put("response",storyResponse);
-=======
-        story.put("error", "0");
-        story.put("response", ArangoInterfaceMethods.getStory(paramsObject.getString("id")));
->>>>>>> 8a1384face36bbbdf8699da8d4b6e79a78a903c2
         return story;
     }
 
     public static JSONObject getMyStories(String userId) {
         //        @TODO: validate expiry time
         JSONObject myStory = new JSONObject();
-<<<<<<< HEAD
         JSONArray stories = Cache.getUserStoriesFromCache(userId);
         if(stories==null) {
             stories = ArangoInterfaceMethods.getStories(userId);
@@ -109,10 +95,6 @@ public class Controller extends shared.MQServer.Controller {
         }
         myStory.put("error","0");
         myStory.put("response",stories);
-=======
-        myStory.put("error", "0");
-        myStory.put("response", ArangoInterfaceMethods.getStories(userId));
->>>>>>> 8a1384face36bbbdf8699da8d4b6e79a78a903c2
         return myStory;
     }
 
