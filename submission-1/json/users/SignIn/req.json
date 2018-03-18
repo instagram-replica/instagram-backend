@@ -2,6 +2,6 @@
 	"method" : "signIn",
 	"params": {
 		"username" : "sawahel",
-		"passwordHash" : "!@#!@$C!"
+		"password" : "123456"
 	}
 }

@@ -1,0 +1,6 @@
+{
+  "method": "getPostLikers",
+  "params": {
+    "postId": "12"
+  }
+}

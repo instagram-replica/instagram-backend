@@ -9,7 +9,7 @@ import static utilities.Main.readPropertiesFile;
 
 public class Main {
     public static void openConnection() throws IOException {
-        Properties properties = readPropertiesFile("src/main/resources/config.properties");
+        Properties properties = readPropertiesFile("src/main/resources/postgres.properties");
         Base.open(
                 properties.getProperty("POSTGRESQL_DRIVER"),
                 properties.getProperty("POSTGRESQL_URL"),
