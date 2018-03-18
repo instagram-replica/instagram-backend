@@ -68,14 +68,20 @@ public class Logic {
         return matchedUser;
     }
 
-    public static User getProfile(String userId) throws ValidationException {
+    public static User getProfile(String userId) throws ValidationException, DatabaseException {
         ValidationResult validationResult = Validator.validateId(userId);
 
         if (validationResult.type == ValidationResultType.FAILURE) {
             throw new ValidationException(validationResult.message);
         }
 
-        return Database.getUserById(userId);
+        User user = Database.getUserById(userId);
+
+        if (user == null) {
+            throw new DatabaseException("User cannot be found");
+        }
+
+        return user;
     }
 
     public static User updateProfile(User user) throws ValidationException, DatabaseException {

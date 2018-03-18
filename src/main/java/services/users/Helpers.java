@@ -25,6 +25,10 @@ public class Helpers {
     }
 
     public static JSONObject mapUserToJSON(User user) {
+        if (user == null) {
+            return new JSONObject();
+        }
+
         return new JSONObject()
                 .put("id", mapJavaNullToJSONNull(user.id))
                 .put("username", mapJavaNullToJSONNull(user.username))

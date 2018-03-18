@@ -1,6 +1,5 @@
 package services.users;
 
-import exceptions.AuthenticationException;
 import auth.JWT;
 import auth.JWTPayload;
 import exceptions.CustomException;
@@ -10,7 +9,6 @@ import exceptions.DatabaseException;
 import persistence.sql.users.User;
 import exceptions.ValidationException;
 
-import java.io.IOException;
 import java.util.List;
 
 import static persistence.sql.Main.closeConnection;
@@ -108,33 +106,40 @@ public class Controller extends shared.MQServer.Controller {
         }
     }
 
-    private static JSONObject handleLogin(JSONObject params)
-            throws ValidationException, AuthenticationException, IOException {
-        // TODO: Handle errors thrown
+    private static JSONObject handleLogin(JSONObject params) {
+        try {
+            User user = Logic.login(
+                    params.getString("email"),
+                    params.getString("password")
+            );
 
-        User user = Logic.login(
-                params.getString("email"),
-                params.getString("password")
-        );
+            String token = JWT.signJWT(
+                    new JWTPayload.Builder()
+                            .userId(user.id)
+                            .build()
+            );
 
-        String token = JWT.signJWT(
-                new JWTPayload.Builder()
-                        .userId(user.id)
-                        .build()
-        );
-
-        return Helpers.constructOKResponse(
-                new JSONObject()
-                        .put("user", Helpers.mapUserToJSON(user))
-                        .put("token", token)
-        );
+            return Helpers.constructOKResponse(
+                    new JSONObject()
+                            .put("user", Helpers.mapUserToJSON(user))
+                            .put("token", token)
+            );
+        } catch (CustomException e) {
+            return Helpers.constructErrorResponse(e.getMessage());
+        } catch (Exception e) {
+            return Helpers.constructErrorResponse();
+        }
     }
 
-    private static JSONObject handleGetProfile(JSONObject params) throws ValidationException {
-        // TODO: Handle errors thrown
-
-        User user = Logic.getProfile(params.getString("userId"));
-        return Helpers.constructOKResponse(Helpers.mapUserToJSON(user));
+    private static JSONObject handleGetProfile(JSONObject params) {
+        try {
+            User user = Logic.getProfile(params.getString("id"));
+            return Helpers.constructOKResponse(Helpers.mapUserToJSON(user));
+        } catch (CustomException e) {
+            return Helpers.constructErrorResponse(e.getMessage());
+        } catch (Exception e) {
+            return Helpers.constructErrorResponse();
+        }
     }
 
     private static JSONObject handleUpdateProfile(JSONObject params)
