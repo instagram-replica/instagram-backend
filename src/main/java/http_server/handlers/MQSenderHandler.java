@@ -17,12 +17,6 @@ import static utilities.Main.readPropertiesFile;
 
 @ChannelHandler.Sharable
 public class MQSenderHandler extends SimpleChannelInboundHandler<HTTPRequest> {
-    private final Settings settings;
-
-    public MQSenderHandler(Settings settings) {
-        super();
-        this.settings = settings;
-    }
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, HTTPRequest httpRequest) throws Exception {
@@ -41,7 +35,7 @@ public class MQSenderHandler extends SimpleChannelInboundHandler<HTTPRequest> {
         String uuid = UUID.randomUUID().toString();
         jsonObject
                 .put("uuid", uuid)
-                .put("sender", settings.getName());
+                .put("sender", Settings.getInstance().getInstanceId());
 
         channel.queueDeclare(serviceName, true, false, false, null);
         channel.basicPublish("", serviceName, null, jsonObject.toString().getBytes("UTF-8"));

@@ -44,7 +44,7 @@ public class Server {
                 p.addLast(new CorsHandler(corsConfig));
 
                 p.addLast(new HTTPHandler());
-                p.addLast(new URIHandler(Settings.getInstance()));
+                p.addLast(new URIHandler());
 
                 p.addLast(new JSONHandler());
 

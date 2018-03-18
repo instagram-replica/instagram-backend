@@ -9,16 +9,9 @@ import static shared.Helpers.blockAndSubscribe;
 
 @ChannelHandler.Sharable
 public class MQReceiverHandler extends SimpleChannelInboundHandler<MQHandlerPair> {
-    private final Settings settings;
-
-    public MQReceiverHandler(Settings settings) {
-        super();
-        this.settings = settings;
-    }
-
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, MQHandlerPair mqPair) throws Exception {
-        JSONObject resJSON = blockAndSubscribe(Server.mqSubscriptions, mqPair.uuid, settings.getName(), mqPair.serviceName);
+        JSONObject resJSON = blockAndSubscribe(Server.mqSubscriptions, mqPair.uuid, Settings.getInstance().getInstanceId(), mqPair.serviceName);
         ctx.fireChannelRead(resJSON);
     }
 }

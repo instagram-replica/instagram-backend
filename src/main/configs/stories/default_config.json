@@ -1,5 +1,5 @@
 {
-  "name": "stories1",
+  "instanceId": "stories1",
   "application": "stories",
   "port": 8003,
   "numberOfThreads": 10,

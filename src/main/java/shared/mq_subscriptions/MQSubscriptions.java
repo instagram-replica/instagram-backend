@@ -48,6 +48,5 @@ public class MQSubscriptions {
             map.put(queueName, execArray);
             createConsumer(queueName);
         }
-
     }
 }

@@ -1,5 +1,5 @@
 {
-  "name": "activities1",
+  "instanceId": "activities1",
   "application": "activities",
   "port": 8000,
   "numberOfThreads": 10,

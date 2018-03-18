@@ -10,22 +10,22 @@ import java.io.IOException;
 
 public class Settings {
     private static Settings settings;
-    private String name;
+    private String instanceId;
     private String application;
     private int port;
     private int numberOfThreads;
     private String version;
 
-    private Settings(String name, String application, int port, int numberOfThreads, String version) {
-        this.name = name;
+    private Settings(String instanceId, String application, int port, int numberOfThreads, String version) {
+        this.instanceId = instanceId;
         this.application = application;
         this.port = port;
         this.numberOfThreads = numberOfThreads;
         this.version = version;
     }
 
-    public String getName() {
-        return name;
+    public String getInstanceId() {
+        return instanceId;
     }
 
     public String getApplication() {
@@ -46,7 +46,7 @@ public class Settings {
 
     public JSONObject toJSON() {
         return new JSONObject()
-                .put("name", name)
+                .put("instanceId", instanceId)
                 .put("application", application)
                 .put("port", port)
                 .put("numberOfThreads", numberOfThreads)
@@ -70,7 +70,7 @@ public class Settings {
         try {
             org.json.simple.JSONObject jsonObject = (org.json.simple.JSONObject) parser.parse(new FileReader(fileUri));
             settings = builder
-                    .name((String) jsonObject.get("name"))
+                    .instanceId((String) jsonObject.get("instanceId"))
                     .application((String) jsonObject.get("application"))
                     .port(((Long) jsonObject.get("port")).intValue())
                     .numberOfThreads(((Long) jsonObject.get("numberOfThreads")).intValue())
@@ -84,14 +84,14 @@ public class Settings {
 
 
     public static class Builder {
-        private String name = "netty";
+        private String instanceId = "netty";
         private String application = "netty";
         private int port = 8080;
         private int numberOfThreads = 10;
         private String version = "0.1.0";
 
-        public Builder name(String name) {
-            this.name = name;
+        public Builder instanceId(String instanceId) {
+            this.instanceId = instanceId;
             return this;
         }
 
@@ -117,7 +117,7 @@ public class Settings {
 
         public Settings build() {
             return new Settings(
-                    this.name,
+                    this.instanceId,
                     this.application,
                     this.port,
                     this.numberOfThreads,

@@ -1,5 +1,5 @@
 {
-  "name": "chats1",
+  "instanceId": "chats1",
   "application": "chats",
   "port": 8001,
   "numberOfThreads": 10,

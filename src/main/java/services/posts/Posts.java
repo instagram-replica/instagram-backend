@@ -24,7 +24,7 @@ public class Posts {
         try {
             post = ArangoInterfaceMethods.getPost(postId);
             String ownerId = post.getString("user_id");
-            if (isAuthorizedToView(Settings.getInstance().getName(), loggedInUserId, ownerId)) {
+            if (isAuthorizedToView(Settings.getInstance().getInstanceId(), loggedInUserId, ownerId)) {
                 //TODO: @USERS_TEAM `getUsers`
             }
         } catch (Exception e) {
@@ -58,7 +58,7 @@ public class Posts {
         int pageIndex = paramsObject.getInt("pageIndex");
         String ownerId = paramsObject.getString("userId");
         try {
-            if (isAuthorizedToView(Settings.getInstance().getName(), loggedInUserId, ownerId)) {
+            if (isAuthorizedToView(Settings.getInstance().getInstanceId(), loggedInUserId, ownerId)) {
                 //@TODO: Check if the user exists
                 JSONArray posts = ArangoInterfaceMethods.getPosts(ownerId);
                 JSONObject response = new JSONObject();

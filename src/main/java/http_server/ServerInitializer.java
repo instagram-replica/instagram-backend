@@ -16,8 +16,6 @@ import shared.Settings;
 public class ServerInitializer extends ChannelInitializer<SocketChannel> {
     @Override
     protected void initChannel(SocketChannel arg0) {
-        Settings settings = Settings.getInstance();
-
         CorsConfig corsConfig = CorsConfigBuilder.forAnyOrigin()
                 .allowedRequestHeaders("X-Requested-With", "Content-Type", "Content-Length")
                 .allowedRequestMethods(HttpMethod.GET, HttpMethod.POST, HttpMethod.PUT, HttpMethod.DELETE, HttpMethod.OPTIONS)
@@ -31,12 +29,12 @@ public class ServerInitializer extends ChannelInitializer<SocketChannel> {
         p.addLast(new CorsHandler(corsConfig));
 
         p.addLast(new HTTPHandler());
-        p.addLast(new URIHandler(settings));
+        p.addLast(new URIHandler());
 
         p.addLast(new AuthenticationHandler());
 
-        p.addLast(new MQSenderHandler(settings));
-        p.addLast(new MQReceiverHandler(settings));
+        p.addLast(new MQSenderHandler());
+        p.addLast(new MQReceiverHandler());
 
         p.addLast(new JSONSenderHandler());
 

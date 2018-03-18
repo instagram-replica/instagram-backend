@@ -37,7 +37,7 @@ public class Comments {
             ArrayList<String> mentionsUserNames = getMentions(comment);
 
             JSONObject commentJSON = createCommentJSON(comment, 0, loggedInUserId, postId);
-            if (isAuthorizedToView(Settings.getInstance().getName(), loggedInUserId, post.getString("user_id"))) {
+            if (isAuthorizedToView(Settings.getInstance().getInstanceId(), loggedInUserId, post.getString("user_id"))) {
                 ArangoInterfaceMethods.insertCommentOnPost(postId, commentJSON);
                 JSONObject jsonValue = new JSONObject();
                 JSONObject response = new JSONObject();
@@ -63,7 +63,7 @@ public class Comments {
         String postId = paramsObject.getString("postId");
         try {
             JSONObject post = ArangoInterfaceMethods.getPost(postId);
-            if (isAuthorizedToView(Settings.getInstance().getName(), loggedInUserId, post.getString("user_id"))) {
+            if (isAuthorizedToView(Settings.getInstance().getInstanceId(), loggedInUserId, post.getString("user_id"))) {
                 JSONArray comments = ArangoInterfaceMethods.getCommentsOnPost(postId);
                 JSONObject jsonValue = new JSONObject();
                 jsonValue.put("method", methodName);

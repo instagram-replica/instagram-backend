@@ -9,13 +9,6 @@ import shared.http_server.routes.Controller;
 import static shared.Helpers.sendJSON;
 
 public class URIHandler extends SimpleChannelInboundHandler<HTTPRequest> {
-    private final Settings settings;
-
-    public URIHandler(Settings settings) {
-        super();
-        this.settings = settings;
-    }
-
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, HTTPRequest msg) throws Exception {
         String methodName = msg.uri;
