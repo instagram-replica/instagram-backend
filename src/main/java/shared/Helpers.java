@@ -6,18 +6,14 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.*;
 import io.netty.util.CharsetUtil;
 import org.json.JSONObject;
-import shared.MQServer.Controller;
-import shared.MQSubscriptions.ExecutionPair;
-import shared.MQSubscriptions.MQSubscriptions;
+import shared.mq_server.Controller;
+import shared.mq_subscriptions.ExecutionPair;
+import shared.mq_subscriptions.MQSubscriptions;
 
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class Helpers {
-    public static JSONObject getJSONFromByteBuf(ChannelHandlerContext ctx, Object o) {
-        return new JSONObject(((ByteBuf) (o)).toString(CharsetUtil.UTF_8));
-    }
-
     public static void sendJSON(ChannelHandlerContext channelHandlerContext, JSONObject jsonObject) {
         ByteBuf content = Unpooled.copiedBuffer(jsonObject.toString(), CharsetUtil.UTF_8);
         FullHttpResponse response = new DefaultFullHttpResponse(

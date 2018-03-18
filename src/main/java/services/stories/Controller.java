@@ -3,7 +3,7 @@ package services.stories;
 import org.json.JSONObject;
 import persistence.nosql.ArangoInterfaceMethods;
 
-public class Controller extends shared.MQServer.Controller {
+public class Controller extends shared.mq_server.Controller {
 
 
     public Controller() {

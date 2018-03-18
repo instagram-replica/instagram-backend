@@ -22,10 +22,20 @@ import java.util.*;
 
 import static persistence.sql.Main.openConnection;
 import static persistence.sql.users.Main.getAllUsersIds;
+import static utilities.Main.readPropertiesFile;
 
 public class ArangoInterfaceMethods {
+    private static Properties properties;
 
-    private static ArangoDB arangoDB = new ArangoDB.Builder().build();
+    static {
+        try {
+            properties = readPropertiesFile("src/main/resources/arango.properties");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static ArangoDB arangoDB= new ArangoDB.Builder().host(properties.getProperty("host"), Integer.parseInt(properties.getProperty("port"))).build();
     static String dbName = "InstagramAQL";
 
     private static final String threadsCollectionName = "Threads";
@@ -41,6 +51,9 @@ public class ArangoInterfaceMethods {
     private static final String graphUserInteractsCollectionName = "UserInteracts";
 
     private static final String graphName = "InstagramGraph";
+
+    public ArangoInterfaceMethods() throws IOException {
+    }
 
 
     public static void main(String[] args) throws Exception {

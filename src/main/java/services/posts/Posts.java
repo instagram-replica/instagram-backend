@@ -3,6 +3,7 @@ package services.posts;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import persistence.nosql.ArangoInterfaceMethods;
+import shared.Settings;
 
 import java.io.IOException;
 
@@ -10,10 +11,9 @@ import static shared.Helpers.createJSONError;
 import static shared.Helpers.isAuthorizedToView;
 
 public class Posts {
-
     //TODO: Updates a post, take care of permissions
     //TODO: create JSON req and res for this method in submission1 folder
-    public static JSONObject updatePost(JSONObject paramsObject, String loggedInUserId, String methodName) {
+    public JSONObject updatePost(JSONObject paramsObject, String loggedInUserId, String methodName) {
         return null;
     }
 
@@ -24,7 +24,7 @@ public class Posts {
         try {
             post = ArangoInterfaceMethods.getPost(postId);
             String ownerId = post.getString("user_id");
-            if (isAuthorizedToView("posts", loggedInUserId, ownerId)) {
+            if (isAuthorizedToView(Settings.getInstance().getInstanceId(), loggedInUserId, ownerId)) {
                 //TODO: @USERS_TEAM `getUsers`
             }
         } catch (Exception e) {
@@ -58,13 +58,12 @@ public class Posts {
         int pageIndex = paramsObject.getInt("pageIndex");
         String ownerId = paramsObject.getString("userId");
         try {
-            if (isAuthorizedToView("posts", loggedInUserId, ownerId)) {
+            if (isAuthorizedToView(Settings.getInstance().getInstanceId(), loggedInUserId, ownerId)) {
                 //@TODO: Check if the user exists
                 JSONArray posts = ArangoInterfaceMethods.getPosts(ownerId);
                 JSONObject response = new JSONObject();
                 response.put("method", methodName);
                 response.put("posts", posts);
-                System.out.println(response);
                 return response;
             }
             return createJSONError("Not authorized to view");
@@ -126,7 +125,7 @@ public class Posts {
     }
 
     //TODO:
-    public static JSONObject getTaggedPosts(JSONObject paramsObject, String loggedInUserId) {
+    public static JSONObject getTaggedPosts(JSONObject paramsObject, String loggedInUserId, String methodName) {
         //@TODO: Check if the user has permission to view the other user's profile
         int pageSize = paramsObject.getInt("pageSize");
         int pageIndex = paramsObject.getInt("pageIndex");
