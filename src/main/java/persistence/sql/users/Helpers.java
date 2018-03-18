@@ -68,6 +68,10 @@ public class Helpers {
     }
 
     public static User mapModelToUser(UserModel model) {
+        if (model == null) {
+            return null;
+        }
+
         return new User.Builder()
                 .id(model.getString("id"))
                 .username(model.getString("username"))

@@ -2,70 +2,141 @@ package services.users.validation;
 
 import persistence.sql.users.User;
 
+import java.util.regex.Pattern;
+
 import static utilities.Main.isUUID;
 
 public class Validator {
+    private static final Pattern VALID_USERNAME_REGEX = Pattern.compile(
+            "^[A-Za-z0-9_]+$"
+    );
+    private static final Pattern VALID_EMAIL_REGEX = Pattern.compile(
+            "^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$",
+            Pattern.CASE_INSENSITIVE
+    );
+    private static final Pattern VALID_FULL_NAME_REGEX = Pattern.compile(
+            "^[\\p{L} .'-]+$"
+    );
+    private static final Pattern VALID_PHONE_NUMBER_REGEX = Pattern.compile(
+            "^[0-9]+$"
+    );
+    private static final Pattern VALID_GENDER_REGEX = Pattern.compile(
+            "^(male|female|undefined)$"
+    );
+    private static final Pattern VALID_URL_REGEX = Pattern.compile(
+            "^(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]"
+    );
+
     public static ValidationResult validateUser(User user) {
         if (user.id == null) {
             return new ValidationResult(
                     ValidationResultType.FAILURE,
-                    "User's ID cannot be undefined"
+                    "ID cannot be undefined"
             );
         }
 
         if (user.username == null) {
             return new ValidationResult(
                     ValidationResultType.FAILURE,
-                    "User's username cannot be undefined"
+                    "Username cannot be undefined"
             );
         }
 
         if (user.email == null) {
             return new ValidationResult(
                     ValidationResultType.FAILURE,
-                    "User's email cannot be undefined"
+                    "Email cannot be undefined"
             );
         }
 
         if (user.password == null) {
             return new ValidationResult(
                     ValidationResultType.FAILURE,
-                    "User's password cannot be undefined"
+                    "Password cannot be undefined"
             );
         }
 
         if (user.isPrivate == null) {
             return new ValidationResult(
                     ValidationResultType.FAILURE,
-                    "User's privacy flag cannot be undefined"
+                    "Privacy flag cannot be undefined"
             );
         }
 
         if (user.fullName == null) {
             return new ValidationResult(
                     ValidationResultType.FAILURE,
-                    "User's full name cannot be undefined"
+                    "Full name cannot be undefined"
             );
         }
 
         if (user.gender == null) {
             return new ValidationResult(
                     ValidationResultType.FAILURE,
-                    "User's gender cannot be undefined"
+                    "Gender cannot be undefined"
             );
         }
 
         if (!isValidId(user.id)) {
             return new ValidationResult(
                     ValidationResultType.FAILURE,
-                    "Invalid user ID: " + user.id
+                    "Invalid ID: " + user.id
+            );
+        }
+
+        if (!isValidUsername(user.username)) {
+            return new ValidationResult(
+                    ValidationResultType.FAILURE,
+                    "Invalid username: " + user.username
+            );
+        }
+
+        if (!isValidEmail(user.email)) {
+            return new ValidationResult(
+                    ValidationResultType.FAILURE,
+                    "Invalid email: " + user.email
             );
         }
 
         if (!isValidPassword(user.password)) {
             return new ValidationResult(
                     ValidationResultType.FAILURE,
-                    "Invalid user password"
+                    "Invalid password"
+            );
+        }
+
+        if (!isValidFullName(user.fullName)) {
+            return new ValidationResult(
+                    ValidationResultType.FAILURE,
+                    "Invalid full name: " + user.fullName
+            );
+        }
+
+        if (!isValidGender(user.gender)) {
+            return new ValidationResult(
+                    ValidationResultType.FAILURE,
+                    "Invalid gender: " + user.gender
+            );
+        }
+
+        if (user.phoneNumber != null && !isValidPhoneNumber(user.phoneNumber)) {
+            return new ValidationResult(
+                    ValidationResultType.FAILURE,
+                    "Invalid phone number: " + user.phoneNumber
+            );
+        }
+
+        if (user.profilePictureUrl != null && !isValidUrl(user.profilePictureUrl)) {
+            return new ValidationResult(
+                    ValidationResultType.FAILURE,
+                    "Invalid profile picture URL: " + user.profilePictureUrl
+            );
+        }
+
+        if (user.websiteUrl != null && !isValidUrl(user.websiteUrl)) {
+            return new ValidationResult(
+                    ValidationResultType.FAILURE,
+                    "Invalid website URL: " + user.websiteUrl
             );
         }
 
@@ -76,14 +147,14 @@ public class Validator {
         if (!isValidEmail(email)) {
             return new ValidationResult(
                     ValidationResultType.FAILURE,
-                    "Invalid user email: " + email
+                    "Invalid email: " + email
             );
         }
 
         if (!isValidPassword(password)) {
             return new ValidationResult(
                     ValidationResultType.FAILURE,
-                    "Invalid user password"
+                    "Invalid password"
             );
         }
 
@@ -106,16 +177,34 @@ public class Validator {
     }
 
     private static boolean isValidUsername(String username) {
-        // TODO
-        return true;
+        return username.length() >= 3
+                && username.length() <= 30
+                && VALID_USERNAME_REGEX.matcher(username).find();
     }
 
     private static boolean isValidEmail(String email) {
-        // TODO
-        return true;
+        return VALID_EMAIL_REGEX.matcher(email).find();
     }
 
     private static boolean isValidPassword(String password) {
         return password.length() >= 6;
+    }
+
+    private static boolean isValidFullName(String fullName) {
+        return fullName.length() >= 3
+                && fullName.length() <= 30
+                && VALID_FULL_NAME_REGEX.matcher(fullName).find();
+    }
+
+    private static boolean isValidGender(String gender) {
+        return VALID_GENDER_REGEX.matcher(gender).find();
+    }
+
+    private static boolean isValidPhoneNumber(String phoneNumber) {
+        return VALID_PHONE_NUMBER_REGEX.matcher(phoneNumber).find();
+    }
+
+    private static boolean isValidUrl(String url) {
+        return VALID_URL_REGEX.matcher(url).find();
     }
 }

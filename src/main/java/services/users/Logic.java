@@ -1,5 +1,6 @@
 package services.users;
 
+import auth.BCrypt;
 import exceptions.AuthenticationException;
 import persistence.sql.users.Database;
 import exceptions.DatabaseException;
@@ -7,40 +8,45 @@ import persistence.sql.users.User;
 import exceptions.ValidationException;
 import services.users.validation.ValidationResult;
 import services.users.validation.ValidationResultType;
+import services.users.validation.Validator;
 
 import java.util.List;
 
-import static auth.BCrypt.comparePassword;
-import static auth.BCrypt.hashPassword;
-import static persistence.sql.users.Database.*;
-import static services.users.validation.Validator.*;
 import static utilities.Main.generateUUID;
 
 public class Logic {
     public static User signup(User inputUser) throws ValidationException, DatabaseException {
         User modifiedUser = new User.Builder(inputUser)
                 .id(generateUUID())
-                .passwordHash(hashPassword(inputUser.password))
+                .passwordHash(BCrypt.hashPassword(inputUser.password))
                 .build();
 
-        ValidationResult validationResult = validateUser(modifiedUser);
+        ValidationResult validationResult = Validator.validateUser(modifiedUser);
 
         if (validationResult.type == ValidationResultType.FAILURE) {
             throw new ValidationException(validationResult.message);
         }
 
-        return createUser(modifiedUser);
+        if (Database.getUserByEmail(modifiedUser.email) != null) {
+            throw new DatabaseException("Email already exists");
+        }
+
+        if (Database.getUserByUsername(modifiedUser.username) != null) {
+            throw new DatabaseException("Username already exists");
+        }
+
+        return Database.createUser(modifiedUser);
     }
 
     public static User login(String email, String password)
             throws ValidationException, AuthenticationException {
-        ValidationResult validationResult = validateCredentials(email, password);
+        ValidationResult validationResult = Validator.validateCredentials(email, password);
 
         if (validationResult.type == ValidationResultType.FAILURE) {
             throw new ValidationException(validationResult.message);
         }
 
-        User matchedUser = getUserByEmail(email);
+        User matchedUser = Database.getUserByEmail(email);
 
         if (matchedUser == null) {
             throw new AuthenticationException(
@@ -48,7 +54,7 @@ public class Logic {
             );
         }
 
-        boolean doPasswordsMatch = comparePassword(
+        boolean doPasswordsMatch = BCrypt.comparePassword(
                 password,
                 matchedUser.passwordHash
         );
@@ -63,23 +69,23 @@ public class Logic {
     }
 
     public static User getProfile(String userId) throws ValidationException {
-        ValidationResult validationResult = validateId(userId);
+        ValidationResult validationResult = Validator.validateId(userId);
 
         if (validationResult.type == ValidationResultType.FAILURE) {
             throw new ValidationException(validationResult.message);
         }
 
-        return getUserById(userId);
+        return Database.getUserById(userId);
     }
 
     public static User updateProfile(User user) throws ValidationException, DatabaseException {
-        ValidationResult validationResult = validateUser(user);
+        ValidationResult validationResult = Validator.validateUser(user);
 
         if (validationResult.type == ValidationResultType.FAILURE) {
             throw new ValidationException(validationResult.message);
         }
 
-        return updateUser(user);
+        return Database.updateUser(user);
     }
 
     // TODO: Generalize search criteria

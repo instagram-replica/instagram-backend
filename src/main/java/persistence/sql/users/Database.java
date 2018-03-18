@@ -45,6 +45,11 @@ public class Database {
         return mapModelToUser(model);
     }
 
+    public static User getUserByUsername(String username) {
+        UserModel model = UserModel.findFirst("username = ?", username);
+        return mapModelToUser(model);
+    }
+
     public static List<String> getUsersIdsByUsernames(String[] usernames) {
         /*
          * Query looks unsafe, but here's the source:

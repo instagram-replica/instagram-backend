@@ -23,6 +23,7 @@ public class Controller extends shared.MQServer.Controller {
 
     @Override
     public JSONObject execute(JSONObject payload, String viewerId) throws Exception {
+        // TODO: Handle failure to connect to JDBC URL
         openConnection();
 
         // TODO: Handle inability to find method or params
