@@ -20,7 +20,13 @@ public class Helpers {
 
     public static void sendJSON(ChannelHandlerContext channelHandlerContext, JSONObject jsonObject) {
         ByteBuf content = Unpooled.copiedBuffer(jsonObject.toString(), CharsetUtil.UTF_8);
-        FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, content);
+        FullHttpResponse response = new DefaultFullHttpResponse(
+                HttpVersion.HTTP_1_1,
+                jsonObject.get("error") == JSONObject.NULL
+                        ? HttpResponseStatus.OK
+                        : HttpResponseStatus.INTERNAL_SERVER_ERROR,
+                content
+        );
         response.headers().set(HttpHeaders.Names.CONTENT_TYPE, "application/json");
         response.headers().set(HttpHeaders.Names.CONTENT_LENGTH, content.readableBytes());
         channelHandlerContext.writeAndFlush(response);
