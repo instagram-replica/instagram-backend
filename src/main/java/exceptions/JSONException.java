@@ -1,6 +1,6 @@
 package exceptions;
 
-public class JSONException extends Exception {
+public class JSONException extends CustomException {
     public JSONException(String message) {
         super(message);
     }
