@@ -11,7 +11,6 @@ import org.json.JSONObject;
 import org.junit.*;
 
 import java.io.IOException;
-import java.sql.Array;
 import java.sql.Timestamp;
 import java.util.*;
 
@@ -36,7 +35,8 @@ public class ArangoInterfaceTest {
 
     private static final String graphUserFollowsCollectionName = "UserFollows";
     private static final String graphUserInteractsCollectionName = "UserInteracts";
-
+    private static final String graphUserTaggedCollectionName = "UserTagged";
+    private static final String graphPostTaggedCollectionName = "PostTagged";
 
     private static final String graphName = "InstagramGraph";
 
@@ -46,7 +46,7 @@ public class ArangoInterfaceTest {
         ArangoInterfaceMethods.dbName = ArangoInterfaceTest.dbName;
         Properties properties = readPropertiesFile("src/main/resources/arango.properties");
         arangoDB = new ArangoDB.Builder().host(properties.getProperty("host"), Integer.parseInt(properties.getProperty("port"))).build();
-//        arangoDB.db(dbName).drop();
+        arangoDB.db(dbName).drop();
         try {
             if (arangoDB.getDatabases().contains(dbName)) {
                 arangoDB.db(dbName).drop();
@@ -84,8 +84,8 @@ public class ArangoInterfaceTest {
         }
 
         Iterator<GraphEntity> graphs = arangoDB.db(dbName).getGraphs().iterator();
-        while (graphs.hasNext()) {
-            if (graphs.next().getName().equals(graphName)) {
+        while(graphs.hasNext()){
+            if(graphs.next().getName().equals(graphName)){
                 return;
             }
         }
@@ -93,14 +93,17 @@ public class ArangoInterfaceTest {
         openConnection();
         List<String> user_ids = getAllUsersIds();
         closeConnection();
-        try {
+        try{
 
             Collection<EdgeDefinition> edgeDefinitions = new ArrayList<>();
+
+
             EdgeDefinition edgeUserFollows = new EdgeDefinition();
 
             edgeUserFollows.collection(graphUserFollowsCollectionName);
             edgeUserFollows.from(userCollectionName);
             edgeUserFollows.to(userCollectionName);
+
 
 
             EdgeDefinition edgeUserInteracts = new EdgeDefinition();
@@ -109,8 +112,23 @@ public class ArangoInterfaceTest {
             edgeUserInteracts.from(userCollectionName);
             edgeUserInteracts.to(hashtagCollectionName);
 
+
+            EdgeDefinition edgeUserTagged = new EdgeDefinition();
+
+            edgeUserTagged.collection(graphUserTaggedCollectionName);
+            edgeUserTagged.from(userCollectionName);
+            edgeUserTagged.to(postsCollectionName);
+
+            EdgeDefinition edgePostTagged = new EdgeDefinition();
+
+            edgePostTagged.collection(graphPostTaggedCollectionName);
+            edgePostTagged.from(postsCollectionName);
+            edgePostTagged.to(hashtagCollectionName);
+
             edgeDefinitions.add(edgeUserFollows);
             edgeDefinitions.add(edgeUserInteracts);
+            edgeDefinitions.add(edgeUserTagged);
+            edgeDefinitions.add(edgePostTagged);
 
             GraphCreateOptions options = new GraphCreateOptions();
             options.orphanCollections("dummyOptions");
@@ -118,9 +136,10 @@ public class ArangoInterfaceTest {
             arangoDB.db(dbName).createGraph(graphName, edgeDefinitions, options);
 
 
-            for (int i = 0; i < user_ids.size(); i++) {
+            for(int i =0 ;i< user_ids.size();i++){
                 BaseDocument userDocument = new BaseDocument();
                 userDocument.setKey(user_ids.get(i));
+                System.out.println(user_ids.get(i));
                 arangoDB.db(dbName).graph(graphName).vertexCollection(userCollectionName).insertVertex(userDocument, null);
             }
         } catch (ArangoDBException e) {
@@ -359,8 +378,9 @@ public class ArangoInterfaceTest {
     @Test
     public void insertAndGetPost() throws Exception {
 
+        String UUID = utilities.Main.generateUUID();
         JSONObject obj = new JSONObject();
-        obj.put("user_id", utilities.Main.generateUUID());
+        obj.put("user_id", UUID);
         obj.put("caption", "Taken By MiSO EL Gen");
         obj.put("media", new ArrayList<String>());
         obj.put("likes", new ArrayList<String>());
@@ -372,24 +392,19 @@ public class ArangoInterfaceTest {
         obj.put("blocked_at", new Timestamp(System.currentTimeMillis()));
         obj.put("deleted_at", new Timestamp(System.currentTimeMillis()));
 
-        String id = ArangoInterfaceMethods.insertPost(obj, utilities.Main.generateUUID());
-        JSONObject readObj = ArangoInterfaceMethods.getPost(id);
-        Iterator iterator = Objects.requireNonNull(readObj).keys();
-        while (iterator.hasNext()) {
-            String key = iterator.next().toString();
-            String value = readObj.get(key).toString();
-            Assert.assertEquals(value, obj.get(key).toString());
 
-        }
+        String id = ArangoInterfaceMethods.insertPost(obj, UUID);
+        JSONObject readObj = ArangoInterfaceMethods.getPost(id);
+        Assert.assertEquals(readObj.get("caption"), obj.get("caption").toString());
     }
 
 
     @Test
     public void updateAndDeletePost() throws Exception {
 
-        utilities.Main.generateUUID();
+        String UUID1 = utilities.Main.generateUUID();
         JSONObject obj = new JSONObject();
-        obj.put("user_id", utilities.Main.generateUUID());
+        obj.put("user_id", UUID1);
         obj.put("caption", "Taken By MiSO EL Gen");
         obj.put("media", new ArrayList<String>());
         obj.put("likes", new ArrayList<String>());
@@ -402,6 +417,7 @@ public class ArangoInterfaceTest {
         obj.put("deleted_at", new Timestamp(System.currentTimeMillis()));
 
         JSONObject updatedObj = new JSONObject();
+        updatedObj.put("user_id", UUID1);
         updatedObj.put("caption", "Friends");
         updatedObj.put("media", new ArrayList<String>());
         updatedObj.put("likes", new ArrayList<String>());
@@ -414,7 +430,7 @@ public class ArangoInterfaceTest {
         updatedObj.put("deleted_at", new Timestamp(System.currentTimeMillis()));
 
 
-        String id = ArangoInterfaceMethods.insertPost(obj, utilities.Main.generateUUID());
+        String id = ArangoInterfaceMethods.insertPost(obj, UUID1);
         ArangoInterfaceMethods.updatePost(id, updatedObj);
         JSONObject jsonNotification = ArangoInterfaceMethods.getPost(id);
 
@@ -481,65 +497,69 @@ public class ArangoInterfaceTest {
     @Test
     public void insertCommentInPost() throws Exception {
 
+        String UUID1 = utilities.Main.generateUUID();
         JSONObject obj = new JSONObject();
+        obj.put("user_id", UUID1);
         obj.put("caption", "Taken By MiSO EL Gen");
         obj.put("media", new ArrayList<String>());
         obj.put("likes", new ArrayList<String>());
         obj.put("tags", new ArrayList<String>());
-        obj.put("location", "{ name: EspressoLab, coordinates:{long: 1.0.01.01, lat: 2.1.0.10} }");
+//        obj.put("location", "{ name: EspressoLab, coordinates:{long: 1.0.01.01, lat: 2.1.0.10} }");
         obj.put("comments", new ArrayList<String>());
         obj.put("created_at", new Timestamp(System.currentTimeMillis()));
         obj.put("updated_at", new Timestamp(System.currentTimeMillis()));
         obj.put("blocked_at", new Timestamp(System.currentTimeMillis()));
         obj.put("deleted_at", new Timestamp(System.currentTimeMillis()));
 
-        String id = ArangoInterfaceMethods.insertPost(obj, utilities.Main.generateUUID());
+        String id = ArangoInterfaceMethods.insertPost(obj, UUID1);
         JSONObject comment = new JSONObject();
         comment.put("content", "Hello");
-
+        System.out.println("kiki");
         ArangoInterfaceMethods.insertCommentOnPost(id, comment);
 
+
         JSONObject fetchedPost = ArangoInterfaceMethods.getPost(id);
+
+
 
         Assert.assertTrue(fetchedPost.get("comments").toString().contains(comment.toString()));
     }
 
     @Test
     public void followTest() {
-        followUser("Users/f5e1008c-6157-e05d-c01c-5f5c7e055b2c", "Users/3d9c043c-7608-8afa-8e09-1f62bb84427b");
-        followUser("Users/f5e1008c-6157-e05d-c01c-5f5c7e055b2c", "Users/040ea46c-fb03-5ea8-dcae-7b42a06909e8");
+        followUser("Users/9087b6df-b6f5-4de5-856b-a965c1e3d829", "Users/2af9121b-89a1-4365-83e8-96be1a7f2847");
+        followUser("Users/9087b6df-b6f5-4de5-856b-a965c1e3d829", "Users/302d0e85-91be-46c2-ac71-2a4991207d3b");
 
-        followUser("Users/a10d47bf-7c9c-8193-381f-79db326cc8dd", "Users/f5e1008c-6157-e05d-c01c-5f5c7e055b2c");
-        followUser("Users/c38233c6-cddd-4e04-5b8b-7d667854b61a", "Users/f5e1008c-6157-e05d-c01c-5f5c7e055b2c");
-        followUser("Users/f1099115-5201-7e6a-34c3-b61591a37b84", "Users/f5e1008c-6157-e05d-c01c-5f5c7e055b2c");
-        followUser("Users/040ea46c-fb03-5ea8-dcae-7b42a06909e8", "Users/f5e1008c-6157-e05d-c01c-5f5c7e055b2c");
+        followUser("Users/768a9e00-3d8e-4274-8f21-de6a76c64456", "Users/9087b6df-b6f5-4de5-856b-a965c1e3d829");
+        followUser("Users/20981745-ca25-483f-a831-edd6c1ffcade", "Users/9087b6df-b6f5-4de5-856b-a965c1e3d829");
+        followUser("Users/2af9121b-89a1-4365-83e8-96be1a7f2847", "Users/9087b6df-b6f5-4de5-856b-a965c1e3d829");
+        followUser("Users/302d0e85-91be-46c2-ac71-2a4991207d3b", "Users/9087b6df-b6f5-4de5-856b-a965c1e3d829");
 
-//        ArrayList<String> following = getAllfollowingIDs("Users/f5e1008c-6157-e05d-c01c-5f5c7e055b2c");
-//        following.size();
-//        Assert.assertEquals(following.size(), 2);
-//
-//        ArrayList<String> followers = getAllfollowersIDs("Users/f5e1008c-6157-e05d-c01c-5f5c7e055b2c");
-//        Assert.assertEquals(followers.size(), 4);
-//
-//        unFollowUser("Users/f5e1008c-6157-e05d-c01c-5f5c7e055b2c", "Users/3d9c043c-7608-8afa-8e09-1f62bb84427b");
-//
-//        ArrayList<String> followingAfterUnfollow = getAllfollowingIDs("Users/f5e1008c-6157-e05d-c01c-5f5c7e055b2c");
-//        Assert.assertEquals(followingAfterUnfollow.size(), 1);
-//
-//        String newUserUUID = UUID.randomUUID().toString();
-//        makeUserNode(newUserUUID);
-//
-//        followUser("Users/f5e1008c-6157-e05d-c01c-5f5c7e055b2c", "Users/" + newUserUUID);
-//        ArrayList<String> newFollowing = getAllfollowingIDs("Users/f5e1008c-6157-e05d-c01c-5f5c7e055b2c");
-//        Assert.assertEquals(newFollowing.size(), 2);
-//        ;
-//
-////        removeUserNode("f5e1008c-6157-e05d-c01c-5f5c7e055b2c");
-////        ArrayList<String> emptyFollowing = getAllfollowingIDs("Users/f5e1008c-6157-e05d-c01c-5f5c7e055b2c");
-////        Assert.assertEquals(emptyFollowing.size(),0);
-//
-//        Assert.assertTrue(isFollowing("Users/f5e1008c-6157-e05d-c01c-5f5c7e055b2c", "Users/040ea46c-fb03-5ea8-dcae-7b42a06909e8"));
-//        Assert.assertFalse(isFollowing("Users/a10d47bf-7c9c-8193-381f-79db326cc8dd", "Users/c38233c6-cddd-4e04-5b8b-7d667854b61a"));
+        ArrayList<String> following = getAllfollowingIDs("Users/9087b6df-b6f5-4de5-856b-a965c1e3d829");
+        Assert.assertEquals(following.size(), 2);
+
+        ArrayList<String> followers = getAllfollowersIDs("Users/9087b6df-b6f5-4de5-856b-a965c1e3d829");
+        Assert.assertEquals(followers.size(), 4);
+
+        unFollowUser("Users/9087b6df-b6f5-4de5-856b-a965c1e3d829", "Users/2af9121b-89a1-4365-83e8-96be1a7f2847");
+
+        ArrayList<String> followingAfterUnfollow = getAllfollowingIDs("Users/9087b6df-b6f5-4de5-856b-a965c1e3d829");
+        Assert.assertEquals(followingAfterUnfollow.size(), 1);
+
+        String newUserUUID = UUID.randomUUID().toString();
+        makeUserNode(newUserUUID);
+
+        followUser("Users/9087b6df-b6f5-4de5-856b-a965c1e3d829", "Users/" + newUserUUID);
+        ArrayList<String> newFollowing = getAllfollowingIDs("Users/9087b6df-b6f5-4de5-856b-a965c1e3d829");
+        Assert.assertEquals(newFollowing.size(), 2);
+        ;
+
+//        removeUserNode("f5e1008c-6157-e05d-c01c-5f5c7e055b2c");
+//        ArrayList<String> emptyFollowing = getAllfollowingIDs("Users/f5e1008c-6157-e05d-c01c-5f5c7e055b2c");
+//        Assert.assertEquals(emptyFollowing.size(),0);
+
+        Assert.assertTrue(isFollowing("Users/9087b6df-b6f5-4de5-856b-a965c1e3d829", "Users/302d0e85-91be-46c2-ac71-2a4991207d3b"));
+        Assert.assertFalse(isFollowing("Users/768a9e00-3d8e-4274-8f21-de6a76c64456", "Users/20981745-ca25-483f-a831-edd6c1ffcade"));
     }
 
     @Test
@@ -548,27 +568,141 @@ public class ArangoInterfaceTest {
         makeHashtagNode("manU");
         makeHashtagNode("pancakes");
         makeHashtagNode("3eesh_namlla_takol_sokar");
-        System.out.println("_______________________________________________");
 
-        followHashtag("Users/f5e1008c-6157-e05d-c01c-5f5c7e055b2c", "Hashtags/manU");
-        followHashtag("Users/f5e1008c-6157-e05d-c01c-5f5c7e055b2c", "Hashtags/pancakes");
-        followHashtag("Users/f5e1008c-6157-e05d-c01c-5f5c7e055b2c", "Hashtags/3eesh_namlla_takol_sokar");
+        followHashtag("Users/9087b6df-b6f5-4de5-856b-a965c1e3d829", "Hashtags/manU");
+        followHashtag("Users/9087b6df-b6f5-4de5-856b-a965c1e3d829", "Hashtags/pancakes");
+        followHashtag("Users/9087b6df-b6f5-4de5-856b-a965c1e3d829", "Hashtags/3eesh_namlla_takol_sokar");
 
-        followHashtag("Users/a10d47bf-7c9c-8193-381f-79db326cc8dd", "Hashtags/manU");
+        followHashtag("Users/768a9e00-3d8e-4274-8f21-de6a76c64456", "Hashtags/manU");
 
-//        ArrayList<String> myHashtags = getAllFollowingHashtags("Users/f5e1008c-6157-e05d-c01c-5f5c7e055b2c");
-//        Assert.assertEquals(myHashtags.size(), 3);
+        ArrayList<String> myHashtags = getAllFollowingHashtags("Users/9087b6df-b6f5-4de5-856b-a965c1e3d829");
+        Assert.assertEquals(myHashtags.size(), 3);
 
-//        ArrayList<String> hashtagFollowers = getAllHashtagFollowers("Hashtags/manU");
-//        Assert.assertEquals(hashtagFollowers.size(), 2);
-//
-//        unFolllowHashtag("Users/f5e1008c-6157-e05d-c01c-5f5c7e055b2c", "Hashtags/manU");
-//        ArrayList<String> myHashtagsUpdated = getAllFollowingHashtags("Users/f5e1008c-6157-e05d-c01c-5f5c7e055b2c");
-//        Assert.assertEquals(myHashtagsUpdated.size(), 2);
-//
-//
-//        Assert.assertTrue(isInteracting("Users/f5e1008c-6157-e05d-c01c-5f5c7e055b2c", "Hashtags/pancakes"));
-//        Assert.assertFalse(isInteracting("Users/a10d47bf-7c9c-8193-381f-79db326cc8dd", "Hashtags/pancakes"));
+        ArrayList<String> hashtagFollowers = getAllHashtagFollowers("Hashtags/manU");
+        Assert.assertEquals(hashtagFollowers.size(), 2);
+
+        unFolllowHashtag("Users/9087b6df-b6f5-4de5-856b-a965c1e3d829", "Hashtags/manU");
+        ArrayList<String> myHashtagsUpdated = getAllFollowingHashtags("Users/9087b6df-b6f5-4de5-856b-a965c1e3d829");
+        Assert.assertEquals(myHashtagsUpdated.size(), 2);
+
+
+        Assert.assertTrue(isInteracting("Users/9087b6df-b6f5-4de5-856b-a965c1e3d829", "Hashtags/pancakes"));
+        Assert.assertFalse(isInteracting("Users/768a9e00-3d8e-4274-8f21-de6a76c64456", "Hashtags/pancakes"));
+    }
+
+    @Test
+    public void tagUserTest() throws Exception {
+        String UUID1 = utilities.Main.generateUUID() ;
+        String UUID2 = utilities.Main.generateUUID() ;
+        JSONObject obj1= new JSONObject();
+        obj1.put("user_id",UUID1);
+        obj1.put("caption","Taken By MiSO EL Gen");
+        obj1.put("media", new ArrayList<String>());
+        obj1.put("likes", new ArrayList<String>());
+        obj1.put("tags",new ArrayList<String>());
+        obj1.put("location","{ name: EspressoLab, coordinates:{long: 1.0.01.01, lat: 2.1.0.10} }");
+        obj1.put("comments", new ArrayList<String>());
+        obj1.put("created_at",new Timestamp(System.currentTimeMillis()));
+        obj1.put("updated_at",new Timestamp(System.currentTimeMillis()));
+        obj1.put("blocked_at",new Timestamp(System.currentTimeMillis()));
+        obj1.put("deleted_at",new Timestamp(System.currentTimeMillis()));
+
+        JSONObject obj2= new JSONObject();
+        obj2.put("user_id",UUID2);
+        obj2.put("caption","Taken By Mohamed ABouzeid");
+        obj2.put("media", new ArrayList<String>());
+        obj2.put("likes", new ArrayList<String>());
+        obj2.put("tags",new ArrayList<String>());
+        obj2.put("location","{ name: C1, coordinates:{long: 1.0.01.01, lat: 2.1.0.10} }");
+        obj2.put("comments", new ArrayList<String>());
+        obj2.put("created_at",new Timestamp(System.currentTimeMillis()));
+        obj2.put("updated_at",new Timestamp(System.currentTimeMillis()));
+        obj2.put("blocked_at",new Timestamp(System.currentTimeMillis()));
+        obj2.put("deleted_at",new Timestamp(System.currentTimeMillis()));
+
+        String id1 = ArangoInterfaceMethods.insertPost(obj1,UUID1);
+        String id2 = ArangoInterfaceMethods.insertPost(obj2,UUID2);
+
+        tagUserInPost("Users/9087b6df-b6f5-4de5-856b-a965c1e3d829", "Posts/"+id1);
+        tagUserInPost("Users/768a9e00-3d8e-4274-8f21-de6a76c64456", "Posts/"+id1);
+        tagUserInPost("Users/2af9121b-89a1-4365-83e8-96be1a7f2847","Posts/"+id1);
+
+        tagUserInPost("Users/9087b6df-b6f5-4de5-856b-a965c1e3d829", "Posts/"+id2);
+
+        ArrayList<String> posts = getAllTaggedPosts("Users/9087b6df-b6f5-4de5-856b-a965c1e3d829");
+        Assert.assertEquals(posts.size(),2);
+
+        ArrayList<String> ids = getAllUsersTaggedInAPost("Posts/"+id1);
+        Assert.assertEquals(ids.size(),3);
+
+        untagUser("Users/768a9e00-3d8e-4274-8f21-de6a76c64456","Posts/"+id1);
+        ArrayList<String> idsAfterUntagging = getAllUsersTaggedInAPost("Posts/"+id1);
+        Assert.assertEquals(idsAfterUntagging.size(),2);
+
+        Assert.assertTrue(isTaggedUser("Users/9087b6df-b6f5-4de5-856b-a965c1e3d829","Posts/"+id1));
+        Assert.assertFalse(isTaggedUser("Users/2af9121b-89a1-4365-83e8-96be1a7f2847","Posts/"+id2));
+
+    }
+
+    @Test
+    public void tagPostTest() throws Exception {
+
+        String UUID1 = utilities.Main.generateUUID() ;
+        String UUID2 = utilities.Main.generateUUID() ;
+
+        JSONObject obj1= new JSONObject();
+        obj1.put("user_id",UUID1);
+        obj1.put("caption","Taken By MiSO EL Gen");
+        obj1.put("media", new ArrayList<String>());
+        obj1.put("likes", new ArrayList<String>());
+        obj1.put("tags",new ArrayList<String>());
+        obj1.put("location","{ name: EspressoLab, coordinates:{long: 1.0.01.01, lat: 2.1.0.10} }");
+        obj1.put("comments", new ArrayList<String>());
+        obj1.put("created_at",new Timestamp(System.currentTimeMillis()));
+        obj1.put("updated_at",new Timestamp(System.currentTimeMillis()));
+        obj1.put("blocked_at",new Timestamp(System.currentTimeMillis()));
+        obj1.put("deleted_at",new Timestamp(System.currentTimeMillis()));
+
+        JSONObject obj2= new JSONObject();
+        obj2.put("user_id",UUID2);
+        obj2.put("caption","Taken By Mohamed ABouzeid");
+        obj2.put("media", new ArrayList<String>());
+        obj2.put("likes", new ArrayList<String>());
+        obj2.put("tags",new ArrayList<String>());
+        obj2.put("location","{ name: C1, coordinates:{long: 1.0.01.01, lat: 2.1.0.10} }");
+        obj2.put("comments", new ArrayList<String>());
+        obj2.put("created_at",new Timestamp(System.currentTimeMillis()));
+        obj2.put("updated_at",new Timestamp(System.currentTimeMillis()));
+        obj2.put("blocked_at",new Timestamp(System.currentTimeMillis()));
+        obj2.put("deleted_at",new Timestamp(System.currentTimeMillis()));
+
+        String id1 = ArangoInterfaceMethods.insertPost(obj1,UUID1);
+        String id2 = ArangoInterfaceMethods.insertPost(obj2,UUID2);
+
+        makeHashtagNode("Chelsea");
+        makeHashtagNode("Liverpool");
+        makeHashtagNode("from_Russia_with_love");
+
+        tagPostInHashtag("Posts/"+id1, "Hashtags/Chelsea");
+        tagPostInHashtag("Posts/"+id1, "Hashtags/Liverpool");
+        tagPostInHashtag("Posts/"+id1, "Hashtags/from_Russia_with_love");
+
+
+        tagPostInHashtag("Posts/"+id2, "Hashtags/Chelsea");
+
+        ArrayList<String> hashtags = getAllHashtagsTaggedInPost("Posts/"+id1);
+        Assert.assertEquals(hashtags.size(),3);
+
+        ArrayList<String> posts = getAllPostsTaggedInHashtag("Hashtags/Chelsea");
+        Assert.assertEquals(posts.size(),2);
+
+        untagPost("Posts/"+id1,"Hashtags/from_Russia_with_love");
+        ArrayList<String> hashtagsAfterUntagging = getAllHashtagsTaggedInPost("Posts/"+id1);
+        Assert.assertEquals(hashtagsAfterUntagging.size(),2);
+
+        Assert.assertTrue(isTaggedPost("Posts/"+id1, "Hashtags/Liverpool"));
+        Assert.assertFalse(isTaggedPost("Posts/"+id1, "Hashtags/from_Russia_with_love"));
+
     }
 
 }
