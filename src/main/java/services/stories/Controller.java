@@ -5,7 +5,7 @@ import org.json.JSONObject;
 import persistence.cache.Cache;
 import persistence.nosql.ArangoInterfaceMethods;
 
-public class Controller extends shared.MQServer.Controller {
+public class Controller extends shared.mq_server.Controller {
 
 
     public Controller() {

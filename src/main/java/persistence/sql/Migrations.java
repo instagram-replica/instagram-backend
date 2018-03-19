@@ -1,24 +1,25 @@
 package persistence.sql;
 
-import org.javalite.activejdbc.Base;
+import org.flywaydb.core.Flyway;
 
 import java.io.IOException;
 import java.util.Properties;
 
 import static utilities.Main.readPropertiesFile;
 
-public class Main {
-    public static void openConnection() throws IOException {
+public class Migrations {
+    public static void main(String[] args) throws IOException {
         Properties properties = readPropertiesFile("src/main/resources/postgres.properties");
-        Base.open(
-                properties.getProperty("POSTGRESQL_DRIVER"),
+
+        Flyway flyway = new Flyway();
+
+        flyway.setDataSource(
                 properties.getProperty("POSTGRESQL_URL"),
                 properties.getProperty("POSTGRESQL_USER"),
                 properties.getProperty("POSTGRESQL_PASSWORD")
         );
+
+        flyway.migrate();
     }
 
-    public static void closeConnection() {
-        Base.close();
-    }
 }

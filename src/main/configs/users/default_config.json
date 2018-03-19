@@ -1,0 +1,7 @@
+{
+  "instanceId": "users1",
+  "application": "users",
+  "port": 8004,
+  "numberOfThreads": 10,
+  "version": "0.1.0"
+}

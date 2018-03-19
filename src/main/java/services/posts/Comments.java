@@ -4,6 +4,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import persistence.cache.Cache;
 import persistence.nosql.ArangoInterfaceMethods;
+import shared.Settings;
 import utilities.Main;
 
 import java.sql.Timestamp;
@@ -13,7 +14,6 @@ import static shared.Helpers.createJSONError;
 import static shared.Helpers.isAuthorizedToView;
 
 public class Comments {
-
     private static ArrayList<String> getMentions(String text) {
         String[] split = text.split(" ");
         ArrayList<String> mentions = new ArrayList<>();
@@ -38,7 +38,7 @@ public class Comments {
             ArrayList<String> mentionsUserNames = getMentions(comment);
 
             JSONObject commentJSON = createCommentJSON(comment, 0, loggedInUserId, postId);
-            if (isAuthorizedToView("posts", loggedInUserId, post.getString("user_id"))) {
+            if (isAuthorizedToView(Settings.getInstance().getInstanceId(), loggedInUserId, post.getString("user_id"))) {
                 ArangoInterfaceMethods.insertCommentOnPost(postId, commentJSON);
                 JSONObject jsonValue = new JSONObject();
                 JSONObject response = new JSONObject();
@@ -68,7 +68,7 @@ public class Comments {
                 post = ArangoInterfaceMethods.getPost(postId);
                 Cache.insertPostIntoCache(post,postId);
             }
-            if (isAuthorizedToView("posts", loggedInUserId, post.getString("user_id"))) {
+            if (isAuthorizedToView(Settings.getInstance().getInstanceId(), loggedInUserId, post.getString("user_id"))) {
                 JSONArray comments = Cache.getCommentsFromCache(postId);
                 if(comments==null) {
                     comments = ArangoInterfaceMethods.getPosts(postId);
