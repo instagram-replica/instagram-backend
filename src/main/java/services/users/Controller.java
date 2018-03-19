@@ -14,7 +14,7 @@ import java.util.List;
 import static persistence.sql.Main.closeConnection;
 import static persistence.sql.Main.openConnection;
 
-public class Controller extends shared.MQServer.Controller {
+public class Controller extends shared.mq_server.Controller {
     public Controller() {
         super();
     }
@@ -100,8 +100,10 @@ public class Controller extends shared.MQServer.Controller {
                             .put("token", token)
             );
         } catch (CustomException e) {
+            e.printStackTrace();
             return Helpers.constructErrorResponse(e.getMessage());
         } catch (Exception e) {
+            e.printStackTrace();
             return Helpers.constructErrorResponse();
         }
     }
@@ -125,8 +127,10 @@ public class Controller extends shared.MQServer.Controller {
                             .put("token", token)
             );
         } catch (CustomException e) {
+            e.printStackTrace();
             return Helpers.constructErrorResponse(e.getMessage());
         } catch (Exception e) {
+            e.printStackTrace();
             return Helpers.constructErrorResponse();
         }
     }
@@ -136,8 +140,10 @@ public class Controller extends shared.MQServer.Controller {
             User user = Logic.getProfile(params.getString("id"));
             return Helpers.constructOKResponse(Helpers.mapUserToJSON(user));
         } catch (CustomException e) {
+            e.printStackTrace();
             return Helpers.constructErrorResponse(e.getMessage());
         } catch (Exception e) {
+            e.printStackTrace();
             return Helpers.constructErrorResponse();
         }
     }
