@@ -1,0 +1,7 @@
+{
+  "instanceId": "posts1",
+  "application": "posts",
+  "port": 8002,
+  "numberOfThreads": 10,
+  "version": "0.1.0"
+}

@@ -13,6 +13,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -21,11 +22,21 @@ import java.util.*;
 
 import static persistence.sql.Main.openConnection;
 import static persistence.sql.users.Main.getAllUsersIds;
+import static utilities.Main.readPropertiesFile;
 
 public class ArangoInterfaceMethods {
+    private static Properties properties;
 
-    private static ArangoDB arangoDB = new ArangoDB.Builder().build();
-    static String dbName =  "InstagramAQL";
+    static {
+        try {
+            properties = readPropertiesFile("src/main/resources/arango.properties");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static ArangoDB arangoDB= new ArangoDB.Builder().host(properties.getProperty("host"), Integer.parseInt(properties.getProperty("port"))).build();
+    static String dbName = "InstagramAQL";
 
     private static final String threadsCollectionName = "Threads";
     private static final String notificationsCollectionName = "Notifications";
@@ -44,18 +55,21 @@ public class ArangoInterfaceMethods {
 
     private static final String graphName = "InstagramGraph";
 
+    public ArangoInterfaceMethods() throws IOException {
+    }
 
 
-    public static void main(String[]args) throws IOException {
+    public static void main(String[] args) throws Exception {
+//        arangoDB.db(dbName).drop();
         initializeDB();
         initializeGraphCollections();
 
     }
 
 
-    public static void initializeDB(){
+    public static void initializeDB() {
         try {
-            if(!arangoDB.getDatabases().contains(dbName)){
+            if (!arangoDB.getDatabases().contains(dbName)) {
                 arangoDB.createDatabase(dbName);
                 System.out.println("Database created: " + dbName);
                 CollectionEntity threadsCollection = arangoDB.db(dbName).createCollection(threadsCollectionName);
@@ -85,12 +99,12 @@ public class ArangoInterfaceMethods {
 
     }
 
-    public static void closeConnection(){
+    public static void closeConnection() {
         arangoDB.shutdown();
     }
 
     //Thread CRUD
-    public static String insertThread(JSONObject threadJSON){
+    public static String insertThread(JSONObject threadJSON) {
 
         try {
 
@@ -107,20 +121,20 @@ public class ArangoInterfaceMethods {
             return id;
         } catch (ArangoDBException e) {
             System.err.println("Failed to insert thread. " + e.getMessage());
-        } catch (JSONException e){
+        } catch (JSONException e) {
             System.err.println("JSON Thread Incorrect format. " + e.getMessage());
         }
         return null;
     }
 
-    public static JSONObject getThread(String id){
+    public static JSONObject getThread(String id) {
         try {
             BaseDocument threadDoc = arangoDB.db(dbName).collection(threadsCollectionName).getDocument(id,
                     BaseDocument.class);
-            if(threadDoc == null){
-                throw new ArangoDBException("Thread with ID: " + id+" Not Found");
+            if (threadDoc == null) {
+                throw new ArangoDBException("Thread with ID: " + id + " Not Found");
             }
-            JSONObject threadJSON  = new JSONObject(threadDoc.getProperties());
+            JSONObject threadJSON = new JSONObject(threadDoc.getProperties());
             return reformatJSON(threadJSON);
         } catch (ArangoDBException e) {
             System.err.println("Failed to get Thread: " + e.getMessage());
@@ -128,7 +142,7 @@ public class ArangoInterfaceMethods {
         }
     }
 
-    public static void updateThread(String id,JSONObject threadJSON){
+    public static void updateThread(String id, JSONObject threadJSON) {
         try {
             BaseDocument myObject = new BaseDocument();
             myObject.addAttribute("creator_id", threadJSON.get("creator_id").toString());
@@ -142,23 +156,23 @@ public class ArangoInterfaceMethods {
             System.out.println("Thread Updated");
         } catch (ArangoDBException e) {
             System.err.println("Failed to Update Thread. " + e.getMessage());
-        } catch (JSONException e){
+        } catch (JSONException e) {
             System.err.println("JSON Thread Incorrect format. " + e.getMessage());
         }
     }
 
-    public static void deleteThread(String id){
+    public static void deleteThread(String id) {
         try {
             arangoDB.db(dbName).collection(threadsCollectionName).deleteDocument(id);
-            System.out.println("Thread Deleted: "+id);
-        } catch (ArangoDBException e){
-            System.err.println("Thread ID does not exist:  "+id+",  "+e.getMessage());
+            System.out.println("Thread Deleted: " + id);
+        } catch (ArangoDBException e) {
+            System.err.println("Thread ID does not exist:  " + id + ",  " + e.getMessage());
         }
     }
 
 
     //NOTIFICATION CRUD
-    public static String insertNotification(JSONObject notificationJSON){
+    public static String insertNotification(JSONObject notificationJSON) {
         try {
             BaseDocument myObject = new BaseDocument();
             myObject.addAttribute("activity_type", notificationJSON.get("activity_type").toString());
@@ -171,20 +185,20 @@ public class ArangoInterfaceMethods {
             return id;
         } catch (ArangoDBException e) {
             System.err.println("Failed to insert Notification. " + e.getMessage());
-        } catch (JSONException e){
+        } catch (JSONException e) {
             System.err.println("JSON Notification Incorrect format. " + e.getMessage());
         }
         return null;
     }
 
-    public static JSONObject getNotification(String id){
+    public static JSONObject getNotification(String id) {
         try {
-            BaseDocument notificationDoc = arangoDB.db(dbName).collection(notificationsCollectionName).getDocument( id,
+            BaseDocument notificationDoc = arangoDB.db(dbName).collection(notificationsCollectionName).getDocument(id,
                     BaseDocument.class);
-            if(notificationDoc == null){
-                throw new ArangoDBException("Notification with ID: " + id+" Not Found");
+            if (notificationDoc == null) {
+                throw new ArangoDBException("Notification with ID: " + id + " Not Found");
             }
-            JSONObject notificationJSON  = new JSONObject(notificationDoc.getProperties());
+            JSONObject notificationJSON = new JSONObject(notificationDoc.getProperties());
             return reformatJSON(notificationJSON);
         } catch (ArangoDBException e) {
             System.err.println("Failed to get Notification: " + e.getMessage());
@@ -192,7 +206,7 @@ public class ArangoInterfaceMethods {
         }
     }
 
-    public static void updateNotification(String id,JSONObject notificationJSON){
+    public static void updateNotification(String id, JSONObject notificationJSON) {
         try {
             BaseDocument myObject = new BaseDocument();
             myObject.addAttribute("activity_type", notificationJSON.get("activity_type").toString());
@@ -204,24 +218,23 @@ public class ArangoInterfaceMethods {
             System.out.println("Notification Updated");
         } catch (ArangoDBException e) {
             System.err.println("Failed to Update Notification. " + e.getMessage());
-        } catch (JSONException e){
+        } catch (JSONException e) {
             System.err.println("JSON Notification Incorrect format. " + e.getMessage());
         }
     }
 
-    public static void deleteNotification(String id){
+    public static void deleteNotification(String id) {
         try {
             arangoDB.db(dbName).collection(notificationsCollectionName).deleteDocument(id);
-            System.out.println("Notification Deleted: "+id);
-        } catch (ArangoDBException e){
-            System.err.println("Notification ID does not exist:  "+id+",  "+e.getMessage());
+            System.out.println("Notification Deleted: " + id);
+        } catch (ArangoDBException e) {
+            System.err.println("Notification ID does not exist:  " + id + ",  " + e.getMessage());
         }
     }
 
 
-
     //ACTIVITY CRUD
-    public static String insertActivity(JSONObject activityJSON){
+    public static String insertActivity(JSONObject activityJSON) {
         try {
             BaseDocument myObject = new BaseDocument();
             myObject.addAttribute("activity_type", activityJSON.get("activity_type").toString());
@@ -234,20 +247,20 @@ public class ArangoInterfaceMethods {
             return id;
         } catch (ArangoDBException e) {
             System.err.println("Failed to insert Activity. " + e.getMessage());
-        } catch (JSONException e){
+        } catch (JSONException e) {
             System.err.println("JSON Activity Incorrect format. " + e.getMessage());
         }
         return null;
     }
 
-    public static JSONObject getActivity(String id){
+    public static JSONObject getActivity(String id) {
         try {
             BaseDocument activityDoc = arangoDB.db(dbName).collection(activitiesCollectionName).getDocument(id,
                     BaseDocument.class);
-            if(activityDoc == null){
-                throw new ArangoDBException("Activity with ID: " + id+" Not Found");
+            if (activityDoc == null) {
+                throw new ArangoDBException("Activity with ID: " + id + " Not Found");
             }
-            JSONObject activityJSON  = new JSONObject(activityDoc.getProperties());
+            JSONObject activityJSON = new JSONObject(activityDoc.getProperties());
             return reformatJSON(activityJSON);
         } catch (ArangoDBException e) {
             System.err.println("Failed to get Activity: " + e.getMessage());
@@ -255,7 +268,7 @@ public class ArangoInterfaceMethods {
         }
     }
 
-    public static void updateActivity(String id,JSONObject activityJSON){
+    public static void updateActivity(String id, JSONObject activityJSON) {
         try {
             BaseDocument myObject = new BaseDocument();
             myObject.addAttribute("activity_type", activityJSON.get("activity_type").toString());
@@ -267,23 +280,23 @@ public class ArangoInterfaceMethods {
             System.out.println("Activity Updated");
         } catch (ArangoDBException e) {
             System.err.println("Failed to Update Activity. " + e.getMessage());
-        } catch (JSONException e){
+        } catch (JSONException e) {
             System.err.println("JSON Activity Incorrect format. " + e.getMessage());
         }
     }
 
-    public static void deleteActivity(String id){
+    public static void deleteActivity(String id) {
         try {
             arangoDB.db(dbName).collection(activitiesCollectionName).deleteDocument(id);
-            System.out.println("Activity Deleted: "+id);
-        } catch (ArangoDBException e){
-            System.err.println("Activity ID does not exist:  "+id+",  "+e.getMessage());
+            System.out.println("Activity Deleted: " + id);
+        } catch (ArangoDBException e) {
+            System.err.println("Activity ID does not exist:  " + id + ",  " + e.getMessage());
         }
     }
 
 
     //STORY CRUD
-    public static String insertStory(JSONObject storyJSON){
+    public static String insertStory(JSONObject storyJSON) {
         try {
             BaseDocument myObject = new BaseDocument();
             myObject.addAttribute("user_id", storyJSON.get("user_id").toString());
@@ -300,20 +313,20 @@ public class ArangoInterfaceMethods {
             return id;
         } catch (ArangoDBException e) {
             System.err.println("Failed to insert Story. " + e.getMessage());
-        } catch (JSONException e){
+        } catch (JSONException e) {
             System.err.println("JSON Story Incorrect format. " + e.getMessage());
         }
         return null;
     }
 
-    public static JSONObject getStory(String id){
+    public static JSONObject getStory(String id) {
         try {
             BaseDocument storyDoc = arangoDB.db(dbName).collection(storiesCollectionName).getDocument(id,
                     BaseDocument.class);
-            if(storyDoc == null){
-                throw new ArangoDBException("Story with ID: " + id+" Not Found");
+            if (storyDoc == null) {
+                throw new ArangoDBException("Story with ID: " + id + " Not Found");
             }
-            JSONObject storyJSON  = new JSONObject(storyDoc.getProperties());
+            JSONObject storyJSON = new JSONObject(storyDoc.getProperties());
             return reformatJSON(storyJSON);
         } catch (ArangoDBException e) {
             System.err.println("Failed to get Story: " + e.getMessage());
@@ -321,7 +334,7 @@ public class ArangoInterfaceMethods {
         }
     }
 
-    public static boolean updateStory(String id,JSONObject storyJSON){
+    public static boolean updateStory(String id, JSONObject storyJSON) {
         try {
             BaseDocument myObject = new BaseDocument();
             myObject.addAttribute("user_id", storyJSON.get("user_id").toString());
@@ -339,31 +352,31 @@ public class ArangoInterfaceMethods {
         } catch (ArangoDBException e) {
             System.err.println("Failed to Update Story. " + e.getMessage());
             return false;
-        } catch (JSONException e){
+        } catch (JSONException e) {
             System.err.println("JSON Story Incorrect format. " + e.getMessage());
             return false;
         }
     }
 
-    public static boolean deleteStory(String id){
+    public static boolean deleteStory(String id) {
         try {
             arangoDB.db(dbName).collection(storiesCollectionName).deleteDocument(id);
-            System.out.println("Story Deleted: "+id);
+            System.out.println("Story Deleted: " + id);
             return true;
-        } catch (ArangoDBException e){
-            System.err.println("Story ID does not exist:  "+id+",  "+e.getMessage());
+        } catch (ArangoDBException e) {
+            System.err.println("Story ID does not exist:  " + id + ",  " + e.getMessage());
             return false;
         }
     }
 
-    public static JSONArray getStories(String user_id){
+    public static JSONArray getStories(String user_id) {
 
         try {
-            String dbQuery = "For story in "+storiesCollectionName+" FILTER story.user_id == "+user_id+" RETURN story";
+            String dbQuery = "For story in " + storiesCollectionName + " FILTER story.user_id == " + user_id + " RETURN story";
             ArangoCursor<BaseDocument> cursor = arangoDB.db(dbName).query(dbQuery, null, null, BaseDocument.class);
             JSONArray result = new JSONArray();
             cursor.forEachRemaining(aDocument -> {
-                JSONObject postJSON  = new JSONObject(aDocument.getProperties());
+                JSONObject postJSON = new JSONObject(aDocument.getProperties());
                 result.put(reformatJSON(postJSON));
             });
             return result;
@@ -376,45 +389,42 @@ public class ArangoInterfaceMethods {
 
 
     //POSTS CRUD
-    public static String insertPost(JSONObject postJSON){
+    public static String insertPost(JSONObject postJSON, String userId) throws Exception {
         try {
 
             BaseDocument myObject = new BaseDocument();
-            String postId  = utilities.Main.generateUUID();
-            myObject.setKey(postId);
-            myObject.addAttribute("id", postId);
-            myObject.addAttribute("user_id", postJSON.get("user_id").toString());
+            myObject.addAttribute("user_id", userId);
             myObject.addAttribute("caption", postJSON.get("caption").toString());
-            myObject.addAttribute("media", postJSON.get("media").toString());
-            myObject.addAttribute("likes", postJSON.get("likes").toString());
-            myObject.addAttribute("tags", postJSON.get("tags").toString());
-            myObject.addAttribute("location", postJSON.get("location").toString());
-            myObject.addAttribute("comments",  postJSON.get("comments"));
-            myObject.addAttribute("created_at", postJSON.get("created_at").toString());
-            myObject.addAttribute("updated_at", postJSON.get("updated_at").toString());
-            myObject.addAttribute("blocked_at", postJSON.get("blocked_at").toString());
-            myObject.addAttribute("deleted_at", postJSON.get("deleted_at").toString());
-            String id = arangoDB.db(dbName).collection(postsCollectionName).insertDocument(postJSON.toString()).getKey();
+            myObject.addAttribute("media", postJSON.get("media"));
+            //TODO: @MAGDY location gets inserted in a wrong way (with key "map")
+            myObject.addAttribute("location", postJSON.getJSONObject("location"));
+            myObject.addAttribute("comments", new ArrayList<>());
+            myObject.addAttribute("likes", new ArrayList<>());
+            myObject.addAttribute("created_at", new Timestamp(System.currentTimeMillis()));
+            myObject.addAttribute("updated_at", null);
+            myObject.addAttribute("blocked_at", null);
+            myObject.addAttribute("deleted_at", null);
+            String id = arangoDB.db(dbName).collection(postsCollectionName).insertDocument(myObject).getKey();
             System.out.println("Post inserted");
             return id;
         } catch (ArangoDBException e) {
             System.err.println("Failed to insert Post. " + e.getMessage());
             return "";
-        } catch (JSONException e){
-            System.err.println("JSON Post Incorrect format. " + e.getMessage());
-            return "";
+        } catch (JSONException e) {
+            throw new Exception(e.getMessage());
         }
 //        return null;
     }
 
-    public static JSONObject getPost(String id){
+    public static JSONObject getPost(String id) throws Exception {
         try {
             BaseDocument postDoc = arangoDB.db(dbName).collection(postsCollectionName).getDocument(id,
                     BaseDocument.class);
-            if(postDoc == null){
-                throw new ArangoDBException("Post with ID: " + id+" Not Found");
+            if (postDoc == null) {
+                throw new Exception("Post with ID: " + id + " Not Found");
             }
-            JSONObject postJSON  = new JSONObject(postDoc.getProperties());
+            JSONObject postJSON = new JSONObject(postDoc.getProperties());
+            postJSON.put("id", postDoc.getKey());
             return reformatJSON(postJSON);
         } catch (ArangoDBException e) {
             System.err.println("Failed to get Post: " + e.getMessage());
@@ -422,16 +432,17 @@ public class ArangoInterfaceMethods {
         }
     }
 
-    public static JSONArray getPosts(String userId){
+    public static JSONArray getPosts(String userId) {
         try {
-            String query = "FOR t IN "+postsCollectionName+" FILTER t.user_id == @id RETURN t";
+            String query = "FOR t IN " + postsCollectionName + " FILTER t.user_id == @id RETURN t";
             Map<String, Object> bindVars = new MapBuilder().put("id", userId).get();
             ArangoCursor<BaseDocument> cursor = arangoDB.db(dbName).query(query, bindVars, null,
                     BaseDocument.class);
             JSONArray result = new JSONArray();
             cursor.forEachRemaining(aDocument -> {
-                JSONObject postJSON  = new JSONObject(aDocument.getProperties());
-                result.put(reformatJSON(postJSON));
+                JSONObject postJSON = new JSONObject(aDocument.getProperties());
+                postJSON.put("id", aDocument.getKey());
+                result.put(postJSON);
             });
             return result;
         } catch (ArangoDBException e) {
@@ -441,48 +452,50 @@ public class ArangoInterfaceMethods {
 
 
     }
-    public static void likePost(String postID, String userID){
+
+    public static void likePost(String postID, String userID) throws Exception {
         JSONObject post = getPost(postID);
         JSONArray likes = (JSONArray) post.get("likes");
         likes.put(userID);
         updatePost(postID, post);
     }
-    public static void updatePost(String id,JSONObject postJSON){
+
+    public static void updatePost(String id, JSONObject postJSON) {
         try {
             BaseDocument myObject = new BaseDocument();
             myObject.addAttribute("user_id", postJSON.get("user_id").toString());
             myObject.addAttribute("caption", postJSON.get("caption").toString());
             myObject.addAttribute("media", postJSON.get("media").toString());
             myObject.addAttribute("likes", postJSON.get("likes").toString());
-            myObject.addAttribute("tags", postJSON.get("tags").toString());
             myObject.addAttribute("location", postJSON.get("location").toString());
             myObject.addAttribute("comments", postJSON.get("comments").toString());
             myObject.addAttribute("created_at", postJSON.get("created_at").toString());
-            myObject.addAttribute("updated_at", postJSON.get("updated_at").toString());
-            myObject.addAttribute("blocked_at", postJSON.get("blocked_at").toString());
-            myObject.addAttribute("deleted_at", postJSON.get("deleted_at").toString());
+            myObject.addAttribute("updated_at", new Timestamp(System.currentTimeMillis()));
+            if (postJSON.has("blocked_at"))
+                myObject.addAttribute("blocked_at", postJSON.get("blocked_at").toString());
+            if (postJSON.has("deleted_at"))
+                myObject.addAttribute("deleted_at", postJSON.get("deleted_at").toString());
             arangoDB.db(dbName).collection(postsCollectionName).updateDocument(id, postJSON.toString());
             System.out.println("Post Updated");
         } catch (ArangoDBException e) {
             System.err.println("Failed to Update Post. " + e.getMessage());
-        } catch (JSONException e){
+        } catch (JSONException e) {
             System.err.println("JSON Post Incorrect format. " + e.getMessage());
         }
     }
 
-    public static void deletePost(String id){
+    public static void deletePost(String id) {
         try {
             arangoDB.db(dbName).collection(postsCollectionName).deleteDocument(id);
-            System.out.println("Post Deleted: "+id);
-        } catch (ArangoDBException e){
-            System.err.println("Post ID does not exist:  "+id+",  "+e.getMessage());
+            System.out.println("Post Deleted: " + id);
+        } catch (ArangoDBException e) {
+            System.err.println("Post ID does not exist:  " + id + ",  " + e.getMessage());
         }
     }
 
 
-
     //BOOKMARKS CRUD
-    public static String insertBookmark(JSONObject bookmarkJSON){
+    public static String insertBookmark(JSONObject bookmarkJSON) {
         try {
             BaseDocument myObject = new BaseDocument();
             myObject.addAttribute("user_id", bookmarkJSON.get("user_id").toString());
@@ -492,20 +505,20 @@ public class ArangoInterfaceMethods {
             return id;
         } catch (ArangoDBException e) {
             System.err.println("Failed to insert Bookmark. " + e.getMessage());
-        } catch (JSONException e){
+        } catch (JSONException e) {
             System.err.println("JSON Bookmark Incorrect format. " + e.getMessage());
         }
         return null;
     }
 
-    public static JSONObject getBookmark(String id){
+    public static JSONObject getBookmark(String id) {
         try {
             BaseDocument bookmarkDoc = arangoDB.db(dbName).collection(bookmarksCollectionName).getDocument(id,
                     BaseDocument.class);
-            if(bookmarkDoc == null){
-                throw new ArangoDBException("Bookmark with ID: " + id+" Not Found");
+            if (bookmarkDoc == null) {
+                throw new ArangoDBException("Bookmark with ID: " + id + " Not Found");
             }
-            JSONObject bookmarkJSON  = new JSONObject(bookmarkDoc.getProperties());
+            JSONObject bookmarkJSON = new JSONObject(bookmarkDoc.getProperties());
             return reformatJSON(bookmarkJSON);
         } catch (ArangoDBException e) {
             System.err.println("Failed to get Bookmark: " + e.getMessage());
@@ -513,7 +526,7 @@ public class ArangoInterfaceMethods {
         }
     }
 
-    public static void updateBookmark(String id,JSONObject bookmarkJSON){
+    public static void updateBookmark(String id, JSONObject bookmarkJSON) {
         try {
             BaseDocument myObject = new BaseDocument();
             myObject.addAttribute("user_id", bookmarkJSON.get("user_id").toString());
@@ -522,29 +535,29 @@ public class ArangoInterfaceMethods {
             System.out.println("Bookmark Updated");
         } catch (ArangoDBException e) {
             System.err.println("Failed to Update Bookmark. " + e.getMessage());
-        } catch (JSONException e){
+        } catch (JSONException e) {
             System.err.println("JSON Bookmark Incorrect format. " + e.getMessage());
         }
     }
 
-    public static void deleteBookmark(String id){
+    public static void deleteBookmark(String id) {
         try {
             arangoDB.db(dbName).collection(bookmarksCollectionName).deleteDocument(id);
-            System.out.println("Bookmark Deleted: "+id);
-        } catch (ArangoDBException e){
-            System.err.println("Bookmark ID does not exist:  "+id+",  "+e.getMessage());
+            System.out.println("Bookmark Deleted: " + id);
+        } catch (ArangoDBException e) {
+            System.err.println("Bookmark ID does not exist:  " + id + ",  " + e.getMessage());
         }
     }
 
 
     //COMMENTS CRUD
-    public static void insertCommentReply(String commentID, JSONObject commentReply){
+    public static void insertCommentReply(String commentID, JSONObject commentReply) {
 
-        String dbQuery = "FOR post in Posts LET willUpdateDocument = ( FOR comment IN post.comments FILTER comment.id == '"+commentID+"' LIMIT 1 RETURN 1) FILTER LENGTH(willUpdateDocument) > 0 LET alteredList = ( FOR comment IN post.comments LET newItem = (comment.id == '"+commentID+"' ? merge(comment, { 'comments' : append(comment.comments,"+commentReply.toString()+")}) : comment) RETURN newItem) UPDATE post WITH { comments:  alteredList } IN Posts";
-        arangoDB.db(dbName).query(dbQuery,null,null,null);
+        String dbQuery = "FOR post in Posts LET willUpdateDocument = ( FOR comment IN post.comments FILTER comment.id == '" + commentID + "' LIMIT 1 RETURN 1) FILTER LENGTH(willUpdateDocument) > 0 LET alteredList = ( FOR comment IN post.comments LET newItem = (comment.id == '" + commentID + "' ? merge(comment, { 'comments' : append(comment.comments," + commentReply.toString() + ")}) : comment) RETURN newItem) UPDATE post WITH { comments:  alteredList } IN Posts";
+        arangoDB.db(dbName).query(dbQuery, null, null, null);
     }
 
-    public static void insertCommentOnPost(String postID, JSONObject comment) {
+    public static void insertCommentOnPost(String postID, JSONObject comment) throws Exception {
         JSONObject post = getPost(postID);
         ((JSONArray) post.get("comments")).put(comment);
         updatePost(postID, post);
@@ -576,6 +589,7 @@ public class ArangoInterfaceMethods {
     public static void initializeGraphCollections() throws IOException {
         for (GraphEntity graphEntity : arangoDB.db(dbName).getGraphs()) {
             if (graphEntity.getName().equals(graphName)) {
+
                 return;
             }
         }
@@ -583,7 +597,7 @@ public class ArangoInterfaceMethods {
         openConnection();
         List<String> user_ids = getAllUsersIds();
         closeConnection();
-        try{
+        try {
 
             Collection<EdgeDefinition> edgeDefinitions = new ArrayList<>();
 
@@ -593,7 +607,6 @@ public class ArangoInterfaceMethods {
             edgeUserFollows.collection(graphUserFollowsCollectionName);
             edgeUserFollows.from(userCollectionName);
             edgeUserFollows.to(userCollectionName);
-
 
 
             EdgeDefinition edgeUserInteracts = new EdgeDefinition();
@@ -631,31 +644,28 @@ public class ArangoInterfaceMethods {
                 userDocument.setKey(user_id);
                 arangoDB.db(dbName).graph(graphName).vertexCollection(userCollectionName).insertVertex(userDocument, null);
             }
-        }
-        catch (ArangoDBException e ){
+        } catch (ArangoDBException e) {
             System.err.println("Faild to intilize graph: " + e.getMessage());
             return;
         }
     }
 
 
-
-    public static boolean followUser(String followerID, String followedID){
+    public static boolean followUser(String followerID, String followedID) {
 
         BaseEdgeDocument edge = new BaseEdgeDocument();
         String followerKey = followerID.split("/")[1];
         String followedKey = followedID.split("/")[1];
-        edge.setKey(followerKey+followedKey);
+        edge.setKey(followerKey + followedKey);
         edge.setFrom(followerID);
         edge.setTo(followedID);
 
-        try{
+        try {
             ArangoEdgeCollection edgecollection = arangoDB.db(dbName).graph(graphName).edgeCollection(graphUserFollowsCollectionName);
 
-            edgecollection.insertEdge(edge,null);
+            edgecollection.insertEdge(edge, null);
             return true;
-        }
-        catch (ArangoDBException e){
+        } catch (ArangoDBException e) {
             System.err.println("Edge Insertion Failed In Graph: " + e.getMessage());
             return false;
         }
@@ -666,16 +676,15 @@ public class ArangoInterfaceMethods {
         BaseEdgeDocument edge = new BaseEdgeDocument();
         String userIdKey = userID.split("/")[1];
         String hashtagNameKey = hashtagName.split("/")[1];
-        edge.setKey(userIdKey+hashtagNameKey);
+        edge.setKey(userIdKey + hashtagNameKey);
         edge.setFrom(userID);
         edge.setTo(hashtagName);
 
-        try{
+        try {
             ArangoEdgeCollection edgecollection = arangoDB.db(dbName).graph(graphName).edgeCollection(graphUserInteractsCollectionName);
-            edgecollection.insertEdge(edge,null);
+            edgecollection.insertEdge(edge, null);
             return true;
-        }
-        catch (ArangoDBException e){
+        } catch (ArangoDBException e) {
             System.err.println("Edge Insertion Failed In Graph: " + e.getMessage());
             return false;
         }
@@ -731,8 +740,7 @@ public class ArangoInterfaceMethods {
             ArangoEdgeCollection edgecollection = arangoDB.db(dbName).graph(graphName).edgeCollection(graphUserFollowsCollectionName);
             edgecollection.deleteEdge(followerKey + followedKey);
             return true;
-        }
-        catch (ArangoDBException e){
+        } catch (ArangoDBException e) {
             System.err.println("Edge Deletion Failed In Graph: " + e.getMessage());
             return false;
         }
@@ -740,15 +748,14 @@ public class ArangoInterfaceMethods {
 
     }
 
-    public static boolean unFolllowHashtag(String userID, String hashtagName){
+    public static boolean unFolllowHashtag(String userID, String hashtagName) {
         try {
             String userIDKey = userID.split("/")[1];
             String hashtagNameKey = hashtagName.split("/")[1];
             ArangoEdgeCollection edgecollection = arangoDB.db(dbName).graph(graphName).edgeCollection(graphUserInteractsCollectionName);
             edgecollection.deleteEdge(userIDKey + hashtagNameKey);
             return true;
-        }
-        catch (ArangoDBException e){
+        } catch (ArangoDBException e) {
             System.err.println("Edge Deletion Failed In Graph: " + e.getMessage());
             return false;
         }
@@ -789,13 +796,13 @@ public class ArangoInterfaceMethods {
             userDocument.setKey(userID);
             arangoDB.db(dbName).graph(graphName).vertexCollection(userCollectionName).insertVertex(userDocument, null);
             return true;
-        }
-        catch(ArangoDBException e){
+        } catch (ArangoDBException e) {
             System.err.println("Failed to initialize a node for user In Graph: " + e.getMessage());
             return false;
         }
 
     }
+
 
     public static boolean makeHashtagNode(String hashtagName){
         try{
@@ -803,8 +810,7 @@ public class ArangoInterfaceMethods {
             hashtagDocument.setKey(hashtagName);
             arangoDB.db(dbName).graph(graphName).vertexCollection(hashtagCollectionName).insertVertex(hashtagDocument, null);
             return true;
-        }
-        catch(ArangoDBException e){
+        } catch (ArangoDBException e) {
             System.err.println("Failed to initialize a node for hashtag In Graph: " + e.getMessage());
             return false;
         }
@@ -825,29 +831,27 @@ public class ArangoInterfaceMethods {
 //    }
 
 
-    public static boolean isFollowing(String userID, String followingID){
+    public static boolean isFollowing(String userID, String followingID) {
         ArangoEdgeCollection edgecollection = arangoDB.db(dbName).graph(graphName).edgeCollection(graphUserFollowsCollectionName);
         String userKey = userID.split("/")[1];
         String followingKey = followingID.split("/")[1];
-        BaseEdgeDocument edgeDoc = edgecollection.getEdge(userKey+followingKey,BaseEdgeDocument.class);
-        if(edgeDoc == null){
+        BaseEdgeDocument edgeDoc = edgecollection.getEdge(userKey + followingKey, BaseEdgeDocument.class);
+        if (edgeDoc == null) {
             return false;
-        }
-        else{
+        } else {
             return true;
         }
 
     }
 
-    public static boolean isInteracting(String userID, String hashtagName){
+    public static boolean isInteracting(String userID, String hashtagName) {
         ArangoEdgeCollection edgecollection = arangoDB.db(dbName).graph(graphName).edgeCollection(graphUserInteractsCollectionName);
         String userKey = userID.split("/")[1];
         String hashtagKey = hashtagName.split("/")[1];
-        BaseEdgeDocument edgeDoc = edgecollection.getEdge(userKey+hashtagKey,BaseEdgeDocument.class);
-        if(edgeDoc == null){
+        BaseEdgeDocument edgeDoc = edgecollection.getEdge(userKey + hashtagKey, BaseEdgeDocument.class);
+        if (edgeDoc == null) {
             return false;
-        }
-        else{
+        } else {
             return true;
         }
 
@@ -881,7 +885,6 @@ public class ArangoInterfaceMethods {
 
     }
 
-
     //    public static boolean removeUserNode(String userID){
 //        try{
 //            arangoDB.db(dbName).graph(graphName).vertexCollection(userCollectionName).deleteVertex(userID);
@@ -906,8 +909,8 @@ public class ArangoInterfaceMethods {
 //
 //    }
 
-    public static ArrayList<String> getAllfollowingIDs(String userID){
-        try{
+    public static ArrayList<String> getAllfollowingIDs(String userID) {
+        try {
             ArrayList<String> IDs = new ArrayList<>();
             String query = "FOR vertex IN OUTBOUND \""  + userID+"\" "+ graphUserFollowsCollectionName + " RETURN vertex " ;
             Map<String, Object> bindVars = new MapBuilder().get();
@@ -915,7 +918,7 @@ public class ArangoInterfaceMethods {
                     BaseDocument.class);
             cursor.forEachRemaining(aDocument -> {
                 IDs.add(aDocument.getKey());
-                System.out.println("ID following: "+ aDocument.getKey());
+                System.out.println("ID following: " + aDocument.getKey());
             });
             return IDs;
         } catch (ArangoDBException e) {
@@ -955,7 +958,7 @@ public class ArangoInterfaceMethods {
                     BaseDocument.class);
             cursor.forEachRemaining(aDocument -> {
                 HashtagNames.add(aDocument.getKey());
-                System.out.println("Hashtag following: "+ aDocument.getKey());
+                System.out.println("Hashtag following: " + aDocument.getKey());
             });
             return HashtagNames;
         } catch (ArangoDBException e) {
@@ -966,6 +969,7 @@ public class ArangoInterfaceMethods {
 
     }
 
+
     public static ArrayList<String> getAllHashtagFollowers(String hashtagName){
         try{
             ArrayList<String> IDs = new ArrayList<>();
@@ -975,7 +979,7 @@ public class ArangoInterfaceMethods {
                     BaseDocument.class);
             cursor.forEachRemaining(aDocument -> {
                 IDs.add(aDocument.getKey());
-                System.out.println("ID follower: "+ aDocument.getKey());
+                System.out.println("ID follower: " + aDocument.getKey());
             });
             return IDs;
         } catch (ArangoDBException e) {
@@ -994,7 +998,7 @@ public class ArangoInterfaceMethods {
                     BaseDocument.class);
             cursor.forEachRemaining(aDocument -> {
                 IDs.add(aDocument.getKey());
-                System.out.println("ID : "+ aDocument.getKey());
+                System.out.println("ID follower: " + aDocument.getKey());
             });
             return IDs;
         } catch (ArangoDBException e) {
@@ -1058,14 +1062,14 @@ public class ArangoInterfaceMethods {
         }
     }
 
-    private static JSONObject reformatJSON(JSONObject json){
+    private static JSONObject reformatJSON(JSONObject json) {
         String openingArray = "\"\\[";
         String closedArray = "]\"";
         String backslash = "\\\\";
         String jsonString = json.toString();
-        jsonString = jsonString.replaceAll(openingArray,"\\[")
-                                .replaceAll(closedArray, "\\]")
-                                .replaceAll(backslash,"");
+        jsonString = jsonString.replaceAll(openingArray, "\\[")
+                .replaceAll(closedArray, "\\]")
+                .replaceAll(backslash, "");
 
         return new JSONObject(jsonString);
 

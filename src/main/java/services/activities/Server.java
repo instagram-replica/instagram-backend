@@ -1,18 +1,17 @@
 package services.activities;
 
+import shared.Settings;
 
-import java.io.IOException;
 
 public class Server {
-    public static void main(String[] args) {
-        try {
-            Controller controller = new Controller();
-            shared.MQServer.Server server = new shared.MQServer.Server("activities");
+    private static final String DEFAULT_CONFIG_URI_LOC = "src/main/configs/activities/default_config.json";
 
-            server.run(controller);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public static void main(String[] args) {
+        String fileUri = args.length == 1 ? args[0] : DEFAULT_CONFIG_URI_LOC;
+        Settings.init(fileUri);
+
+        Controller controller = new Controller();
+        shared.mq_server.Server.run(controller);
 
     }
 }

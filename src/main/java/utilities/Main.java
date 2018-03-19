@@ -1,5 +1,7 @@
 package utilities;
 
+import org.json.JSONObject;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -29,5 +31,9 @@ public class Main {
         fileInputStream.close();
 
         return properties;
+    }
+
+    public static JSONObject cloneJSONObject(JSONObject originalJSONObject) {
+        return new JSONObject(originalJSONObject, JSONObject.getNames(originalJSONObject));
     }
 }

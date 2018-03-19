@@ -374,10 +374,9 @@ public class ArangoInterfaceTest {
 
     }
     @Test
-    public void insertAndGetPost() {
+    public void insertAndGetPost() throws Exception {
 
         JSONObject obj = new JSONObject();
-        obj.put("user_id",utilities.Main.generateUUID());
         obj.put("caption","Taken By MiSO EL Gen");
         obj.put("media", new ArrayList<String>());
         obj.put("likes", new ArrayList<String>());
@@ -389,8 +388,8 @@ public class ArangoInterfaceTest {
         obj.put("blocked_at",new Timestamp(System.currentTimeMillis()));
         obj.put("deleted_at",new Timestamp(System.currentTimeMillis()));
 
-        String id = ArangoInterfaceMethods.insertPost(obj);
-        System.out.println("_____________________ "+id);
+
+        String id = ArangoInterfaceMethods.insertPost(obj, utilities.Main.generateUUID());
         JSONObject readObj = ArangoInterfaceMethods.getPost(id);
         Iterator iterator = Objects.requireNonNull(readObj).keys();
         while(iterator.hasNext()){
@@ -404,7 +403,7 @@ public class ArangoInterfaceTest {
 
 
     @Test
-    public void updateAndDeletePost() {
+    public void updateAndDeletePost() throws Exception {
 
         utilities.Main.generateUUID();
         JSONObject obj = new JSONObject();
@@ -421,7 +420,6 @@ public class ArangoInterfaceTest {
         obj.put("deleted_at",new Timestamp(System.currentTimeMillis()));
 
         JSONObject updatedObj = new JSONObject();
-        updatedObj.put("user_id",utilities.Main.generateUUID());
         updatedObj.put("caption","Friends");
         updatedObj.put("media", new ArrayList<String>());
         updatedObj.put("likes", new ArrayList<String>());
@@ -434,7 +432,7 @@ public class ArangoInterfaceTest {
         updatedObj.put("deleted_at",new Timestamp(System.currentTimeMillis()));
 
 
-        String id = ArangoInterfaceMethods.insertPost(obj);
+        String id = ArangoInterfaceMethods.insertPost(obj, utilities.Main.generateUUID());
         ArangoInterfaceMethods.updatePost(id,updatedObj);
         JSONObject jsonNotification = ArangoInterfaceMethods.getPost(id);
 
@@ -500,10 +498,9 @@ public class ArangoInterfaceTest {
 
 
     @Test
-    public void insertCommentInPost(){
+    public void insertCommentInPost() throws Exception {
 
         JSONObject obj = new JSONObject();
-        obj.put("user_id",utilities.Main.generateUUID());
         obj.put("caption","Taken By MiSO EL Gen");
         obj.put("media", new ArrayList<String>());
         obj.put("likes", new ArrayList<String>());
@@ -515,7 +512,7 @@ public class ArangoInterfaceTest {
         obj.put("blocked_at",new Timestamp(System.currentTimeMillis()));
         obj.put("deleted_at",new Timestamp(System.currentTimeMillis()));
 
-        String id =ArangoInterfaceMethods.insertPost(obj);
+        String id =ArangoInterfaceMethods.insertPost(obj,utilities.Main.generateUUID());
         JSONObject comment = new JSONObject();
         comment.put("content","Hello");
 
@@ -592,10 +589,11 @@ public class ArangoInterfaceTest {
     }
 
     @Test
-    public void tagUserTest(){
-
+    public void tagUserTest() throws Exception {
+        String UUID1 = utilities.Main.generateUUID() ;
+        String UUID2 = utilities.Main.generateUUID() ;
         JSONObject obj1= new JSONObject();
-        obj1.put("user_id",utilities.Main.generateUUID());
+        obj1.put("user_id",UUID1);
         obj1.put("caption","Taken By MiSO EL Gen");
         obj1.put("media", new ArrayList<String>());
         obj1.put("likes", new ArrayList<String>());
@@ -608,7 +606,7 @@ public class ArangoInterfaceTest {
         obj1.put("deleted_at",new Timestamp(System.currentTimeMillis()));
 
         JSONObject obj2= new JSONObject();
-        obj2.put("user_id",utilities.Main.generateUUID());
+        obj2.put("user_id",UUID2);
         obj2.put("caption","Taken By Mohamed ABouzeid");
         obj2.put("media", new ArrayList<String>());
         obj2.put("likes", new ArrayList<String>());
@@ -620,8 +618,8 @@ public class ArangoInterfaceTest {
         obj2.put("blocked_at",new Timestamp(System.currentTimeMillis()));
         obj2.put("deleted_at",new Timestamp(System.currentTimeMillis()));
 
-        String id1 = ArangoInterfaceMethods.insertPost(obj1);
-        String id2 = ArangoInterfaceMethods.insertPost(obj2);
+        String id1 = ArangoInterfaceMethods.insertPost(obj1,UUID1);
+        String id2 = ArangoInterfaceMethods.insertPost(obj2,UUID2);
 
         tagUserInPost("Users/f5e1008c-6157-e05d-c01c-5f5c7e055b2c", "Posts/"+id1);
         tagUserInPost("Users/a10d47bf-7c9c-8193-381f-79db326cc8dd", "Posts/"+id1);
@@ -645,10 +643,13 @@ public class ArangoInterfaceTest {
     }
 
     @Test
-    public void tagPostTest(){
+    public void tagPostTest() throws Exception {
+
+        String UUID1 = utilities.Main.generateUUID() ;
+        String UUID2 = utilities.Main.generateUUID() ;
 
         JSONObject obj1= new JSONObject();
-        obj1.put("user_id",utilities.Main.generateUUID());
+        obj1.put("user_id",UUID1);
         obj1.put("caption","Taken By MiSO EL Gen");
         obj1.put("media", new ArrayList<String>());
         obj1.put("likes", new ArrayList<String>());
@@ -661,7 +662,7 @@ public class ArangoInterfaceTest {
         obj1.put("deleted_at",new Timestamp(System.currentTimeMillis()));
 
         JSONObject obj2= new JSONObject();
-        obj2.put("user_id",utilities.Main.generateUUID());
+        obj2.put("user_id",UUID2);
         obj2.put("caption","Taken By Mohamed ABouzeid");
         obj2.put("media", new ArrayList<String>());
         obj2.put("likes", new ArrayList<String>());
@@ -673,8 +674,8 @@ public class ArangoInterfaceTest {
         obj2.put("blocked_at",new Timestamp(System.currentTimeMillis()));
         obj2.put("deleted_at",new Timestamp(System.currentTimeMillis()));
 
-        String id1 = ArangoInterfaceMethods.insertPost(obj1);
-        String id2 = ArangoInterfaceMethods.insertPost(obj2);
+        String id1 = ArangoInterfaceMethods.insertPost(obj1,UUID1);
+        String id2 = ArangoInterfaceMethods.insertPost(obj2,UUID2);
 
         makeHashtagNode("Chelsea");
         makeHashtagNode("Liverpool");

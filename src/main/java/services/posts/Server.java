@@ -1,22 +1,17 @@
 package services.posts;
 
 
-import java.io.IOException;
+import shared.Settings;
+
 
 public class Server {
+    private static final String DEFAULT_CONFIG_URI_LOC = "src/main/configs/posts/default_config.json";
+
     public static void main(String[] args) {
+        String fileUri = args.length == 1 ? args[0] : DEFAULT_CONFIG_URI_LOC;
+        Settings.init(fileUri);
 
-        try {
-
-            Controller controller = new Controller();
-
-            shared.MQServer.Server server = new shared.MQServer.Server("posts");
-
-            server.run(controller);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
+        Controller controller = new Controller();
+        shared.mq_server.Server.run(controller);
     }
 }
