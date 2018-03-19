@@ -3,10 +3,13 @@ package services.users;
 import auth.JWT;
 import auth.JWTPayload;
 import exceptions.CustomException;
+import exceptions.JSONException;
+import json.JSONParser;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import persistence.sql.users.User;
 
+import java.io.IOException;
 import java.util.List;
 
 import static persistence.sql.Main.closeConnection;
@@ -20,37 +23,44 @@ public class Controller extends shared.mq_server.Controller {
     // TODO: Handle all JSON getters failures
 
     @Override
-    public JSONObject execute(JSONObject payload, String viewerId) throws Exception {
+    public JSONObject execute(JSONObject payload, String viewerId) throws IOException {
         // TODO: Handle failure to connect to JDBC URL
-        openConnection();
+        Controller.initialize();
 
-        // TODO: Handle inability to find method or params
-        String method = payload.getString("method");
-        JSONObject params = payload.getJSONObject("params");
-
+        String method;
+        JSONObject params;
         JSONObject response;
+
+        try {
+            method = JSONParser.getString("method", payload);
+            params = JSONParser.getJSONObject("params", payload);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Controller.teardown();
+            return Helpers.constructErrorResponse(e.getMessage());
+        }
 
         switch (method) {
             case "signup":
-                response = handleSignup(params);
+                response = Controller.handleSignup(params);
                 break;
             case "login":
-                response = handleLogin(params);
+                response = Controller.handleLogin(params);
                 break;
             case "getUser":
-                response = handleGetUser(params);
+                response = Controller.handleGetUser(params);
                 break;
             case "updateUser":
-                response = handleUpdateUser(params);
+                response = Controller.handleUpdateUser(params);
                 break;
             case "searchUsers":
-                response = handleSearchUsers(params);
+                response = Controller.handleSearchUsers(params);
                 break;
             case "getUsersByIds":
-                response = handleGetUsersByIds(params);
+                response = Controller.handleGetUsersByIds(params);
                 break;
             case "getUsersIdsByUsernames":
-                response = handleGetUsersIdsByUsernames(params);
+                response = Controller.handleGetUsersIdsByUsernames(params);
                 break;
             case "isUserAuthorizedToView":
                 // TODO: Implement logic
@@ -80,8 +90,16 @@ public class Controller extends shared.mq_server.Controller {
                 response = Helpers.constructErrorResponse();
         }
 
-        closeConnection();
+        Controller.teardown();
         return response;
+    }
+
+    private static void initialize() throws IOException {
+        openConnection();
+    }
+
+    private static void teardown() {
+        closeConnection();
     }
 
     private static JSONObject handleSignup(JSONObject params) {
@@ -111,8 +129,8 @@ public class Controller extends shared.mq_server.Controller {
     private static JSONObject handleLogin(JSONObject params) {
         try {
             User user = Logic.login(
-                    params.getString("email"),
-                    params.getString("password")
+                    JSONParser.getString("email", params),
+                    JSONParser.getString("password", params)
             );
 
             String token = JWT.signJWT(
@@ -137,7 +155,7 @@ public class Controller extends shared.mq_server.Controller {
 
     private static JSONObject handleGetUser(JSONObject params) {
         try {
-            User user = Logic.getUser(params.getString("id"));
+            User user = Logic.getUser(JSONParser.getString("id", params));
             return Helpers.constructOKResponse(Helpers.mapUserToJSON(user));
         } catch (CustomException e) {
             e.printStackTrace();
@@ -165,9 +183,9 @@ public class Controller extends shared.mq_server.Controller {
     private static JSONObject handleSearchUsers(JSONObject params) {
         try {
             List<User> users = Logic.searchUsers(
-                    params.getString("term"),
-                    params.getInt("offset"),
-                    params.getInt("limit")
+                    JSONParser.getString("term", params),
+                    JSONParser.getInt("offset", params),
+                    JSONParser.getInt("limit", params)
             );
 
             JSONArray usersJSON = Helpers.convertUsersListToJSONArray(users);
@@ -184,7 +202,7 @@ public class Controller extends shared.mq_server.Controller {
     private static JSONObject handleGetUsersByIds(JSONObject params) {
         try {
             String[] ids = Helpers.convertJSONArrayToList(
-                    params.getJSONArray("ids")
+                    JSONParser.getJSONArray("ids", params)
             ).stream().toArray(String[]::new);
 
             List<User> users = Logic.getUsersByIds(ids);
@@ -203,7 +221,7 @@ public class Controller extends shared.mq_server.Controller {
     private static JSONObject handleGetUsersIdsByUsernames(JSONObject params) {
         try {
             String[] usernames = Helpers.convertJSONArrayToList(
-                    params.getJSONArray("usernames")
+                    JSONParser.getJSONArray("usernames", params)
             ).stream().toArray(String[]::new);
 
             List<String> usersIds = Logic.getUsersIdsByUsernames(usernames);
