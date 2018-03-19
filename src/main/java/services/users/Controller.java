@@ -3,7 +3,6 @@ package services.users;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import persistence.sql.users.User;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +13,7 @@ import static persistence.sql.users.Main.getUsersByIds;
 import static persistence.sql.users.Main.getUsersIdsByUsernames;
 
 
-public class Controller extends shared.MQServer.Controller {
+public class Controller extends shared.mq_server.Controller {
 
 
     public Controller() {
