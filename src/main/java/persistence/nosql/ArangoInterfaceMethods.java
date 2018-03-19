@@ -1058,7 +1058,6 @@ public class ArangoInterfaceMethods {
         }
     }
 
-
     private static JSONObject reformatJSON(JSONObject json){
         String openingArray = "\"\\[";
         String closedArray = "]\"";
