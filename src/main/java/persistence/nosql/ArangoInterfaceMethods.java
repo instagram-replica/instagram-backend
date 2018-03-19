@@ -387,6 +387,35 @@ public class ArangoInterfaceMethods {
 
     }
 
+    public static ArrayList<JSONArray> getFriendsStories(String userID){
+        ArrayList<JSONArray> resultStories = new ArrayList<JSONArray>();
+        ArrayList<String> followers = getAllfollowersIDs("Users/"+ userID);
+        JSONArray friendStories;
+        for(int  i =0 ; i< followers.size();i++){
+            friendStories = getStories(followers.get(i));
+            resultStories.add(friendStories);
+        }
+        return resultStories;
+    }
+
+    public static ArrayList<JSONObject> getFeedForFriends(ArrayList<String> followers,int limit, int offset){
+        ArrayList<JSONObject> results = new ArrayList<JSONObject>();
+        String dbQuery ="for post in Posts FILTER post.user_id in "+ followers.toString() +" SORT post.created_at DESC   LIMIT "+offset+" , "+limit+ " return post";
+        Map<String, Object> bindVars = new MapBuilder().get();
+        ArangoCursor<BaseDocument> cursor = arangoDB.db(dbName).query(dbQuery, bindVars, null,
+                BaseDocument.class);
+        cursor.forEachRemaining(aDocument -> {
+            JSONObject jsonObject = new JSONObject(aDocument.getProperties());
+            results.add(jsonObject);
+            System.out.println("ID follower: " + aDocument.getKey());
+        });
+        return results;
+    }
+
+    public static ArrayList<JSONObject> getFeed(String userID,int limit, int offset){
+        ArrayList<String> followers = getAllfollowersIDs("Users/"+ userID);
+        return getFeedForFriends(followers,limit,offset);
+    }
 
     //POSTS CRUD
     public static String insertPost(JSONObject postJSON, String userId) throws Exception {
