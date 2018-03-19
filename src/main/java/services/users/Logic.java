@@ -68,7 +68,7 @@ public class Logic {
         return matchedUser;
     }
 
-    public static User getProfile(String userId) throws ValidationException, DatabaseException {
+    public static User getUser(String userId) throws ValidationException, DatabaseException {
         ValidationResult validationResult = Validator.validateId(userId);
 
         if (validationResult.type == ValidationResultType.FAILURE) {
@@ -84,7 +84,7 @@ public class Logic {
         return user;
     }
 
-    public static User updateProfile(User user) throws ValidationException, DatabaseException {
+    public static User updateUser(User user) throws ValidationException, DatabaseException {
         ValidationResult validationResult = Validator.validateUser(user);
 
         if (validationResult.type == ValidationResultType.FAILURE) {
@@ -94,20 +94,37 @@ public class Logic {
         return Database.updateUser(user);
     }
 
-    // TODO: Generalize search criteria
-    public static List<User> searchUsersByFullName(String fullName, int offset, int limit) {
-        // TODO: Validate args
+    public static List<User> searchUsers(String term, int offset, int limit) throws ValidationException {
+        ValidationResult validationResult = Validator.validatePaginationArgs(offset, limit);
 
-        return Database.searchUsersByFullName(fullName, offset, limit);
+        if (validationResult.type == ValidationResultType.FAILURE) {
+            throw new ValidationException(validationResult.message);
+        }
+
+        return Database.searchUsersByFullName(term, offset, limit);
     }
 
-    public static List<User> getUsersByIds(String[] ids) {
-        // TODO: Validate args
+    public static List<User> getUsersByIds(String[] ids) throws ValidationException {
+        for (String id : ids) {
+            ValidationResult validationResult = Validator.validateId(id);
+
+            if (validationResult.type == ValidationResultType.FAILURE) {
+                throw new ValidationException(validationResult.message);
+            }
+        }
+
         return Database.getUsersByIds(ids);
     }
 
-    public static List<String> getUsersIdsByUsernames(String[] usernames) {
-        // TODO: Validate args
+    public static List<String> getUsersIdsByUsernames(String[] usernames) throws ValidationException {
+        for (String username : usernames) {
+            ValidationResult validationResult = Validator.validateUsername(username);
+
+            if (validationResult.type == ValidationResultType.FAILURE) {
+                throw new ValidationException(validationResult.message);
+            }
+        }
+
         return Database.getUsersIdsByUsernames(usernames);
     }
 }

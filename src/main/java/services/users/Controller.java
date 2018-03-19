@@ -5,9 +5,7 @@ import auth.JWTPayload;
 import exceptions.CustomException;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import exceptions.DatabaseException;
 import persistence.sql.users.User;
-import exceptions.ValidationException;
 
 import java.util.List;
 
@@ -18,6 +16,8 @@ public class Controller extends shared.mq_server.Controller {
     public Controller() {
         super();
     }
+
+    // TODO: Handle all JSON getters failures
 
     @Override
     public JSONObject execute(JSONObject payload, String viewerId) throws Exception {
@@ -37,11 +37,11 @@ public class Controller extends shared.mq_server.Controller {
             case "login":
                 response = handleLogin(params);
                 break;
-            case "getProfile":
-                response = handleGetProfile(params);
+            case "getUser":
+                response = handleGetUser(params);
                 break;
-            case "updateProfile":
-                response = handleUpdateProfile(params);
+            case "updateUser":
+                response = handleUpdateUser(params);
                 break;
             case "searchUsers":
                 response = handleSearchUsers(params);
@@ -52,32 +52,32 @@ public class Controller extends shared.mq_server.Controller {
             case "getUsersIdsByUsernames":
                 response = handleGetUsersIdsByUsernames(params);
                 break;
+            case "isUserAuthorizedToView":
+                // TODO: Implement logic
+                response = Helpers.constructErrorResponse();
+                break;
             case "followUser":
                 // TODO: Insert follow edge between nodes in ArangoDB graph database
-                response = new JSONObject();
+                response = Helpers.constructErrorResponse();
                 break;
             case "unfollowUser":
                 // TODO: Remove follow edge between nodes in ArangoDB graph database
-                response = new JSONObject();
+                response = Helpers.constructErrorResponse();
                 break;
             case "blockUser":
                 // TODO: Insert block edge between nodes in ArangoDB graph database
-                response = new JSONObject();
+                response = Helpers.constructErrorResponse();
                 break;
             case "unblockUser":
                 // TODO: Remove block edge between nodes in ArangoDB graph database
-                response = new JSONObject();
+                response = Helpers.constructErrorResponse();
                 break;
             case "reportUser":
-                // TODO
-                response = new JSONObject();
-                break;
-            case "isUserAuthorizedToView":
-                // TODO
-                response = new JSONObject();
+                // TODO: Insert report edge between nodes in ArangoDB graph database
+                response = Helpers.constructErrorResponse();
                 break;
             default:
-                response = new JSONObject();
+                response = Helpers.constructErrorResponse();
         }
 
         closeConnection();
@@ -135,9 +135,9 @@ public class Controller extends shared.mq_server.Controller {
         }
     }
 
-    private static JSONObject handleGetProfile(JSONObject params) {
+    private static JSONObject handleGetUser(JSONObject params) {
         try {
-            User user = Logic.getProfile(params.getString("id"));
+            User user = Logic.getUser(params.getString("id"));
             return Helpers.constructOKResponse(Helpers.mapUserToJSON(user));
         } catch (CustomException e) {
             e.printStackTrace();
@@ -148,51 +148,74 @@ public class Controller extends shared.mq_server.Controller {
         }
     }
 
-    private static JSONObject handleUpdateProfile(JSONObject params)
-            throws DatabaseException, ValidationException {
-        // TODO: Handle errors thrown
-
-        User user = Logic.updateProfile(Helpers.mapJSONToUser(params));
-        return Helpers.constructOKResponse(Helpers.mapUserToJSON(user));
+    private static JSONObject handleUpdateUser(JSONObject params) {
+        // TODO: Verify rightful ownership
+        try {
+            User user = Logic.updateUser(Helpers.mapJSONToUser(params));
+            return Helpers.constructOKResponse(Helpers.mapUserToJSON(user));
+        } catch (CustomException e) {
+            e.printStackTrace();
+            return Helpers.constructErrorResponse(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Helpers.constructErrorResponse();
+        }
     }
 
-    // TODO: Generalize search criteria
     private static JSONObject handleSearchUsers(JSONObject params) {
-        // TODO: Handle errors thrown
+        try {
+            List<User> users = Logic.searchUsers(
+                    params.getString("term"),
+                    params.getInt("offset"),
+                    params.getInt("limit")
+            );
 
-        List<User> users = Logic.searchUsersByFullName(
-                params.getString("fullName"),
-                params.getInt("offset"),
-                params.getInt("limit")
-        );
-
-        JSONArray usersJSON = Helpers.convertUsersListToJSONArray(users);
-        return Helpers.constructOKResponse(usersJSON);
+            JSONArray usersJSON = Helpers.convertUsersListToJSONArray(users);
+            return Helpers.constructOKResponse(usersJSON);
+        } catch (CustomException e) {
+            e.printStackTrace();
+            return Helpers.constructErrorResponse(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Helpers.constructErrorResponse();
+        }
     }
 
     private static JSONObject handleGetUsersByIds(JSONObject params) {
-        // TODO: Handle errors thrown
+        try {
+            String[] ids = Helpers.convertJSONArrayToList(
+                    params.getJSONArray("ids")
+            ).stream().toArray(String[]::new);
 
-        String[] ids = Helpers.convertJSONArrayToList(
-                params.getJSONArray("ids")
-        ).stream().toArray(String[]::new);
+            List<User> users = Logic.getUsersByIds(ids);
+            JSONArray usersJSON = Helpers.convertUsersListToJSONArray(users);
 
-        List<User> users = Logic.getUsersByIds(ids);
-        JSONArray usersJSON = Helpers.convertUsersListToJSONArray(users);
-
-        return Helpers.constructOKResponse(usersJSON);
+            return Helpers.constructOKResponse(usersJSON);
+        } catch (CustomException e) {
+            e.printStackTrace();
+            return Helpers.constructErrorResponse(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Helpers.constructErrorResponse();
+        }
     }
 
     private static JSONObject handleGetUsersIdsByUsernames(JSONObject params) {
-        // TODO: Handle errors thrown
+        try {
+            String[] usernames = Helpers.convertJSONArrayToList(
+                    params.getJSONArray("usernames")
+            ).stream().toArray(String[]::new);
 
-        String[] usernames = Helpers.convertJSONArrayToList(
-                params.getJSONArray("usernames")
-        ).stream().toArray(String[]::new);
+            List<String> usersIds = Logic.getUsersIdsByUsernames(usernames);
+            JSONArray usersJSON = Helpers.convertStringsListToJSONArray(usersIds);
 
-        List<String> usersIds = Logic.getUsersIdsByUsernames(usernames);
-        JSONArray usersJSON = Helpers.convertStringsListToJSONArray(usersIds);
-
-        return Helpers.constructOKResponse(usersJSON);
+            return Helpers.constructOKResponse(usersJSON);
+        } catch (CustomException e) {
+            e.printStackTrace();
+            return Helpers.constructErrorResponse(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Helpers.constructErrorResponse();
+        }
     }
 }

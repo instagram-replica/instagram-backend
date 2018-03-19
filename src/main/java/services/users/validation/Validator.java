@@ -165,7 +165,36 @@ public class Validator {
         if (!isValidId(id)) {
             return new ValidationResult(
                     ValidationResultType.FAILURE,
-                    "Invalid user ID: " + id
+                    "Invalid ID: " + id
+            );
+        }
+
+        return new ValidationResult(ValidationResultType.SUCCESS);
+    }
+
+    public static ValidationResult validateUsername(String username) {
+        if (!isValidUsername(username)) {
+            return new ValidationResult(
+                    ValidationResultType.FAILURE,
+                    "Invalid username: " + username
+            );
+        }
+
+        return new ValidationResult(ValidationResultType.SUCCESS);
+    }
+
+    public static ValidationResult validatePaginationArgs(int offset, int limit) {
+        if (offset < 0) {
+            return new ValidationResult(
+                    ValidationResultType.FAILURE,
+                    "Invalid pagination offset: " + offset
+            );
+        }
+
+        if (limit < 0) {
+            return new ValidationResult(
+                    ValidationResultType.FAILURE,
+                    "Invalid pagination limit: " + limit
             );
         }
 
