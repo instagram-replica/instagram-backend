@@ -2,6 +2,7 @@ package services.posts;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import persistence.cache.Cache;
 import persistence.nosql.ArangoInterfaceMethods;
 import shared.Settings;
 
@@ -39,7 +40,11 @@ public class Posts {
         String postId = paramsObject.getString("postId");
         JSONObject post = null;
         try {
-            post = ArangoInterfaceMethods.getPost(postId);
+            post = Cache.getPostFromCache(postId);
+            if(post==null){
+                post = ArangoInterfaceMethods.getPost(postId);
+                Cache.insertPostIntoCache(post,postId);
+            }
             JSONObject response = new JSONObject();
             response.put("method", methodName);
             response.put("post", post);
@@ -60,7 +65,11 @@ public class Posts {
         try {
             if (isAuthorizedToView(Settings.getInstance().getInstanceId(), loggedInUserId, ownerId)) {
                 //@TODO: Check if the user exists
-                JSONArray posts = ArangoInterfaceMethods.getPosts(ownerId);
+                JSONArray posts = Cache.getPostsFromCache(ownerId, pageIndex, pageSize);
+                if(posts==null) {
+                    posts = ArangoInterfaceMethods.getPosts(ownerId);
+                    Cache.insertPostsIntoCache(posts,ownerId,pageIndex,pageSize);
+                }
                 JSONObject response = new JSONObject();
                 response.put("method", methodName);
                 response.put("posts", posts);
@@ -158,6 +167,5 @@ public class Posts {
         int pageIndex = paramsObject.getInt("pageIndex");
         return new JSONObject();
     }
-
 
 }
