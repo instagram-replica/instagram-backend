@@ -32,6 +32,10 @@ public class Helpers {
             model.set("full_name", user.fullName);
         }
 
+        if (user.gender != null) {
+            model.set("gender", user.gender);
+        }
+
         if (user.bio != null) {
             model.set("bio", user.bio);
         }
@@ -80,6 +84,7 @@ public class Helpers {
                 .isPrivate(model.getBoolean("is_private"))
                 .fullName(model.getString("full_name"))
                 .bio(model.getString("bio"))
+                .gender(model.getString("gender"))
                 .phoneNumber(model.getString("phone_number"))
                 .profilePictureUrl(model.getString("profile_picture_url"))
                 .websiteUrl(model.getString("website_url"))
