@@ -1,0 +1,7 @@
+{
+  "instanceId": "activities1",
+  "application": "activities",
+  "port": 8000,
+  "numberOfThreads": 10,
+  "version": "0.1.0"
+}

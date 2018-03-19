@@ -2,7 +2,9 @@ package services.posts;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import persistence.cache.Cache;
 import persistence.nosql.ArangoInterfaceMethods;
+import shared.Settings;
 
 import java.io.IOException;
 
@@ -10,7 +12,6 @@ import static shared.Helpers.createJSONError;
 import static shared.Helpers.isAuthorizedToView;
 
 public class Posts {
-
     //TODO: Updates a post, take care of permissions
     //Done: create JSON req and res for this method in submission1 folder
     public static JSONObject updatePost(JSONObject paramsObject, String loggedInUserId, String methodName) {
@@ -55,7 +56,7 @@ public class Posts {
         try {
             post = ArangoInterfaceMethods.getPost(postId);
             String ownerId = post.getString("user_id");
-            if (isAuthorizedToView("posts", loggedInUserId, ownerId)) {
+            if (isAuthorizedToView(Settings.getInstance().getInstanceId(), loggedInUserId, ownerId)) {
                 //TODO: @USERS_TEAM `getUsers`
             }
         } catch (Exception e) {
@@ -71,7 +72,11 @@ public class Posts {
         JSONObject post = null;
 
         try {
-                post = ArangoInterfaceMethods.getPost(postId);
+                post = Cache.getPostFromCache(postId);
+                if(post==null){
+                    post = ArangoInterfaceMethods.getPost(postId);
+                    Cache.insertPostIntoCache(post,postId);
+                }
                 JSONArray likes = post.getJSONArray("likes");
                 int noOfLikes= likes.length();
                 JSONObject response = new JSONObject();
@@ -103,7 +108,11 @@ public class Posts {
         try {
             if (isAuthorizedToView("posts", loggedInUserId, ownerId) || loggedInUserId.equals(ownerId)) {
                 //@TODO: Check if the user exists
-                JSONArray posts = ArangoInterfaceMethods.getPosts(ownerId);
+                JSONArray posts = Cache.getPostsFromCache(ownerId, pageIndex, pageSize);
+                if(posts==null) {
+                    posts = ArangoInterfaceMethods.getPosts(ownerId);
+                    Cache.insertPostsIntoCache(posts,ownerId,pageIndex,pageSize);
+                }
 
                 /// replacing likes array with no of likes instead
                 for(int i=0; i<posts.length();i++){
@@ -229,7 +238,7 @@ public class Posts {
 //    }s
 
     //TODO:
-    public static JSONObject getTaggedPosts(JSONObject paramsObject, String loggedInUserId) {
+    public static JSONObject getTaggedPosts(JSONObject paramsObject, String loggedInUserId, String methodName) {
         //@TODO: Check if the user has permission to view the other user's profile
         int pageSize = paramsObject.getInt("pageSize");
         int pageIndex = paramsObject.getInt("pageIndex");
@@ -262,6 +271,5 @@ public class Posts {
         int pageIndex = paramsObject.getInt("pageIndex");
         return new JSONObject();
     }
-
 
 }
