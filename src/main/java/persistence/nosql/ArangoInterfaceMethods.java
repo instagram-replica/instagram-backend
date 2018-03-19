@@ -60,7 +60,7 @@ public class ArangoInterfaceMethods {
 
 
     public static void main(String[] args) throws Exception {
-//        arangoDB.db(dbName).drop();
+        //  arangoDB.db(dbName).drop();
         initializeDB();
         initializeGraphCollections();
 
@@ -397,7 +397,7 @@ public class ArangoInterfaceMethods {
             myObject.addAttribute("caption", postJSON.get("caption").toString());
             myObject.addAttribute("media", postJSON.get("media"));
             //TODO: @MAGDY location gets inserted in a wrong way (with key "map")
-            myObject.addAttribute("location", postJSON.getJSONObject("location"));
+//            myObject.addAttribute("location", postJSON.getJSONObject("location"));
             myObject.addAttribute("comments", new ArrayList<>());
             myObject.addAttribute("likes", new ArrayList<>());
             myObject.addAttribute("created_at", new Timestamp(System.currentTimeMillis()));
@@ -467,7 +467,8 @@ public class ArangoInterfaceMethods {
             myObject.addAttribute("caption", postJSON.get("caption").toString());
             myObject.addAttribute("media", postJSON.get("media").toString());
             myObject.addAttribute("likes", postJSON.get("likes").toString());
-            myObject.addAttribute("location", postJSON.get("location").toString());
+            // @Magdy
+//            myObject.addAttribute("location", postJSON.get("location").toString());
             myObject.addAttribute("comments", postJSON.get("comments").toString());
             myObject.addAttribute("created_at", postJSON.get("created_at").toString());
             myObject.addAttribute("updated_at", new Timestamp(System.currentTimeMillis()));
@@ -644,6 +645,7 @@ public class ArangoInterfaceMethods {
                 userDocument.setKey(user_id);
                 arangoDB.db(dbName).graph(graphName).vertexCollection(userCollectionName).insertVertex(userDocument, null);
             }
+            System.out.println("GraphDB was created");
         } catch (ArangoDBException e) {
             System.err.println("Faild to intilize graph: " + e.getMessage());
             return;
@@ -662,7 +664,6 @@ public class ArangoInterfaceMethods {
 
         try {
             ArangoEdgeCollection edgecollection = arangoDB.db(dbName).graph(graphName).edgeCollection(graphUserFollowsCollectionName);
-
             edgecollection.insertEdge(edge, null);
             return true;
         } catch (ArangoDBException e) {
@@ -913,9 +914,11 @@ public class ArangoInterfaceMethods {
         try {
             ArrayList<String> IDs = new ArrayList<>();
             String query = "FOR vertex IN OUTBOUND \""  + userID+"\" "+ graphUserFollowsCollectionName + " RETURN vertex " ;
+            System.out.println(query);
             Map<String, Object> bindVars = new MapBuilder().get();
             ArangoCursor<BaseDocument> cursor = arangoDB.db(dbName).query(query, bindVars, null,
                     BaseDocument.class);
+            System.out.println(cursor.getCount());
             cursor.forEachRemaining(aDocument -> {
                 IDs.add(aDocument.getKey());
                 System.out.println("ID following: " + aDocument.getKey());
@@ -925,7 +928,6 @@ public class ArangoInterfaceMethods {
             System.err.println("Failed to execute query. " + e.getMessage());
             return null;
         }
-
 
     }
 
@@ -1030,6 +1032,7 @@ public class ArangoInterfaceMethods {
         try{
             ArrayList<String> HashtagNames = new ArrayList<>();
             String query = "FOR vertex IN OUTBOUND \""  + postID+"\" "+ graphPostTaggedCollectionName + " RETURN vertex " ;
+            System.out.println(query);
             Map<String, Object> bindVars = new MapBuilder().get();
             ArangoCursor<BaseDocument> cursor = arangoDB.db(dbName).query(query, bindVars, null,
                     BaseDocument.class);
