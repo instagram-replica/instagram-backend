@@ -5,6 +5,7 @@ import auth.JWTPayload;
 import exceptions.CustomException;
 import exceptions.JSONException;
 import json.JSONParser;
+import org.javalite.activejdbc.InitException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import persistence.sql.users.User;
@@ -20,12 +21,14 @@ public class Controller extends shared.mq_server.Controller {
         super();
     }
 
-    // TODO: Handle all JSON getters failures
-
     @Override
-    public JSONObject execute(JSONObject payload, String viewerId) throws IOException {
-        // TODO: Handle failure to connect to JDBC URL
-        Controller.initialize();
+    public JSONObject execute(JSONObject payload, String viewerId) {
+        try {
+            Controller.initialize();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Helpers.constructErrorResponse();
+        }
 
         String method;
         JSONObject params;
