@@ -57,9 +57,9 @@ public class ArangoInterfaceMethods {
 
 
     public static void main(String[] args) throws Exception {
-//        arangoDB.db(dbName).drop();
+        //  arangoDB.db(dbName).drop();
         initializeDB();
-//        initializeGraphCollections();
+        initializeGraphCollections();
 //        String id1 = utilities.Main.generateUUID();
 //        String id2 = utilities.Main.generateUUID();
 //        String userid1 = utilities.Main.generateUUID();
@@ -463,7 +463,7 @@ public class ArangoInterfaceMethods {
             myObject.addAttribute("caption", postJSON.get("caption").toString());
             myObject.addAttribute("media", postJSON.get("media"));
             //TODO: @MAGDY location gets inserted in a wrong way (with key "map")
-            myObject.addAttribute("location", postJSON.getJSONObject("location"));
+//            myObject.addAttribute("location", postJSON.getJSONObject("location"));
             myObject.addAttribute("comments", new ArrayList<>());
             myObject.addAttribute("likes", new ArrayList<>());
             myObject.addAttribute("created_at", new Timestamp(System.currentTimeMillis()));
@@ -670,6 +670,7 @@ public class ArangoInterfaceMethods {
                 userDocument.setKey(user_ids.get(i));
                 arangoDB.db(dbName).graph(graphName).vertexCollection(userCollectionName).insertVertex(userDocument, null);
             }
+            System.out.println("GraphDB was created");
         } catch (ArangoDBException e) {
             System.err.println("Faild to intilize graph: " + e.getMessage());
             return;
