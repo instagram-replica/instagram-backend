@@ -22,6 +22,8 @@ public class Controller extends shared.mq_server.Controller {
                 return Posts.deletePost(paramsObject, userId, methodName);
             case "createPostLike":
                 return Posts.createPostLike(paramsObject, userId, methodName);
+//            case "deletePostLike":
+//                return Posts.deletePostLike(paramsObject,userId,methodName);
             case "createComment":
                 return Comments.createComment(paramsObject, userId, methodName);
             case "getComments":
@@ -30,6 +32,8 @@ public class Controller extends shared.mq_server.Controller {
                 return Comments.createCommentReply(paramsObject, userId, methodName);
             case "getPostLikers":
                 return Posts.getPostLikers(paramsObject, userId, methodName);
+            case "updatePost":
+                return Posts.updatePost(paramsObject,userId,methodName);
         }
 
         JSONObject newJsonObj = new JSONObject();

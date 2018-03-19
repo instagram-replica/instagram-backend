@@ -527,6 +527,7 @@ public class ArangoInterfaceMethods {
     }
 
     public static void updatePost(String id, JSONObject postJSON) {
+        System.out.println(postJSON);
         try {
             BaseDocument myObject = new BaseDocument();
             myObject.addAttribute("user_id", postJSON.get("user_id").toString());
