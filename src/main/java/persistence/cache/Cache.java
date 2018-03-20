@@ -195,15 +195,29 @@ public class Cache {
             }
         }
     }
-    public static void insertActivityIntoCache(JSONObject activity, String activityId) {
+    public static void insertActivityIntoCache(JSONObject activity, String userId) {
         System.out.println("INSERTING INTO CACHE");
         JedisPool pool = new JedisPool(new JedisPoolConfig(), properties.getProperty("host"), Integer.parseInt(properties.getProperty("port")));
         try (Jedis jedis = pool.getResource()) {
-            String key = "notifications$" + activityId;
+            String key = "notifications$" + userId;
             jedis.set(key, activity.toString());
             jedis.expire(key, EXPIRY_TIME);
         }
         pool.close();
+    }
+    public static JSONObject getNotificationsFromCache(String id) {
+        System.out.println("READING FROM CACHE");
+        JedisPool pool = new JedisPool(new JedisPoolConfig(), properties.getProperty("host"), Integer.parseInt(properties.getProperty("port")));
+        try (Jedis jedis = pool.getResource()) {
+            String key = "notifications$" + id;
+            String jsonStory = jedis.get(key);
+            pool.close();
+            if (jsonStory != null) {
+                return new JSONObject(jsonStory);
+            } else {
+                return null;
+            }
+        }
     }
 
 

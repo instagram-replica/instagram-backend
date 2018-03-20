@@ -17,6 +17,7 @@ public class NotificationActions {
 
         JSONObject notificationJSON = new JSONObject();
         JSONObject innerJSON = new JSONObject();
+        JSONObject cachenotifications = new JSONObject();
         innerJSON.put("type", "liking_post");
         innerJSON.put("post_id",postID);
         notificationJSON.put("activity_type",innerJSON);
