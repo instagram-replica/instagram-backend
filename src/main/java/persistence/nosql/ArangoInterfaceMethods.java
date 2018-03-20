@@ -402,6 +402,19 @@ public class ArangoInterfaceMethods {
         return resultStories;
     }
 
+    public static ArrayList<JSONArray> getDiscoverStories(String userID,int limit, int offset){
+        ArrayList<JSONArray> resultStories = new ArrayList<JSONArray>();
+        ArrayList<String> publicFriendOfFriends = getAllfollowingPublicIDsSecondDegree(""+ userID);
+        JSONArray friendStories;
+        for(int  i =offset ; i< offset+limit;i++){
+            friendStories = getStoriesForUser(publicFriendOfFriends.get(i));
+            if(friendStories.length() != 0){
+                resultStories.add(friendStories);
+            }
+        }
+        return resultStories;
+    }
+
     public static JSONArray getNotifications(String user_id, int start, int limit) {
 
         try {
@@ -448,9 +461,14 @@ public class ArangoInterfaceMethods {
 
 
     public static ArrayList<JSONObject> getFeed(String userID,int limit, int offset){
-        ArrayList<String> followers = getAllfollowingIDs(""+ userID);
-        JSONArray jsonFollowersArray = new JSONArray(followers);
-        System.out.println(jsonFollowersArray);
+        ArrayList<String> friends = getAllfollowingIDs(""+ userID);
+        JSONArray jsonFollowersArray = new JSONArray(friends);
+        return getFeedForFriends(jsonFollowersArray,limit,offset);
+    }
+
+    public static ArrayList<JSONObject> getDiscoveryFeed(String userID,int limit, int offset){
+        ArrayList<String> friends = getAllfollowingPublicIDsSecondDegree(""+ userID);
+        JSONArray jsonFollowersArray = new JSONArray(friends);
         return getFeedForFriends(jsonFollowersArray,limit,offset);
     }
 
@@ -987,7 +1005,6 @@ public class ArangoInterfaceMethods {
             Map<String, Object> bindVars = new MapBuilder().get();
             ArangoCursor<BaseDocument> cursor = arangoDB.db(dbName).query(query, bindVars, null,
                     BaseDocument.class);
-            System.out.println(cursor.getCount());
             cursor.forEachRemaining(aDocument -> {
                 IDs.add(aDocument.getKey());
             });
@@ -1017,6 +1034,28 @@ public class ArangoInterfaceMethods {
             return null;
         }
 
+    }
+
+    public static ArrayList<String> getAllfollowingPublicIDsSecondDegree(String userKey){
+        try {
+            String userID = "Users/"+userKey;
+            ArrayList<String> IDs = new ArrayList<>();
+            String query = "FOR vertex IN 2..2 OUTBOUND  \""  + userID+"\" "+ graphUserFollowsCollectionName + " RETURN vertex " ;
+            System.out.println(query);
+            Map<String, Object> bindVars = new MapBuilder().get();
+            ArangoCursor<BaseDocument> cursor = arangoDB.db(dbName).query(query, bindVars, null,
+                    BaseDocument.class);
+            cursor.forEachRemaining(aDocument -> {
+                IDs.add(aDocument.getKey());
+            });
+            IDs.remove(userKey);
+            //TODO Mohamed Abouzeid uncomment this line when done :D
+//            IDs = removePrivateIDs(IDs);
+            return IDs;
+        } catch (ArangoDBException e) {
+            System.err.println("Failed to execute query. " + e.getMessage());
+            return null;
+        }
     }
 
 

@@ -140,6 +140,7 @@ public class ArangoInterfaceTest {
 
 
             user_ids.forEach(ArangoInterfaceMethods::makeUserNode);
+            user_ids.forEach(System.out::println);
 
         } catch (ArangoDBException e) {
             System.err.println("Faild to intilize graph: " + e.getMessage());
@@ -799,6 +800,63 @@ public class ArangoInterfaceTest {
         JSONArray friendsStories = getFriendsStories("3a1eeb08-db5c-4a85-8e44-655165a916d4");
         Assert.assertEquals(4,friendsStories.length());
         Assert.assertEquals(1, ((JSONArray) ((JSONObject) friendsStories.get(0)).get("stories")).length());
+    }
+
+    @Test
+    public void getDiscoveryFeedTests() throws Exception {
+        followUser("f7d59c0a-b9c9-4cc9-ba46-0d79d09eea7b", "12564536-142f-47a3-95b8-02e02269eb7c");
+
+        followUser("12564536-142f-47a3-95b8-02e02269eb7c", "9040bff3-9d59-4c5c-a37d-a53f648b15f7");
+        followUser("12564536-142f-47a3-95b8-02e02269eb7c", "cfeef461-85ec-4468-be2b-a50de09c7b5a");
+        followUser("12564536-142f-47a3-95b8-02e02269eb7c", "fb4c8107-3e96-42e9-be49-13dec0fb2107");
+        followUser("12564536-142f-47a3-95b8-02e02269eb7c", "4198441c-aa1f-4d97-809b-b1ec950c294d");
+        followUser("12564536-142f-47a3-95b8-02e02269eb7c", "c84a6580-6d99-49db-b034-599c03026e04");
+        followUser("12564536-142f-47a3-95b8-02e02269eb7c", "b452dd80-9801-457c-b574-4cecc5045340");
+        followUser("12564536-142f-47a3-95b8-02e02269eb7c", "f7d59c0a-b9c9-4cc9-ba46-0d79d09eea7b");
+        followUser("12564536-142f-47a3-95b8-02e02269eb7c", "9087b6df-b6f5-4de5-856b-a965c1e3d829");
+
+        JSONObject obj1= new JSONObject();
+        obj1.put("caption","Ya raye2 ya ray2");
+        obj1.put("media", new ArrayList<String>());
+        obj1.put("likes", new ArrayList<String>());
+        obj1.put("tags",new ArrayList<String>());
+        obj1.put("location","{ name: EspressoLab, coordinates:{long: 1.0.01.01, lat: 2.1.0.10} }");
+        obj1.put("comments", new ArrayList<String>());
+        obj1.put("created_at",new Timestamp(System.currentTimeMillis()));
+        obj1.put("updated_at",new Timestamp(System.currentTimeMillis()));
+        obj1.put("blocked_at",new Timestamp(System.currentTimeMillis()));
+        obj1.put("deleted_at",new Timestamp(System.currentTimeMillis()));
+
+        JSONObject obj2= new JSONObject();
+        obj2.put("caption","Piza La2");
+        obj2.put("media", new ArrayList<String>());
+        obj2.put("likes", new ArrayList<String>());
+        obj2.put("tags",new ArrayList<String>());
+        obj2.put("location","{ name: D, coordinates:{long: 1.0.01.01, lat: 2.1.0.10} }");
+        obj2.put("comments", new ArrayList<String>());
+        obj2.put("created_at",new Timestamp(System.currentTimeMillis()));
+        obj2.put("updated_at",new Timestamp(System.currentTimeMillis()));
+        obj2.put("blocked_at",new Timestamp(System.currentTimeMillis()));
+        obj2.put("deleted_at",new Timestamp(System.currentTimeMillis()));
+
+        JSONObject obj3= new JSONObject();
+        obj3.put("caption","lo2lo2a");
+        obj3.put("media", new ArrayList<String>());
+        obj3.put("likes", new ArrayList<String>());
+        obj3.put("tags",new ArrayList<String>());
+        obj3.put("location","{ name: hopa, coordinates:{long: 1.22.01.01, lat: 2.1.0.10} }");
+        obj3.put("comments", new ArrayList<String>());
+        obj3.put("created_at",new Timestamp(System.currentTimeMillis()));
+        obj3.put("updated_at",new Timestamp(System.currentTimeMillis()));
+        obj3.put("blocked_at",new Timestamp(System.currentTimeMillis()));
+        obj3.put("deleted_at",new Timestamp(System.currentTimeMillis()));
+
+        ArangoInterfaceMethods.insertPost(obj1,"9040bff3-9d59-4c5c-a37d-a53f648b15f7");
+        ArangoInterfaceMethods.insertPost(obj2,"9040bff3-9d59-4c5c-a37d-a53f648b15f7");
+        ArangoInterfaceMethods.insertPost(obj3,"9040bff3-9d59-4c5c-a37d-a53f648b15f7");
+
+        Assert.assertEquals(3,getDiscoveryFeed("f7d59c0a-b9c9-4cc9-ba46-0d79d09eea7b",100,0).size());
+
     }
 
     @Test
