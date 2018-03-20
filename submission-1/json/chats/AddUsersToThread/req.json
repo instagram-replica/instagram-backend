@@ -1,0 +1,14 @@
+{
+	"method" : "addUsersToThread",
+	"params" : {
+		"users": [
+			{
+				"id": 132
+			},
+			{
+				"id": 12314
+			}
+		],
+		"threadId" : 123
+	}
+}

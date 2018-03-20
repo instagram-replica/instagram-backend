@@ -1,0 +1,19 @@
+{
+  "method" : "getThreads",
+  "response":{
+    "threads": [
+      {
+        "threadId": 213,
+        "name": "7amada ezzayak"
+      },
+      {
+        "threadId": 233,
+        "name": "el7amdolellah"
+      },
+      {
+        "threadId": 2123,
+        "name": "yalla yad"
+      }
+    ]
+  }
+}
