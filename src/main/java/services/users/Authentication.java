@@ -1,6 +1,7 @@
 package services.users;
 import auth.JWTPayload;
 
+import persistence.nosql.ArangoInterfaceMethods;
 import persistence.sql.users.Main;
 import persistence.sql.users.User;
 import org.json.JSONObject;
@@ -42,6 +43,8 @@ public class Authentication {
 //        newUser.setProfilePictureUrl(params.getString("avatar"));
         newUser.setPhoneNumber(params.getString("phone"));
         newUser.setPasswordHash(hashPassword(params.getString("password")));
+
+        ArangoInterfaceMethods.makeUserNode(newUser.getId());
 
         boolean created = Main.createUser(newUser);
 
