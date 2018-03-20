@@ -718,9 +718,9 @@ public class ArangoInterfaceTest {
         post.put("caption","hello");
         post.put("media",new ArrayList<String>());
         post.put("comments",new ArrayList<String>());
-        String postID = ArangoInterfaceMethods.insertPost(post,userId1);
-        ArangoInterfaceMethods.followUser("Users/"+userId2,"Users/"+userId1);
-        ArangoInterfaceMethods.likePost(postID,userId2);
+        String postID = insertPost(post,userId1);
+        followUser(userId2,userId1);
+        likePost(postID,userId2);
         String receiverId = userId1;
         JSONObject notificationJSON = new JSONObject();
         JSONObject innerJSON = new JSONObject();
@@ -732,12 +732,10 @@ public class ArangoInterfaceTest {
         notificationJSON.put("created_at",new java.util.Date());
         notificationJSON.put("blocked_at","null");
         notificationJSON.put("id",utilities.Main.generateUUID());
-        ArangoInterfaceMethods.insertNotification(notificationJSON);
-        ArangoInterfaceMethods.insertActivity(notificationJSON);
+        insertNotification(notificationJSON);
+        insertActivity(notificationJSON);
 
-        Assert.assertTrue(ArangoInterfaceMethods.getNotifications(userId1,0,5).length()==1);
-        System.out.println("HEERE:  "+ArangoInterfaceMethods.getNotifications(userId1,0,5));
-
+        Assert.assertTrue(getNotifications(userId1,0,5).length()==1);
     }
 
     @Test
@@ -746,9 +744,9 @@ public class ArangoInterfaceTest {
         String userId2 = utilities.Main.generateUUID() ;
         String userId3 = utilities.Main.generateUUID() ;
 
-        ArangoInterfaceMethods.makeUserNode(userId1);
-        ArangoInterfaceMethods.makeUserNode(userId2);
-        ArangoInterfaceMethods.makeUserNode(userId3);
+        makeUserNode(userId1);
+        makeUserNode(userId2);
+        makeUserNode(userId3);
 
         JSONObject post = new JSONObject();
 
@@ -756,14 +754,14 @@ public class ArangoInterfaceTest {
         post.put("caption","hello");
         post.put("media",new ArrayList<String>());
         post.put("comments",new ArrayList<String>());
-        String postID = ArangoInterfaceMethods.insertPost(post,userId1);
-        ArangoInterfaceMethods.followUser("Users/"+userId2,"Users/"+userId1);
-        ArangoInterfaceMethods.followUser("Users/"+userId3,"Users/"+userId2);
-        ArangoInterfaceMethods.likePost(postID,userId2);
+        String postID = insertPost(post,userId1);
+        followUser(userId2,userId1);
+        followUser(userId3,userId2);
+        likePost(postID,userId2);
         JSONObject comment = new JSONObject();
         comment.put("content","hello");
         comment.put("user_id",userId2);
-        ArangoInterfaceMethods.insertCommentOnPost(postID,comment);
+        insertCommentOnPost(postID,comment);
         String receiverId = userId1;
         JSONObject notificationJSON = new JSONObject();
         JSONObject innerJSON = new JSONObject();
@@ -775,13 +773,13 @@ public class ArangoInterfaceTest {
         notificationJSON.put("created_at",new java.util.Date());
         notificationJSON.put("blocked_at","null");
         notificationJSON.put("id",utilities.Main.generateUUID());
-        ArangoInterfaceMethods.insertNotification(notificationJSON);
-        ArangoInterfaceMethods.insertActivity(notificationJSON);
+        insertNotification(notificationJSON);
+        insertActivity(notificationJSON);
 
-        Assert.assertTrue(ArangoInterfaceMethods.getNotifications(userId1,0,5).length()==1);
+        Assert.assertTrue(getNotifications(userId1,0,5).length()==1);
 
-        ArrayList<String> followings = ArangoInterfaceMethods.getAllfollowingIDs("Users/" + userId3);
-        Assert.assertEquals(ArangoInterfaceMethods.getActivities(followings,0,5).length(), 1);
+        ArrayList<String> followings = getAllfollowingIDs(userId3);
+        Assert.assertEquals(getActivities(followings,0,5).length(), 1);
 
     }
 
