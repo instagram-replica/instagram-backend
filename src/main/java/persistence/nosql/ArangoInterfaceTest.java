@@ -140,7 +140,6 @@ public class ArangoInterfaceTest {
 
 
             user_ids.forEach(ArangoInterfaceMethods::makeUserNode);
-            user_ids.forEach(System.out::println);
 
         } catch (ArangoDBException e) {
             System.err.println("Faild to intilize graph: " + e.getMessage());
@@ -802,6 +801,7 @@ public class ArangoInterfaceTest {
         Assert.assertEquals(1,friendsStories.get(0).length());
     }
 
+
     @Test
     public void getDiscoveryFeedTests() throws Exception {
         followUser("f7d59c0a-b9c9-4cc9-ba46-0d79d09eea7b", "12564536-142f-47a3-95b8-02e02269eb7c");
@@ -856,6 +856,42 @@ public class ArangoInterfaceTest {
         ArangoInterfaceMethods.insertPost(obj3,"9040bff3-9d59-4c5c-a37d-a53f648b15f7");
 
         Assert.assertEquals(3,getDiscoveryFeed("f7d59c0a-b9c9-4cc9-ba46-0d79d09eea7b",100,0).size());
+
+    }
+
+    @Test
+    public void getDiscoverStoriesTest(){
+        followUser("e03168b3-226a-415d-9838-524f104f6348", "4441c5b9-a459-48f0-ab39-afec995746a3");
+
+        followUser("4441c5b9-a459-48f0-ab39-afec995746a3", "4c22c88e-69b3-46a3-b159-c394856a5355");
+        followUser("4441c5b9-a459-48f0-ab39-afec995746a3", "9235f108-fc46-4308-870d-bb0b1542bdab");
+        followUser("4441c5b9-a459-48f0-ab39-afec995746a3", "da1f5e4a-98bf-4873-8327-aadaf3d73ad4");
+        followUser("4441c5b9-a459-48f0-ab39-afec995746a3", "1c139068-1ffe-4c5c-896c-09bba1e8ce90");
+
+        JSONObject obj = new JSONObject();
+        obj.put("user_id", "4c22c88e-69b3-46a3-b159-c394856a5355");
+        obj.put("is_featured", false);
+        obj.put("media_id", utilities.Main.generateUUID());
+        obj.put("reports", new ArrayList<String>());
+        obj.put("seen_by_users_ids", new ArrayList<String>());
+        obj.put("created_at", new Timestamp(System.currentTimeMillis()));
+        obj.put("deleted_at", new Timestamp(System.currentTimeMillis()));
+        obj.put("expired_at", new Timestamp(System.currentTimeMillis()));
+        obj.put("blocked_at", new Timestamp(System.currentTimeMillis()));
+
+        String id1 = ArangoInterfaceMethods.insertStory(obj);
+
+        obj.put("user_id","9235f108-fc46-4308-870d-bb0b1542bdab");
+        String id2 = ArangoInterfaceMethods.insertStory(obj);
+
+        obj.put("user_id","da1f5e4a-98bf-4873-8327-aadaf3d73ad4");
+        String id3 = ArangoInterfaceMethods.insertStory(obj);
+
+        obj.put("user_id","1c139068-1ffe-4c5c-896c-09bba1e8ce90");
+        String id4 = ArangoInterfaceMethods.insertStory(obj);
+
+        JSONArray friendsStories = getDiscoverStories("e03168b3-226a-415d-9838-524f104f6348");
+        Assert.assertEquals(4,friendsStories.length());
 
     }
 

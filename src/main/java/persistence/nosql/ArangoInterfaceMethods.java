@@ -399,14 +399,20 @@ public class ArangoInterfaceMethods {
         return resultStories;
     }
 
-    public static ArrayList<JSONArray> getDiscoverStories(String userID,int limit, int offset){
-        ArrayList<JSONArray> resultStories = new ArrayList<JSONArray>();
+    public static JSONArray getDiscoverStories(String userID){
+        JSONArray resultStories = new JSONArray();
         ArrayList<String> publicFriendOfFriends = getAllfollowingPublicIDsSecondDegree(""+ userID);
+
+        Collections.shuffle(publicFriendOfFriends);
         JSONArray friendStories;
-        for(int  i =offset ; i< offset+limit;i++){
+        int min = Math.min(10,publicFriendOfFriends.size());
+        for(int  i =0 ; i< min;i++){
             friendStories = getStoriesForUser(publicFriendOfFriends.get(i));
+            JSONObject JSONUserStories = new JSONObject();
+            JSONUserStories.put("user_id",publicFriendOfFriends.get(i));
+            JSONUserStories.put("user_id",friendStories);
             if(friendStories.length() != 0){
-                resultStories.add(friendStories);
+                resultStories.put(JSONUserStories);
             }
         }
         return resultStories;
