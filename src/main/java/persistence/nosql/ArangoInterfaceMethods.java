@@ -9,6 +9,7 @@ import com.arangodb.*;
 import com.arangodb.entity.*;
 import com.arangodb.model.GraphCreateOptions;
 import com.arangodb.util.MapBuilder;
+import exceptions.CustomException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -127,19 +128,15 @@ public class ArangoInterfaceMethods {
         return null;
     }
 
-    public static JSONObject getThread(String id) {
-        try {
+    public static JSONObject getThread(String id) throws CustomException{
             BaseDocument threadDoc = arangoDB.db(dbName).collection(threadsCollectionName).getDocument(id,
                     BaseDocument.class);
             if (threadDoc == null) {
-                throw new ArangoDBException("Thread with ID: " + id + " Not Found");
+                throw new CustomException("Thread with ID: " + id + " Not Found");
             }
             JSONObject threadJSON = new JSONObject(threadDoc.getProperties());
             return reformatJSON(threadJSON);
-        } catch (ArangoDBException e) {
-            System.err.println("Failed to get Thread: " + e.getMessage());
-            return null;
-        }
+
     }
 
     public static void updateThread(String id, JSONObject threadJSON) {
@@ -191,19 +188,15 @@ public class ArangoInterfaceMethods {
         return null;
     }
 
-    public static JSONObject getNotification(String id) {
-        try {
+    public static JSONObject getNotification(String id) throws CustomException{
             BaseDocument notificationDoc = arangoDB.db(dbName).collection(notificationsCollectionName).getDocument(id,
                     BaseDocument.class);
             if (notificationDoc == null) {
-                throw new ArangoDBException("Notification with ID: " + id + " Not Found");
+                throw new CustomException("Notification with ID: " + id + " Not Found");
             }
             JSONObject notificationJSON = new JSONObject(notificationDoc.getProperties());
             return reformatJSON(notificationJSON);
-        } catch (ArangoDBException e) {
-            System.err.println("Failed to get Notification: " + e.getMessage());
-            return null;
-        }
+
     }
 
     public static void updateNotification(String id, JSONObject notificationJSON) {
@@ -253,19 +246,16 @@ public class ArangoInterfaceMethods {
         return null;
     }
 
-    public static JSONObject getActivity(String id) {
-        try {
+    public static JSONObject getActivity(String id) throws CustomException{
+
             BaseDocument activityDoc = arangoDB.db(dbName).collection(activitiesCollectionName).getDocument(id,
                     BaseDocument.class);
             if (activityDoc == null) {
-                throw new ArangoDBException("Activity with ID: " + id + " Not Found");
+                throw new CustomException("Activity with ID: " + id + " Not Found");
             }
             JSONObject activityJSON = new JSONObject(activityDoc.getProperties());
             return reformatJSON(activityJSON);
-        } catch (ArangoDBException e) {
-            System.err.println("Failed to get Activity: " + e.getMessage());
-            return null;
-        }
+
     }
 
     public static void updateActivity(String id, JSONObject activityJSON) {
@@ -319,19 +309,15 @@ public class ArangoInterfaceMethods {
         return null;
     }
 
-    public static JSONObject getStory(String id) {
-        try {
+    public static JSONObject getStory(String id) throws CustomException{
+
             BaseDocument storyDoc = arangoDB.db(dbName).collection(storiesCollectionName).getDocument(id,
                     BaseDocument.class);
             if (storyDoc == null) {
-                throw new ArangoDBException("Story with ID: " + id + " Not Found");
+                throw new CustomException("Story with ID: " + id + " Not Found");
             }
             JSONObject storyJSON = new JSONObject(storyDoc.getProperties());
             return reformatJSON(storyJSON);
-        } catch (ArangoDBException e) {
-            System.err.println("Failed to get Story: " + e.getMessage());
-            return null;
-        }
     }
 
     public static boolean updateStory(String id, JSONObject storyJSON) {
@@ -389,9 +375,7 @@ public class ArangoInterfaceMethods {
 
 
     //POSTS CRUD
-    public static String insertPost(JSONObject postJSON, String userId) throws Exception {
-        try {
-
+    public static String insertPost(JSONObject postJSON, String userId) throws JSONException {
             BaseDocument myObject = new BaseDocument();
             myObject.addAttribute("user_id", userId);
             myObject.addAttribute("caption", postJSON.get("caption").toString());
@@ -407,21 +391,14 @@ public class ArangoInterfaceMethods {
             String id = arangoDB.db(dbName).collection(postsCollectionName).insertDocument(myObject).getKey();
             System.out.println("Post inserted");
             return id;
-        } catch (ArangoDBException e) {
-            System.err.println("Failed to insert Post. " + e.getMessage());
-            return "";
-        } catch (JSONException e) {
-            throw new Exception(e.getMessage());
-        }
-//        return null;
     }
 
-    public static JSONObject getPost(String id) throws Exception {
+    public static JSONObject getPost(String id) throws CustomException, ArangoDBException {
         try {
             BaseDocument postDoc = arangoDB.db(dbName).collection(postsCollectionName).getDocument(id,
                     BaseDocument.class);
             if (postDoc == null) {
-                throw new Exception("Post with ID: " + id + " Not Found");
+                throw new CustomException("Post with ID: " + id + " Not Found");
             }
             JSONObject postJSON = new JSONObject(postDoc.getProperties());
             postJSON.put("id", postDoc.getKey());
@@ -454,8 +431,6 @@ public class ArangoInterfaceMethods {
     }
 
     public static void updatePost(String id, JSONObject postJSON) {
-        System.out.println(postJSON);
-        try {
             BaseDocument myObject = new BaseDocument();
             myObject.addAttribute("user_id", postJSON.get("user_id").toString());
             myObject.addAttribute("caption", postJSON.get("caption").toString());
@@ -472,11 +447,6 @@ public class ArangoInterfaceMethods {
                 myObject.addAttribute("deleted_at", postJSON.get("deleted_at").toString());
             arangoDB.db(dbName).collection(postsCollectionName).updateDocument(id, postJSON.toString());
             System.out.println("Post Updated");
-        } catch (ArangoDBException e) {
-            System.err.println("Failed to Update Post. " + e.getMessage());
-        } catch (JSONException e) {
-            System.err.println("JSON Post Incorrect format. " + e.getMessage());
-        }
     }
 
     public static void deletePost(String id) {
@@ -506,19 +476,15 @@ public class ArangoInterfaceMethods {
         return null;
     }
 
-    public static JSONObject getBookmark(String id) {
-        try {
+    public static JSONObject getBookmark(String id) throws CustomException, ArangoDBException {
+
             BaseDocument bookmarkDoc = arangoDB.db(dbName).collection(bookmarksCollectionName).getDocument(id,
                     BaseDocument.class);
             if (bookmarkDoc == null) {
-                throw new ArangoDBException("Bookmark with ID: " + id + " Not Found");
+                throw new CustomException("Bookmark with ID: " + id + " Not Found");
             }
             JSONObject bookmarkJSON = new JSONObject(bookmarkDoc.getProperties());
             return reformatJSON(bookmarkJSON);
-        } catch (ArangoDBException e) {
-            System.err.println("Failed to get Bookmark: " + e.getMessage());
-            return null;
-        }
     }
 
     public static void updateBookmark(String id, JSONObject bookmarkJSON) {
@@ -558,23 +524,20 @@ public class ArangoInterfaceMethods {
         updatePost(postID, post);
     }
 
-    public static JSONArray getCommentsOnPost(String postID){
-        try {
+    public static JSONArray getCommentsOnPost(String postID) throws CustomException{
+
             BaseDocument postDoc = arangoDB.db(dbName).collection(postsCollectionName).getDocument(postID,
                     BaseDocument.class);
             if(postDoc == null){
-                throw new ArangoDBException("Post with ID: " + postID +" Not Found");
+                throw new CustomException("Post with ID: " + postID +" Not Found");
             }
             JSONObject postJSON  = new JSONObject(postDoc.getProperties());
             return (JSONArray) reformatJSON(postJSON).get("comments");
-        } catch (ArangoDBException e) {
-            System.err.println("Failed to get Post: " + e.getMessage());
-            return null;
-        }
+
     }
 
 
-    public static void insertMessageOnThread(String threadID, JSONObject message){
+    public static void insertMessageOnThread(String threadID, JSONObject message) throws CustomException{
         JSONObject post = getThread(threadID);
         ((JSONArray) post.get("messages")).put(message);
         updatePost(threadID,post);
