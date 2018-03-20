@@ -9,6 +9,7 @@ import shared.Settings;
 import java.io.IOException;
 
 import static shared.Helpers.createJSONError;
+import static shared.Helpers.getUsersByIds;
 import static shared.Helpers.isAuthorizedToView;
 
 public class Posts {
@@ -56,8 +57,12 @@ public class Posts {
         try {
             post = ArangoInterfaceMethods.getPost(postId);
             String ownerId = post.getString("user_id");
-            if (isAuthorizedToView(Settings.getInstance().getInstanceId(), loggedInUserId, ownerId)) {
-                //TODO: @USERS_TEAM `getUsers`
+            JSONArray userIds = post.getJSONArray("likes");
+            if (isAuthorizedToView("posts", loggedInUserId, ownerId)) {
+                JSONObject response = new JSONObject();
+                response.put("method", methodName);
+                response.put("users", getUsersByIds("posts", userIds));
+                return response;
             }
         } catch (Exception e) {
             e.printStackTrace();

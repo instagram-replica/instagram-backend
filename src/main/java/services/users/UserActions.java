@@ -1,9 +1,17 @@
 package services.users;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import persistence.sql.users.Main;
 import persistence.sql.users.User;
 
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static persistence.sql.users.Main.getUsersByIds;
+import static persistence.sql.users.Main.getUsersIdsByUsernames;
 import static shared.Helpers.createJSONError;
 
 public class UserActions {
@@ -109,6 +117,31 @@ public class UserActions {
         }
 
         return jObject;
+    }
+
+    public static JSONObject GetUsersByIds(JSONObject paramsObject, String loggedInUserId) {
+        //Todo: Make use of the loggedInUserId
+        ArrayList<String> usersIds = new ArrayList<>();
+        JSONArray usersIdsJSON = paramsObject.getJSONArray("ids");
+
+        usersIdsJSON.forEach(userId -> usersIds.add((String) userId));
+
+        try {
+            List<User> users = getUsersByIds(usersIds);
+            return new JSONObject()
+                    .put("data", new JSONObject().put("users", new JSONArray(users)));
+        } catch (Exception e) {
+            return createJSONError(e.getMessage());
+        }
+    }
+
+    public static JSONObject GetUsersIdsByUsernames(JSONObject params, String loggedInUserId) {
+        ArrayList<String> usersNames = new ArrayList<>();
+        params.getJSONArray("usernames").forEach(username -> usersNames.add((String) username));
+
+        List<String> ids = getUsersIdsByUsernames(usersNames);
+        return new JSONObject()
+                .put("data", new JSONObject().put("ids", new JSONArray(ids)));
     }
 
     public static JSONObject CreateUserReport(JSONObject paramsObject, String loggedInUserId) {

@@ -4,6 +4,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import persistence.sql.users.User;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static persistence.sql.Main.closeConnection;
@@ -50,20 +51,10 @@ public class Controller extends shared.mq_server.Controller {
                 resJSON = Authentication.authorizedToView(paramsObject.getString("viewerId"), paramsObject.getString("toBeViewedId"));
                 break;
             case "getUsersByIds":
-                // TODO @maged: Refactor logic into dedicated file
-                List<User> users = getUsersByIds(
-                        new String[] {} // TODO @magdy: Swap with data from params object
-                );
-                resJSON = new JSONObject()
-                        .put("response", new JSONObject().put("data", new JSONArray(users)));
+                resJSON = UserActions.GetUsersByIds(paramsObject, userId);
                 break;
             case "getUsersIdsByUsernames":
-                // TODO @maged: Refactor logic into dedicated file
-                List<String> ids = getUsersIdsByUsernames(
-                        new String[] {} // TODO @magdy: Swap with data from params object
-                );
-                resJSON = new JSONObject()
-                        .put("response", new JSONObject().put("data", new JSONArray(ids)));
+                resJSON = UserActions.GetUsersIdsByUsernames(paramsObject, userId);
                 break;
         }
         closeConnection();

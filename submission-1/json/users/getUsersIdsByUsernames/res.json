@@ -1,0 +1,9 @@
+{
+  "method": "getUsersIdsByUsernames",
+  "data": {
+    "ids": [
+      "asjhdajsd",
+      "asdasdasd"
+    ]
+  }
+}
