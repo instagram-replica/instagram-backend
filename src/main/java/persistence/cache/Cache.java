@@ -195,6 +195,16 @@ public class Cache {
             }
         }
     }
+    public static void insertActivityIntoCache(JSONObject activity, String activityId) {
+        System.out.println("INSERTING INTO CACHE");
+        JedisPool pool = new JedisPool(new JedisPoolConfig(), properties.getProperty("host"), Integer.parseInt(properties.getProperty("port")));
+        try (Jedis jedis = pool.getResource()) {
+            String key = "notifications$" + activityId;
+            jedis.set(key, activity.toString());
+            jedis.expire(key, EXPIRY_TIME);
+        }
+        pool.close();
+    }
 
 
 }
