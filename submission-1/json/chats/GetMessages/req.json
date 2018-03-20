@@ -1,0 +1,8 @@
+{
+  "method" : "createThread",
+  "params":{
+    "threadId" : 12,
+    "pageSize": 5,
+    "pageIndex": 1
+  }
+}
