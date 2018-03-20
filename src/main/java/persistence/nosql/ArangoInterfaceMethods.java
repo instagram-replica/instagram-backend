@@ -567,10 +567,10 @@ public class ArangoInterfaceMethods {
     }
 
 
-    public static void insertMessageOnThread(String threadID, JSONObject message) throws CustomException{
-        JSONObject post = getThread(threadID);
-        ((JSONArray) post.get("messages")).put(message);
-        updatePost(threadID,post);
+    public static void insertMessageOnThread(String threadID, JSONObject message) throws CustomException {
+        JSONObject thread = getThread(threadID);
+        ((JSONArray) thread.get("messages")).put(message);
+        updateThread(threadID, thread);
     }
 
 

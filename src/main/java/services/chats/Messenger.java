@@ -27,8 +27,10 @@ public class Messenger {
 
         JSONObject res = new JSONObject();
         res.put("id", messageId);
+        res.put("user_id", userId);
         res.put("text", params.getString("text"));
         res.put("created_at", time);
+
         return res;
     }
 
@@ -47,14 +49,12 @@ public class Messenger {
         //get users and join them
         JSONArray users = paramsObject.getJSONArray("threadUsers");
         for (int i = 0; i < users.length(); i++) {
-            ArangoInterfaceMethods.joinThread(users.getJSONObject(i).getString("id"),threadId);
+            ArangoInterfaceMethods.joinThread(users.getJSONObject(i).getString("id"), threadId);
         }
-        JSONObject threadIdObject = new JSONObject();
-        threadIdObject.put("threadId", threadId);
-        return threadIdObject;
+        return new JSONObject().put("threadId", threadId);
     }
 
-    public static JSONObject getMessages(JSONObject paramsObject, String userId) throws CustomException{
+    public static JSONObject getMessages(JSONObject paramsObject, String userId) throws CustomException {
         JSONObject res = new JSONObject();
         String threadId = paramsObject.getString("threadId");
         JSONObject thread = ArangoInterfaceMethods.getThread(threadId);
@@ -65,11 +65,9 @@ public class Messenger {
         int end = offset + pageSize;
         ArrayList<JSONObject> messagesToReturn = new ArrayList<>();
 
-        for (int i = offset; i < end; i++) {
-            if(messages.getJSONObject(i)!=null)
-                messagesToReturn.add(messages.getJSONObject(i));
-            else
-                break;
+        int minEnd = end < messages.length() ? end : messages.length();
+        for (int i = offset; i < minEnd; i++) {
+            messagesToReturn.add(messages.getJSONObject(i));
         }
 
         JSONArray resultMessages = new JSONArray(messagesToReturn);
@@ -79,7 +77,7 @@ public class Messenger {
         return res;
     }
 
-    public static JSONObject getThreads(JSONObject paramsObject, String userId) throws  CustomException{
+    public static JSONObject getThreads(JSONObject paramsObject, String userId) throws CustomException {
         ArrayList<String> threadsIds = ArangoInterfaceMethods.getAllThreadsForUser(userId);
         ArrayList<JSONObject> threads = new ArrayList<>();
         for (int i = 0; i < threadsIds.size(); i++) {
