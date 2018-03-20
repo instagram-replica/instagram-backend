@@ -110,10 +110,7 @@ public class UserActions {
 
         return jObject;
     }
-
-    //TODO delete blocks
-    //TODO check blocks
-
+    
     public static JSONObject CreateUserReport(JSONObject paramsObject, String loggedInUserId) {
         //TODO: Test this via postman
         JSONObject jsonObject = new JSONObject();
