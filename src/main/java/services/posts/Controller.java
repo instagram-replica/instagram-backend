@@ -29,8 +29,8 @@ public class Controller extends shared.mq_server.Controller{
                 data = Posts.deletePost(paramsObject, userId, methodName); break;
             case "createPostLike":
                 data = Posts.createPostLike(paramsObject, userId, methodName); break;
-//            case "deletePostLike":
-//                return Posts.deletePostLike(paramsObject,userId,methodName); break;
+            case "deletePostLike":
+                data= Posts.deletePostLike(paramsObject,userId,methodName); break;
             case "createComment":
                 data = Comments.createComment(paramsObject, userId, methodName); break;
             case "getComments":

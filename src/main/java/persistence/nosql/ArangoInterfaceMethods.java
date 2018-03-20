@@ -470,6 +470,11 @@ public class ArangoInterfaceMethods {
         updatePost(postID, post);
     }
 
+    public static void unlikePost(String postID, String userID) throws Exception {
+        String dbQuery = "FOR post IN Posts FILTER post._key == '"+postID+"' UPDATE post WITH { likes: REMOVE_VALUE( post.likes, '"+userID+"' ) } IN Posts";
+        arangoDB.db(dbName).query(dbQuery, null, null, null);
+    }
+
     public static void updatePost(String id, JSONObject postJSON) {
             BaseDocument myObject = new BaseDocument();
             myObject.addAttribute("user_id", postJSON.get("user_id").toString());

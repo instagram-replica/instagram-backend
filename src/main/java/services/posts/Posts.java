@@ -9,7 +9,11 @@ import persistence.nosql.ArangoInterfaceMethods;
 import shared.Settings;
 
 import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.ArrayList;
 
+import static persistence.nosql.ArangoInterfaceMethods.makeHashtagNode;
+import static persistence.nosql.ArangoInterfaceMethods.tagPostInHashtag;
 import static shared.Helpers.createJSONError;
 import static shared.Helpers.isAuthorizedToView;
 
@@ -183,27 +187,28 @@ public class Posts {
             return response;
     }
 
-//    public static JSONObject deletePostLike(JSONObject paramsObject, String loggedInUserId, String methodName){
-//        String postId = paramsObject.getString("postId");
-//        try {
-//            JSONObject post = ArangoInterfaceMethods.getPost(postId);
-//            JSONArray likes = post.getJSONArray("likes");
-//            for (int i = 0; i < likes.length(); i++) {
-//                if (likes.get(i).equals(loggedInUserId)) {
-//                ArangoInterfaceMethods.unlikePost(postId, loggedInUserId);
-//                JSONObject res = new JSONObject();
-//                JSONObject response = new JSONObject();
-//                response.put("method", methodName);
-//                res.put("postID", postId);
-//                response.put("response", res);
-//                    return response;
-//            }
-//        }
-//            return createJSONError("You have not liked this post");
-//        } catch (Exception e) {
-//            return createJSONError(e.getMessage());
-//        }
-//    }s
+    public static JSONObject deletePostLike(JSONObject paramsObject, String loggedInUserId, String methodName){
+        String postId = paramsObject.getString("postId");
+        System.out.println("hena///////////////");
+        try {
+            JSONObject post = ArangoInterfaceMethods.getPost(postId);
+            JSONArray likes = post.getJSONArray("likes");
+            for (int i = 0; i < likes.length(); i++) {
+                if (likes.get(i).equals(loggedInUserId)) {
+                ArangoInterfaceMethods.unlikePost(postId, loggedInUserId);
+                JSONObject res = new JSONObject();
+                JSONObject response = new JSONObject();
+                response.put("method", methodName);
+                res.put("postID", postId);
+                response.put("response", res);
+                    return response;
+            }
+        }
+            return createJSONError("You have not liked this post");
+        } catch (Exception e) {
+            return createJSONError(e.getMessage());
+        }
+    }
 
     //TODO:
     public static JSONObject getTaggedPosts(JSONObject paramsObject, String loggedInUserId, String methodName) {
@@ -234,10 +239,34 @@ public class Posts {
     }
 
     //TODO:
-    public static JSONObject getHashtagPosts(JSONObject paramsObject, String loggedInUserId) {
-        int pageSize = paramsObject.getInt("pageSize");
-        int pageIndex = paramsObject.getInt("pageIndex");
-        return new JSONObject();
+    public static JSONObject getHashtagPosts(JSONObject paramsObject, String loggedInUserId, String methodName) {
+     //   int pageSize = paramsObject.getInt("pageSize");
+     //   int pageIndex = paramsObject.getInt("pageIndex");
+
+        JSONObject obj2= new JSONObject();
+        obj2.put("user_id",loggedInUserId);
+        obj2.put("caption","Taken By Mohamed ABouzeid");
+        obj2.put("media", new ArrayList<String>());
+        obj2.put("likes", new ArrayList<String>());
+        obj2.put("tags",new ArrayList<String>());
+        obj2.put("location","{ name: C1, coordinates:{long: 1.0.01.01, lat: 2.1.0.10} }");
+        obj2.put("comments", new ArrayList<String>());
+        obj2.put("created_at",new Timestamp(System.currentTimeMillis()));
+        obj2.put("updated_at",new Timestamp(System.currentTimeMillis()));
+        obj2.put("blocked_at",new Timestamp(System.currentTimeMillis()));
+        obj2.put("deleted_at",new Timestamp(System.currentTimeMillis()));
+
+        String id1 = ArangoInterfaceMethods.insertPost(obj2,loggedInUserId);
+        makeHashtagNode(paramsObject.getString("name"));
+
+        tagPostInHashtag(""+loggedInUserId, paramsObject.getString("name"));
+
+        ArrayList<String> postIds= ArangoInterfaceMethods.getAllPostsTaggedInHashtag(paramsObject.getString("name"));
+        JSONObject response = new JSONObject();
+        response.put("method",methodName);
+        response.put("posts",postIds);
+        response.put("error","null");
+        return response;
     }
 
 }
