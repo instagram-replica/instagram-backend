@@ -7,6 +7,7 @@ import com.arangodb.entity.CollectionEntity;
 import com.arangodb.entity.EdgeDefinition;
 import com.arangodb.entity.GraphEntity;
 import com.arangodb.model.GraphCreateOptions;
+import exceptions.CustomException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.*;
@@ -204,7 +205,13 @@ public class ArangoInterfaceTest {
         Assert.assertEquals(Objects.requireNonNull(jsonThread).get("name"), "Mohamed");
 
         ArangoInterfaceMethods.deleteThread(id);
-        Assert.assertEquals(ArangoInterfaceMethods.getThread(id), null);
+        try{
+            ArangoInterfaceMethods.getThread(id);
+            Assert.assertTrue(false);
+        }catch (CustomException e){
+            Assert.assertTrue(true);
+        }
+
 
     }
 
@@ -255,7 +262,13 @@ public class ArangoInterfaceTest {
                 "{ type: tag, user_id: 2343-2342 }");
 
         ArangoInterfaceMethods.deleteNotification(id);
-        Assert.assertEquals(ArangoInterfaceMethods.getNotification(id), null);
+        try{
+            ArangoInterfaceMethods.getNotification(id);
+            Assert.assertTrue(false);
+        }catch (CustomException e){
+            Assert.assertTrue(true);
+        }
+
     }
 
     @Test
@@ -305,8 +318,12 @@ public class ArangoInterfaceTest {
                 "{ type: tag, user_id: 2343-2342 }");
 
         ArangoInterfaceMethods.deleteActivity(id);
-        Assert.assertEquals(ArangoInterfaceMethods.getActivity(id), null);
-
+        try{
+            ArangoInterfaceMethods.getActivity(id);
+            Assert.assertTrue(false);
+        }catch (CustomException e){
+            Assert.assertTrue(true);
+        }
 
     }
 
@@ -372,7 +389,12 @@ public class ArangoInterfaceTest {
                 true);
 
         ArangoInterfaceMethods.deleteStory(id);
-        Assert.assertEquals(ArangoInterfaceMethods.getStory(id), null);
+        try{
+            ArangoInterfaceMethods.getStory(id);
+            Assert.assertTrue(false);
+        }catch (CustomException e){
+            Assert.assertTrue(true);
+        }
 
     }
 
@@ -441,7 +463,13 @@ public class ArangoInterfaceTest {
                 "Friends");
 
         ArangoInterfaceMethods.deletePost(id);
-        Assert.assertEquals(ArangoInterfaceMethods.getStory(id), null);
+        try{
+            ArangoInterfaceMethods.getPost(id);
+            Assert.assertTrue(false);
+        }catch (CustomException e){
+            Assert.assertTrue(true);
+        }
+
     }
 
     @Test
@@ -488,11 +516,13 @@ public class ArangoInterfaceTest {
                 Objects.requireNonNull(jsonBookmark).get("posts_ids").toString(),
                 updatedObj.get("posts_ids").toString());
 
-
         ArangoInterfaceMethods.deleteBookmark(id);
-        Assert.assertEquals(ArangoInterfaceMethods.getBookmark(id), null);
-
-
+        try{
+            ArangoInterfaceMethods.getBookmark(id);
+            Assert.assertTrue(false);
+        }catch (CustomException e){
+            Assert.assertTrue(true);
+        }
     }
 
 

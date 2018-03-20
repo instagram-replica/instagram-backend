@@ -278,22 +278,21 @@ public class ArangoInterfaceMethods {
             return reformatJSON(storyJSON);
     }
 
-//    public static boolean updateStory(String id, JSONObject storyJSON) {
-//            BaseDocument myObject = new BaseDocument();
-//            myObject.addAttribute("user_id", storyJSON.get("user_id").toString());
-//            myObject.addAttribute("is_featured", storyJSON.get("is_featured").toString());
-//            myObject.addAttribute("media_id", storyJSON.get("media_id").toString());
-//            myObject.addAttribute("reports", storyJSON.get("reports").toString());
-//            myObject.addAttribute("seen_by_users_ids", storyJSON.get("seen_by_users_ids").toString());
-//            myObject.addAttribute("created_at", storyJSON.get("created_at").toString());
-//            myObject.addAttribute("deleted_at", storyJSON.get("deleted_at").toString());
-//            myObject.addAttribute("expired_at", storyJSON.get("expired_at").toString());
-//            myObject.addAttribute("blocked_at", storyJSON.get("blocked_at").toString());
-//            arangoDB.db(dbName).collection(storiesCollectionName).updateDocument(id, storyJSON.toString());
-//            System.out.println("Story Updated");
-//            return true;
-//
-//    }
+    public static boolean updateStory(String id, JSONObject storyJSON) {
+            BaseDocument myObject = new BaseDocument();
+            myObject.addAttribute("user_id", storyJSON.get("user_id").toString());
+            myObject.addAttribute("is_featured", storyJSON.get("is_featured").toString());
+            myObject.addAttribute("media_id", storyJSON.get("media_id").toString());
+            myObject.addAttribute("reports", storyJSON.get("reports").toString());
+            myObject.addAttribute("seen_by_users_ids", storyJSON.get("seen_by_users_ids").toString());
+            myObject.addAttribute("created_at", storyJSON.get("created_at").toString());
+            myObject.addAttribute("deleted_at", storyJSON.get("deleted_at").toString());
+            myObject.addAttribute("expired_at", storyJSON.get("expired_at").toString());
+            myObject.addAttribute("blocked_at", storyJSON.get("blocked_at").toString());
+            arangoDB.db(dbName).collection(storiesCollectionName).updateDocument(id, storyJSON.toString());
+            System.out.println("Story Updated");
+            return true;
+    }
 
     public static void deleteStory(String id) {
             arangoDB.db(dbName).collection(storiesCollectionName).deleteDocument(id);
@@ -947,7 +946,7 @@ public class ArangoInterfaceMethods {
     }
 
     public static ArrayList<String> getAllPostsTaggedInHashtag(String hashtagNameKey){
-  
+
             String hashtagName = "Hashtags/"+hashtagNameKey;
             ArrayList<String> posts = new ArrayList<>();
             String query = "FOR vertex IN INBOUND \""  + hashtagName+"\" "+ graphPostTaggedCollectionName + " RETURN vertex " ;
