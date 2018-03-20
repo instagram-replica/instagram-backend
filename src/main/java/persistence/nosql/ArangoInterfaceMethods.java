@@ -432,8 +432,7 @@ public class ArangoInterfaceMethods {
         }
     }
 
-    public static JSONArray getPosts(String userId) {
-        try {
+    public static JSONArray getPosts(String userId) throws ArangoDBException{
             String query = "FOR t IN " + postsCollectionName + " FILTER t.user_id == @id RETURN t";
             Map<String, Object> bindVars = new MapBuilder().put("id", userId).get();
             ArangoCursor<BaseDocument> cursor = arangoDB.db(dbName).query(query, bindVars, null,
@@ -445,12 +444,6 @@ public class ArangoInterfaceMethods {
                 result.put(postJSON);
             });
             return result;
-        } catch (ArangoDBException e) {
-            System.err.println("Failed to execute query. " + e.getMessage());
-            return null;
-        }
-
-
     }
 
     public static void likePost(String postID, String userID) throws Exception {

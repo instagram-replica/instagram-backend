@@ -1,5 +1,7 @@
 package services.posts;
 
+import com.arangodb.ArangoDBException;
+import exceptions.CustomException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import persistence.cache.Cache;
@@ -98,7 +100,7 @@ public class Posts {
     }
 
 
-    public static JSONObject getPosts(JSONObject paramsObject, String loggedInUserId, String methodName) {
+    public static JSONObject getPosts(JSONObject paramsObject, String loggedInUserId, String methodName) throws ArangoDBException{
 
         //DONE: Calculate number of likes and return it, instead of the likes array
         //TODO: Make use of the pagination params (do not spend much time on this)
@@ -182,7 +184,7 @@ public class Posts {
             response.put("method", methodName);
             response.put("postId",postId);
             response.put("response", postResponse);
-
+            System.out.println("HEEREEEE:  "+response);
             return response;
         } catch (Exception e) {
             return createJSONError(e.getMessage());

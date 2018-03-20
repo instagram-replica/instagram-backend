@@ -1,12 +1,16 @@
 package services.posts;
 
 
+import com.arangodb.ArangoDBException;
+import exceptions.CustomException;
+import org.json.JSONException;
 import org.json.JSONObject;
 import shared.Settings;
 
-public class Controller extends shared.mq_server.Controller {
+public class Controller extends shared.mq_server.Controller{
     @Override
-    public JSONObject execute(JSONObject jsonObject, String userId) {
+    public JSONObject execute(JSONObject jsonObject, String userId) throws Exception {
+        try{
         String methodName = jsonObject.getString("method");
         JSONObject paramsObject = jsonObject.getJSONObject("params");
         switch (methodName) {
@@ -33,12 +37,40 @@ public class Controller extends shared.mq_server.Controller {
             case "getPostLikers":
                 return Posts.getPostLikers(paramsObject, userId, methodName);
             case "updatePost":
-                return Posts.updatePost(paramsObject,userId,methodName);
+                return Posts.updatePost(paramsObject, userId, methodName);
+            default: {
+                JSONObject newJsonObj = new JSONObject();
+                newJsonObj.put("application", "feed/posts");
+                return newJsonObj;
+            }
         }
+        }
+//        catch(CustomException e){
+//            throw new Exception();
+//        }
+        catch(org.json.JSONException  e){
+//           //TODO error json
+            System.out.println("JSON ERROR");
+            JSONObject newJsonObj = new JSONObject();
+            newJsonObj.put("application", "feed/posts");
+            return newJsonObj;
+        }
+        catch(ArangoDBException e){
+//           //TODO error json
+            System.out.println("JSON ERROR");
+            JSONObject newJsonObj = new JSONObject();
+            newJsonObj.put("application", "feed/posts");
+            return newJsonObj;
+        }
+        catch(Exception e){
+            //TODO internal server error
+            System.err.println(e.getMessage());
+            System.out.println("JSON ERROR");
+            JSONObject newJsonObj = new JSONObject();
+            newJsonObj.put("application", "feed/posts");
+            return newJsonObj;
 
-        JSONObject newJsonObj = new JSONObject();
-        newJsonObj.put("application", "feed/posts");
-        return newJsonObj;
+        }
     }
 
 
