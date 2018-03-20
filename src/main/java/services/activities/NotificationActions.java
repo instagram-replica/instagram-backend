@@ -3,7 +3,7 @@ package services.activities;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import persistence.nosql.ArangoInterfaceMethods;
-import persistence.sql.users.Main;
+import persistence.sql.users.Database;
 
 import java.sql.Timestamp;
 
@@ -50,7 +50,7 @@ public class NotificationActions {
         for(int i=0;i<receivers.length();i++){
             JSONObject taggedPerson = receivers.getJSONObject(i);
             JSONObject notifyReceiver = new JSONObject();
-            String recID = Main.getUserIdFromUsername(taggedPerson.getString("username"));
+            String recID = Database.getUserByUsername(taggedPerson.getString("username")).id;
             notifyReceiver.put("activity_type","{ type: tag, user_id: " + recID+ "\"");
             notifyReceiver.put("receiver_id", recID);
             notifyReceiver.put("sender_id", userId);
