@@ -41,6 +41,8 @@ public class Controller extends shared.mq_server.Controller{
                 data = Posts.getPostLikers(paramsObject, userId, methodName); break;
             case "updatePost":
                 data = Posts.updatePost(paramsObject, userId, methodName); break;
+            case "getHashtagPosts":
+                data = Posts.getHashtagPosts(paramsObject,userId,methodName); break;
             default: {
                 JSONObject newJsonObj = new JSONObject();
                 newJsonObj.put("application", "feed/posts");

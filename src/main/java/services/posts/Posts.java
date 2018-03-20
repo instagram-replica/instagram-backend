@@ -14,6 +14,7 @@ import java.util.ArrayList;
 
 import static persistence.nosql.ArangoInterfaceMethods.makeHashtagNode;
 import static persistence.nosql.ArangoInterfaceMethods.tagPostInHashtag;
+import static persistence.nosql.ArangoInterfaceMethods.tagUserInPost;
 import static shared.Helpers.createJSONError;
 import static shared.Helpers.isAuthorizedToView;
 
@@ -189,7 +190,6 @@ public class Posts {
 
     public static JSONObject deletePostLike(JSONObject paramsObject, String loggedInUserId, String methodName){
         String postId = paramsObject.getString("postId");
-        System.out.println("hena///////////////");
         try {
             JSONObject post = ArangoInterfaceMethods.getPost(postId);
             JSONArray likes = post.getJSONArray("likes");
@@ -211,7 +211,7 @@ public class Posts {
     }
 
     //TODO:
-    public static JSONObject getTaggedPosts(JSONObject paramsObject, String loggedInUserId, String methodName) {
+    public static JSONObject getTaggedPosts(JSONObject paramsObject, String loggedInUserId, String methodName) throws Exception {
         //@TODO: Check if the user has permission to view the other user's profile
         int pageSize = paramsObject.getInt("pageSize");
         int pageIndex = paramsObject.getInt("pageIndex");
@@ -227,7 +227,16 @@ public class Posts {
 //        }
 //        JSONObject jsonValue = new JSONObject();
 //        jsonValue.put("tagged_posts", posts);
-        return new JSONObject();
+
+        if(isAuthorizedToView("posts", loggedInUserId, ownerId) || loggedInUserId.equals(ownerId)) {
+            ArrayList<String> postIds = ArangoInterfaceMethods.getAllTaggedPosts(loggedInUserId);
+            JSONObject response = new JSONObject();
+            response.put("method", methodName);
+            response.put("posts", postIds);
+            response.put("error", "null");
+            return response;
+        } else
+            throw new CustomException("unAuthorized to view");
 
     }
 
