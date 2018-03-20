@@ -7,10 +7,6 @@ import io.netty.handler.codec.http.*;
 import io.netty.handler.codec.http.cors.CorsConfig;
 import io.netty.handler.codec.http.cors.CorsConfigBuilder;
 import io.netty.handler.codec.http.cors.CorsHandler;
-import shared.http_server.handlers.HTTPHandler;
-import shared.http_server.handlers.JSONSenderHandler;
-import shared.http_server.handlers.URIHandler;
-import shared.Settings;
 
 @ChannelHandler.Sharable
 public class ServerInitializer extends ChannelInitializer<SocketChannel> {
@@ -25,18 +21,8 @@ public class ServerInitializer extends ChannelInitializer<SocketChannel> {
 
         p.addLast("codec", new HttpServerCodec());
         p.addLast("aggregator", new HttpObjectAggregator(Short.MAX_VALUE));
-
         p.addLast(new CorsHandler(corsConfig));
 
-        p.addLast(new HTTPHandler());
-        p.addLast(new URIHandler());
-
-        p.addLast(new AuthenticationHandler());
-
-        p.addLast(new MQSenderHandler());
-        p.addLast(new MQReceiverHandler());
-
-        p.addLast(new JSONSenderHandler());
-
+        p.addLast(new MethodMultiplexer());
     }
 }
