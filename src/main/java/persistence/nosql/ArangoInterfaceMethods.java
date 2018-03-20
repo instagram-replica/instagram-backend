@@ -386,14 +386,17 @@ public class ArangoInterfaceMethods {
         }
     }
 
-    public static ArrayList<JSONArray> getFriendsStories(String userID){
-        ArrayList<JSONArray> resultStories = new ArrayList<JSONArray>();
+    public static JSONArray getFriendsStories(String userID){
+        JSONArray resultStories = new JSONArray();
         ArrayList<String> friends = getAllfollowingIDs(""+ userID);
         JSONArray friendStories;
         for(int  i =0 ; i< friends.size();i++){
             friendStories = getStoriesForUser(friends.get(i));
+            JSONObject userStories = new JSONObject();
+            userStories.put("user_id",friends.get(i));
+            userStories.put("stories",friendStories);
             if(friendStories.length() != 0){
-                resultStories.add(friendStories);
+                resultStories.put(userStories);
             }
         }
         return resultStories;
