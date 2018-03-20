@@ -16,7 +16,8 @@ public class Controller extends shared.mq_server.Controller {
     @Override
     public JSONObject execute(JSONObject jsonObject, String userId) {
         JSONObject newJsonObj = new JSONObject();
-
+        JSONObject data = new JSONObject();
+        JSONObject error = new JSONObject();
         String methodName = jsonObject.getString("method");
         JSONObject paramsObject = jsonObject.getJSONObject("params");
         try {
@@ -41,12 +42,26 @@ public class Controller extends shared.mq_server.Controller {
                     break;
             }
         }
-        catch (Exception e){
-            //TODO handle stories exceptions
+        catch(org.json.JSONException e){
+            e.printStackTrace();
+            error.put("description",utilities.Main.stringifyJSONException(e));
+        }
+        catch(CustomException e){
+            e.printStackTrace();
+            error.put("description", e.getMessage());
+        }
+        catch(Exception e){
+            e.printStackTrace();
+            System.err.println(e.getMessage());
+            error.put("description","Internal Server Error");
+        }
+        finally {
+            JSONObject response = new JSONObject();
+            response.put("error",error);
+            response.put("data",data);
+            return response;
         }
 
-        newJsonObj.put("application", methodName);
-        return newJsonObj;
     }
 
 
