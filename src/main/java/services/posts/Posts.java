@@ -161,7 +161,6 @@ public class Posts {
             response.put("method", methodName);
             response.put("postId",postId);
             response.put("response", postResponse);
-            System.out.println("HEEREEEE:  "+response);
             return response;
 
     }

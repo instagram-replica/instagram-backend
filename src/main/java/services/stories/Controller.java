@@ -1,5 +1,6 @@
 package services.stories;
 
+import exceptions.CustomException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import persistence.cache.Cache;
@@ -18,26 +19,30 @@ public class Controller extends shared.mq_server.Controller {
 
         String methodName = jsonObject.getString("method");
         JSONObject paramsObject = jsonObject.getJSONObject("params");
-
-        switch (methodName) {
-            case "createStory":
-                createStory(paramsObject);
-                break;
-            case "deleteStory":
-                deleteStory(paramsObject);
-                break;
-            case "getMyStory":
-                getMyStories(userId);
-                break;
-            case "getMyStories":
-                getStories();
-                break;
-            case "getStory":
-                getStory(paramsObject);
-                break;
-            case "getDiscoverStories":
-                getDiscoverStories();
-                break;
+        try {
+            switch (methodName) {
+                case "createStory":
+                    createStory(paramsObject);
+                    break;
+                case "deleteStory":
+                    deleteStory(paramsObject);
+                    break;
+                case "getMyStory":
+                    getMyStories(userId);
+                    break;
+                case "getMyStories":
+                    getStories();
+                    break;
+                case "getStory":
+                    getStory(paramsObject);
+                    break;
+                case "getDiscoverStories":
+                    getDiscoverStories();
+                    break;
+            }
+        }
+        catch (Exception e){
+            //TODO handle stories exceptions
         }
 
         newJsonObj.put("application", methodName);
@@ -72,7 +77,7 @@ public class Controller extends shared.mq_server.Controller {
         return delteStory;
     }
 
-    public static JSONObject getStory(JSONObject paramsObject) {
+    public static JSONObject getStory(JSONObject paramsObject) throws CustomException{
         JSONObject story = new JSONObject();
         String storyID = paramsObject.getString("id");
         JSONObject storyResponse = Cache.getStoryFromCache(storyID);

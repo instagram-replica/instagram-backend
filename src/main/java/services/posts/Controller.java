@@ -15,46 +15,50 @@ public class Controller extends shared.mq_server.Controller{
         try{
         String methodName = jsonObject.getString("method");
         JSONObject paramsObject = jsonObject.getJSONObject("params");
+            System.out.println("METHODNAME:  "+methodName);
         switch (methodName) {
             case "getPosts":
-                data = Posts.getPosts(paramsObject, userId, methodName);
+                data = Posts.getPosts(paramsObject, userId, methodName); break;
             case "getPost":
-                data = Posts.getPost(paramsObject, userId, methodName);
+                data = Posts.getPost(paramsObject, userId, methodName); break;
             case "createPost":
-                data = Posts.createPost(paramsObject, userId, methodName);
+                data = Posts.createPost(paramsObject, userId, methodName); break;
             case "getTaggedPosts":
-                data = Posts.getTaggedPosts(paramsObject, userId, methodName);
+                data = Posts.getTaggedPosts(paramsObject, userId, methodName); break;
             case "deletePost":
-                data = Posts.deletePost(paramsObject, userId, methodName);
+                data = Posts.deletePost(paramsObject, userId, methodName); break;
             case "createPostLike":
-                data = Posts.createPostLike(paramsObject, userId, methodName);
+                data = Posts.createPostLike(paramsObject, userId, methodName); break;
 //            case "deletePostLike":
-//                return Posts.deletePostLike(paramsObject,userId,methodName);
+//                return Posts.deletePostLike(paramsObject,userId,methodName); break;
             case "createComment":
-                data = Comments.createComment(paramsObject, userId, methodName);
+                data = Comments.createComment(paramsObject, userId, methodName); break;
             case "getComments":
-                data = Comments.getCommentsOnPost(paramsObject, userId, methodName);
+                data = Comments.getCommentsOnPost(paramsObject, userId, methodName); break;
             case "createCommentReply":
-                data = Comments.createCommentReply(paramsObject, userId, methodName);
+                data = Comments.createCommentReply(paramsObject, userId, methodName); break;
             case "getPostLikers":
-                data = Posts.getPostLikers(paramsObject, userId, methodName);
+                data = Posts.getPostLikers(paramsObject, userId, methodName); break;
             case "updatePost":
-                data = Posts.updatePost(paramsObject, userId, methodName);
+                data = Posts.updatePost(paramsObject, userId, methodName); break;
             default: {
                 JSONObject newJsonObj = new JSONObject();
                 newJsonObj.put("application", "feed/posts");
                 data = newJsonObj;
+                break;
             }
         }
         }
         catch(org.json.JSONException e){
+            e.printStackTrace();
             error.put("description",utilities.Main.stringifyJSONException(e));
         }
         catch(CustomException e){
-          error.put("description", e.getMessage());
+            e.printStackTrace();
+            error.put("description", e.getMessage());
         }
         catch(Exception e){
-            //TODO internal server error
+            e.printStackTrace();
             System.err.println(e.getMessage());
             error.put("description","Internal Server Error");
         }
