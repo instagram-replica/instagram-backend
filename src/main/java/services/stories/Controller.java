@@ -6,6 +6,8 @@ import org.json.JSONObject;
 import persistence.cache.Cache;
 import persistence.nosql.ArangoInterfaceMethods;
 
+import java.util.ArrayList;
+
 public class Controller extends shared.mq_server.Controller {
 
 
@@ -60,6 +62,7 @@ public class Controller extends shared.mq_server.Controller {
             response.put("error",error);
             response.put("data",data);
             return response;
+
         }
 
     }
@@ -108,9 +111,9 @@ public class Controller extends shared.mq_server.Controller {
     public static JSONObject getMyStories(String userId) {
         //        @TODO: validate expiry time
         JSONObject myStory = new JSONObject();
-        JSONArray stories = Cache.getUserStoriesFromCache(userId);
+        JSONArray stories = Cache.getMyStoriesFromCache(userId);
         if(stories==null) {
-            stories = ArangoInterfaceMethods.getStories(userId);
+            stories = ArangoInterfaceMethods.getStoriesForUser(userId);
             Cache.insertUserStoriesIntoCache(stories,userId);
         }
         myStory.put("error","0");
@@ -118,8 +121,17 @@ public class Controller extends shared.mq_server.Controller {
         return myStory;
     }
 
-    public static void getStories() {
+    public static JSONObject getStories(String userId) {
 //        @TODO: validate expiry time
+        JSONObject resultStories = new JSONObject();
+        JSONArray allStories = Cache.getUserStoriesFromCache(userId);
+        if(allStories==null){
+           allStories = ArangoInterfaceMethods.getFriendsStories(userId);
+           Cache.insertUserStoriesIntoCache(allStories,userId);
+        }
+        resultStories.put("error","0");
+        resultStories.put("response",allStories);
+        return resultStories;
     }
 
     public static void getDiscoverStories() {

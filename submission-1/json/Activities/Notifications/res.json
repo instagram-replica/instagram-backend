@@ -1,0 +1,18 @@
+{
+  "method": "getNotifications",
+  "notifications": [
+    {
+      "type": "follow",
+      "id": "null",
+      "userId": "12344",
+      "createAt": "2012-04-23T18:25:43.511Z"
+    },
+    {
+      "type": "comment",
+      "id": "123",
+      "userId": "123444",
+      "createAt": "2012-04-23T18:25:43.511Z"
+    }
+  ],
+  "error":null
+}
