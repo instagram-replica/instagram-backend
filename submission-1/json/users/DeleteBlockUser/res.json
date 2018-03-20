@@ -1,7 +1,0 @@
-{
-  "method": "deleteBlockUser",
-  "response": {
-    "success": true,
-    "error": null
-  }
-}

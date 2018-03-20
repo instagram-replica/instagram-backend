@@ -1,7 +1,0 @@
-{
-  "method": "createBlockUser",
-  "response": {
-    "success": true,
-    "error": null
-  }
-}
