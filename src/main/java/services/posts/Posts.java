@@ -210,9 +210,8 @@ public class Posts {
         }
     }
 
-    //TODO:
+    //TODO: return post instead of postIds
     public static JSONObject getTaggedPosts(JSONObject paramsObject, String loggedInUserId, String methodName) throws Exception {
-        //@TODO: Check if the user has permission to view the other user's profile
         int pageSize = paramsObject.getInt("pageSize");
         int pageIndex = paramsObject.getInt("pageIndex");
         String ownerId = paramsObject.getString("userId");
@@ -252,29 +251,30 @@ public class Posts {
      //   int pageSize = paramsObject.getInt("pageSize");
      //   int pageIndex = paramsObject.getInt("pageIndex");
 
-        JSONObject obj2= new JSONObject();
-        obj2.put("user_id",loggedInUserId);
-        obj2.put("caption","Taken By Mohamed ABouzeid");
-        obj2.put("media", new ArrayList<String>());
-        obj2.put("likes", new ArrayList<String>());
-        obj2.put("tags",new ArrayList<String>());
-        obj2.put("location","{ name: C1, coordinates:{long: 1.0.01.01, lat: 2.1.0.10} }");
-        obj2.put("comments", new ArrayList<String>());
-        obj2.put("created_at",new Timestamp(System.currentTimeMillis()));
-        obj2.put("updated_at",new Timestamp(System.currentTimeMillis()));
-        obj2.put("blocked_at",new Timestamp(System.currentTimeMillis()));
-        obj2.put("deleted_at",new Timestamp(System.currentTimeMillis()));
-
-        String id1 = ArangoInterfaceMethods.insertPost(obj2,loggedInUserId);
-        makeHashtagNode(paramsObject.getString("name"));
-
-        tagPostInHashtag(""+loggedInUserId, paramsObject.getString("name"));
-
-        ArrayList<String> postIds= ArangoInterfaceMethods.getAllPostsTaggedInHashtag(paramsObject.getString("name"));
+//        JSONObject obj2= new JSONObject();
+//        obj2.put("user_id",loggedInUserId);
+//        obj2.put("caption","Taken By Mohamed ABouzeid");
+//        obj2.put("media", new ArrayList<String>());
+//        obj2.put("likes", new ArrayList<String>());
+//        obj2.put("tags",new ArrayList<String>());
+//        obj2.put("location","{ name: C1, coordinates:{long: 1.0.01.01, lat: 2.1.0.10} }");
+//        obj2.put("comments", new ArrayList<String>());
+//        obj2.put("created_at",new Timestamp(System.currentTimeMillis()));
+//        obj2.put("updated_at",new Timestamp(System.currentTimeMillis()));
+//        obj2.put("blocked_at",new Timestamp(System.currentTimeMillis()));
+//        obj2.put("deleted_at",new Timestamp(System.currentTimeMillis()));
+//
+//        String id1 = ArangoInterfaceMethods.insertPost(obj2,loggedInUserId);
+//        makeHashtagNode(paramsObject.getString("name"));
+//
+//        tagPostInHashtag(""+loggedInUserId, paramsObject.getString("name"));
+//
+//        ArrayList<String> postIds= ArangoInterfaceMethods.getAllPostsTaggedInHashtag(paramsObject.getString("name"));
+//
         JSONObject response = new JSONObject();
-        response.put("method",methodName);
-        response.put("posts",postIds);
-        response.put("error","null");
+//        response.put("method",methodName);
+//        response.put("posts",postIds);
+//        response.put("error","null");
         return response;
     }
 
