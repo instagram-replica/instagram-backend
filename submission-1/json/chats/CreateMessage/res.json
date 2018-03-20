@@ -4,7 +4,8 @@
     "data": {
       "newMessage": {
         "id" : 12,
-        "text": "yoooo"
+        "text": "yoooo",
+        "created_at": 135486
       }
     },
     "error": null
