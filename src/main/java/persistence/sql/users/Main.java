@@ -12,12 +12,14 @@ import persistence.sql.users.Models.UsersReportModel;
 
 import java.io.IOException;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.postgresql.core.types.*;
 
+import static persistence.sql.Helpers.constructList;
 import static persistence.sql.Main.closeConnection;
 import static persistence.sql.Main.openConnection;
 import static persistence.sql.users.Validation.isValidUser;
@@ -59,7 +61,7 @@ public class Main {
     }
 
 
-    public static List getUserByUsername(String username) {
+    public static List<UsersModel> getUserByUsername(String username) {
 
         return UsersModel.findBySQL("SELECT user FROM users WHERE username=?", username);
     }
@@ -69,10 +71,58 @@ public class Main {
         return UsersModel.findBySQL("SELECT user FROM users WHERE email=?", email);
     }
 
+    public static List<User> getUsersByIds(String[] usersIds) {
+        if (usersIds.length == 0) {
+            return new ArrayList<>();
+        }
+
+        for (String userId : usersIds) {
+            if (!isValidUserId(userId)) {
+                throw new RuntimeException(
+                        "Cannot fetch user: Invalid user ID: "
+                        + userId
+                );
+            }
+        }
+
+        /*
+        * Query looks unsafe, but here's the source:
+        * http://javalite.io/in_clause
+        */
+        List<UsersModel> results = UsersModel.where(
+                "id IN (" + constructList(usersIds) + ")"
+        );
+
+        return results
+                .stream()
+                .map(Main::mapModelToUser)
+                .collect(Collectors.toList());
+    }
+
+    public static List<String> getUsersIdsByUsernames(String[] usernames) {
+        if (usernames.length == 0) {
+            return new ArrayList<>();
+        }
+
+        /*
+         * Query looks unsafe, but here's the source:
+         * http://javalite.io/in_clause
+         */
+        List<UsersModel> results = UsersModel.where(
+                "username IN (" + constructList(usernames) + ")"
+        );
+
+        return results
+                .stream()
+                .map(Main::mapModelToUser)
+                .map(User::getId)
+                .collect(Collectors.toList());
+    }
+
     public static boolean createUser(User user) throws Exception {
         if (isValidUser(user)) {
             UsersModel usersModel = new UsersModel();
-            usersModel.set("id", generateUUID());
+            usersModel.set("id", user.getId());
             usersModel.set("username", user.getUsername());
             usersModel.set("email", user.getEmail());
             usersModel.set("password_hash", user.getPasswordHash());
@@ -219,14 +269,16 @@ public class Main {
     }
 
 
-    public static List searchForUser(String userFullName, String searcher) {
+    public static List searchForUser(String userFullName, String searcher) throws Exception {
 
-        List allResults = UsersModel.findBySQL("SELECT* FROM users WHERE full_name LIKE '%' || ? || '%'", userFullName);
+        List<UsersModel> allResults = UsersModel.findBySQL("SELECT* FROM users WHERE LOWER(full_name) LIKE '%' || ? || '%' limit 10", userFullName.toLowerCase());
 
-
-        //TODO exclude blocked user from the searcher's/blocker search result
-        List blockedUsers = UsersBlockModel.findBySQL("SELECT* FROM users_blocks WHERE blocker_id = ?", searcher);
-        Base.findAll("SELECT* FROM users u FULL OUTTER JOIN users_blocks ub ON u.id = ub.blocked_id WHERE u.id IS NULL OR ub.blocked_id IS NULL AND ub.blocker_id = ?", searcher);
+        for(int i=0; i<allResults.size(); i++){
+          User user1 = mapModelToUser(allResults.get(i));
+           if(blocks(searcher,user1.getId())){
+               allResults.remove(i);
+           }
+        }
 
         return allResults;
     }

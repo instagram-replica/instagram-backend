@@ -2,7 +2,7 @@ package services.activities;
 
 import org.json.JSONObject;
 
-public class Controller extends shared.Controller {
+public class Controller extends shared.mq_server.Controller {
 
     public Controller() {
         super();

@@ -3,7 +3,7 @@
 	"params": {
 		"username" : "sawahel",
 		"fullname" : "Ahmed Sawahel",
-		"passwordHash" : "!@#!@$C!",
+		"password" : "123456",
 		"email" : "sawahel@magdy.com",
 		"gender" : "male",
 		"dateOfBirth" : "Sun Mar 04 23:05:25 EET 2018",

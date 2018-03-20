@@ -1,9 +1,11 @@
 package services.stories;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
+import persistence.cache.Cache;
 import persistence.nosql.ArangoInterfaceMethods;
 
-public class Controller extends shared.Controller {
+public class Controller extends shared.mq_server.Controller {
 
 
     public Controller() {
@@ -45,6 +47,7 @@ public class Controller extends shared.Controller {
 
     public static void createStory(JSONObject paramsObject) {
         JSONObject createStory = new JSONObject();
+
         if (!ArangoInterfaceMethods.insertStory(paramsObject).equals(null)) {
             createStory.put("success", "true");
             createStory.put("error", "0");
@@ -71,16 +74,27 @@ public class Controller extends shared.Controller {
 
     public static JSONObject getStory(JSONObject paramsObject) {
         JSONObject story = new JSONObject();
-        story.put("error", "0");
-        story.put("response", ArangoInterfaceMethods.getStory(paramsObject.getString("id")));
+        String storyID = paramsObject.getString("id");
+        JSONObject storyResponse = Cache.getStoryFromCache(storyID);
+        if(storyResponse==null) {
+            storyResponse = ArangoInterfaceMethods.getStory(storyID);
+            Cache.insertStoryIntoCache(storyResponse,storyID);
+        }
+        story.put("error","0");
+        story.put("response",storyResponse);
         return story;
     }
 
     public static JSONObject getMyStories(String userId) {
         //        @TODO: validate expiry time
         JSONObject myStory = new JSONObject();
-        myStory.put("error", "0");
-        myStory.put("response", ArangoInterfaceMethods.getStories(userId));
+        JSONArray stories = Cache.getUserStoriesFromCache(userId);
+        if(stories==null) {
+            stories = ArangoInterfaceMethods.getStories(userId);
+            Cache.insertUserStoriesIntoCache(stories,userId);
+        }
+        myStory.put("error","0");
+        myStory.put("response",stories);
         return myStory;
     }
 

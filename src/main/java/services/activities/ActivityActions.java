@@ -5,6 +5,7 @@ import org.json.JSONObject;
 
 import persistence.nosql.ArangoInterfaceMethods;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class ActivityActions {
@@ -70,7 +71,7 @@ public class ActivityActions {
 	public static JSONObject handleGettingActivities(JSONObject params, String userId){
 		int size = params.getInt("pageSize");
 		int start = params.getInt("pageIndex") * size;
-		String[] followings = ArangoInterfaceMethods.getAllfollowingIDs(userId).stream().toArray(String[]::new);
+		ArrayList<String> followings = ArangoInterfaceMethods.getAllfollowingIDs(userId);
 		JSONArray activities= ArangoInterfaceMethods.getActivities(followings, start, size);
 		JSONObject result = new JSONObject();
 		result.put("activities", activities);
