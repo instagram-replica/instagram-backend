@@ -413,7 +413,7 @@ public class ArangoInterfaceMethods {
             friendStories = getStoriesForUser(publicFriendOfFriends.get(i));
             JSONObject JSONUserStories = new JSONObject();
             JSONUserStories.put("user_id",publicFriendOfFriends.get(i));
-            JSONUserStories.put("user_id",friendStories);
+            JSONUserStories.put("stories",friendStories);
             if(friendStories.length() != 0){
                 resultStories.put(JSONUserStories);
             }

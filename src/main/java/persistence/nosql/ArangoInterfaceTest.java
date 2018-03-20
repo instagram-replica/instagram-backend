@@ -892,6 +892,7 @@ public class ArangoInterfaceTest {
 
         JSONArray friendsStories = getDiscoverStories("e03168b3-226a-415d-9838-524f104f6348");
         Assert.assertEquals(4,friendsStories.length());
+        Assert.assertEquals(1, ((JSONArray) ((JSONObject) friendsStories.get(0)).get("stories")).length());
 
     }
 
