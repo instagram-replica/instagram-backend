@@ -8,7 +8,11 @@ import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.cors.CorsConfig;
 import io.netty.handler.codec.http.cors.CorsConfigBuilder;
 import io.netty.handler.codec.http.cors.CorsHandler;
+
 import json.JSONParser;
+
+import org.json.JSONException;
+
 import shared.Settings;
 import com.rabbitmq.client.*;
 import org.json.JSONObject;
@@ -88,7 +92,16 @@ public class Server {
 
                         JSONObject jsonObject = new JSONObject(message);
 
-                        JSONObject resObj = controller.execute(jsonObject, "");
+                        String userId = null;
+
+                        try {
+                            userId = jsonObject.getString("userId");
+                            jsonObject.remove("userId");
+                        } catch (JSONException e) {
+                            // Do nothing
+                        }
+
+                        JSONObject resObj = controller.execute(jsonObject, userId);
 
                         String uuid;
                         try {
@@ -98,7 +111,6 @@ public class Server {
                             resObj.put("uuid", uuid);
 
                             channel.queueDeclare(queueName, true, false, false, null);
-
                             channel.basicPublish("", queueName, null, resObj.toString().getBytes("UTF-8"));
 
                         } catch (Exception ignored) {
