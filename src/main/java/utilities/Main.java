@@ -1,5 +1,6 @@
 package utilities;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.FileInputStream;
@@ -31,6 +32,11 @@ public class Main {
         fileInputStream.close();
 
         return properties;
+    }
+
+    public static String stringifyJSONException(JSONException e){
+        String attribute = e.getMessage().split("\"")[1];
+        return "Invalid JSON format, Missing attribute: ("+attribute+")";
     }
 
     public static JSONObject cloneJSONObject(JSONObject originalJSONObject) {
