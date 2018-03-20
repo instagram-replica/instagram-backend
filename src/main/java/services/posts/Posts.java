@@ -35,7 +35,6 @@ public class Posts {
 
                 JSONObject postResponse = new JSONObject();
                 postResponse.put("post", updatedPost);
-                postResponse.put("error", "null");
 
                 response.put("method", methodName);
                 response.put("postId",postId);
@@ -63,7 +62,7 @@ public class Posts {
         //DONE LOGICALLY: Get the post if the logged in user has permission to view it, otherwise return error
         //DONE: Calculate number of likes and return it, instead of the likes array
         String postId = paramsObject.getString("postId");
-        JSONObject post = null;
+                JSONObject post = null;
                 post = Cache.getPostFromCache(postId);
                 if(post==null){
                     post = ArangoInterfaceMethods.getPost(postId);
@@ -132,7 +131,6 @@ public class Posts {
                 response.put("method", methodName);
                 post.put("id", postId);
                 response.put("post", post);
-                response.put("error", "null");
                 return response;
             }
             throw new CustomException("Not authorized to delete");
@@ -156,7 +154,6 @@ public class Posts {
 
             JSONObject postResponse = new JSONObject();
             postResponse.put("post", postCreated);
-            postResponse.put("error", "null");
 
             response.put("method", methodName);
             response.put("postId",postId);
@@ -182,7 +179,6 @@ public class Posts {
             JSONObject response = new JSONObject();
             response.put("method", methodName);
             res.put("postID", postId);
-            res.put("error", "null");
             response.put("response", res);
             return response;
     }
@@ -199,7 +195,6 @@ public class Posts {
 //                JSONObject response = new JSONObject();
 //                response.put("method", methodName);
 //                res.put("postID", postId);
-//                res.put("error", "null");
 //                response.put("response", res);
 //                    return response;
 //            }

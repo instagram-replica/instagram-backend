@@ -25,22 +25,22 @@ public class Controller extends shared.mq_server.Controller {
         try {
             switch (methodName) {
                 case "createStory":
-                    createStory(paramsObject);
+                    data = createStory(paramsObject);
                     break;
                 case "deleteStory":
-                    deleteStory(paramsObject);
+                    data = deleteStory(paramsObject);
                     break;
                 case "getMyStory":
-                    getMyStories(userId);
+                    data = getMyStories(userId);
                     break;
                 case "getMyStories":
-                    getStories();
+                    data = getStories(userId);
                     break;
                 case "getStory":
-                    getStory(paramsObject);
+                    data = getStory(paramsObject);
                     break;
                 case "getDiscoverStories":
-                    getDiscoverStories();
+                    data = getDiscoverStories();
                     break;
             }
         }
@@ -68,31 +68,18 @@ public class Controller extends shared.mq_server.Controller {
     }
 
 
-    public static void createStory(JSONObject paramsObject) {
+    public static JSONObject createStory(JSONObject paramsObject) {
         JSONObject createStory = new JSONObject();
-
-        if (!ArangoInterfaceMethods.insertStory(paramsObject).equals(null)) {
-            createStory.put("success", "true");
-            createStory.put("error", "0");
-
-        } else {
-            createStory.put("success", "false");
-            createStory.put("error", "Story not created");
-        }
+        createStory.put("story_id",ArangoInterfaceMethods.insertStory(paramsObject));
+        return createStory;
     }
 
 
     public static JSONObject deleteStory(JSONObject paramsObject) {
-
-        JSONObject delteStory = new JSONObject();
-        if (ArangoInterfaceMethods.deleteStory(paramsObject.getString("id"))) {
-            delteStory.put("success", "true");
-            delteStory.put("error", "0");
-        } else {
-            delteStory.put("success", "false");
-            delteStory.put("error", "Story not deleted");
-        }
-        return delteStory;
+        JSONObject deleteStory = new JSONObject();
+        ArangoInterfaceMethods.deleteStory(paramsObject.getString("id"));
+        deleteStory.put("message","Story Deleted");
+        return deleteStory;
     }
 
     public static JSONObject getStory(JSONObject paramsObject) throws CustomException{
@@ -103,7 +90,6 @@ public class Controller extends shared.mq_server.Controller {
             storyResponse = ArangoInterfaceMethods.getStory(storyID);
             Cache.insertStoryIntoCache(storyResponse,storyID);
         }
-        story.put("error","0");
         story.put("response",storyResponse);
         return story;
     }
@@ -116,7 +102,6 @@ public class Controller extends shared.mq_server.Controller {
             stories = ArangoInterfaceMethods.getStoriesForUser(userId);
             Cache.insertUserStoriesIntoCache(stories,userId);
         }
-        myStory.put("error","0");
         myStory.put("response",stories);
         return myStory;
     }
@@ -129,13 +114,12 @@ public class Controller extends shared.mq_server.Controller {
            allStories = ArangoInterfaceMethods.getFriendsStories(userId);
            Cache.insertUserStoriesIntoCache(allStories,userId);
         }
-        resultStories.put("error","0");
         resultStories.put("response",allStories);
         return resultStories;
     }
 
-    public static void getDiscoverStories() {
-
+    public static JSONObject getDiscoverStories() {
+        return null;
     }
 
 }
