@@ -1,0 +1,7 @@
+{
+  "method": "getActivities",
+  "params": {
+    "pageSize": 5,
+    "pageIndex": 1,
+  }
+}

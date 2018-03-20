@@ -46,7 +46,9 @@ public class ArangoInterfaceTest {
         ArangoInterfaceMethods.dbName = ArangoInterfaceTest.dbName;
         Properties properties = readPropertiesFile("src/main/resources/arango.properties");
         arangoDB = new ArangoDB.Builder().host(properties.getProperty("host"), Integer.parseInt(properties.getProperty("port"))).build();
-        arangoDB.db(dbName).drop();
+        if(arangoDB.getDatabases().contains(dbName)) {
+            arangoDB.db(dbName).drop();
+        }
         try {
             if (arangoDB.getDatabases().contains(dbName)) {
                 arangoDB.db(dbName).drop();
@@ -704,5 +706,82 @@ public class ArangoInterfaceTest {
         Assert.assertFalse(isTaggedPost("Posts/"+id1, "Hashtags/from_Russia_with_love"));
 
     }
+
+    @Test
+    public void notificationsTest() throws Exception {
+        String userId1 = utilities.Main.generateUUID() ;
+        String userId2 = utilities.Main.generateUUID() ;
+
+        JSONObject post = new JSONObject();
+
+        post.put("user_id",userId1);
+        post.put("caption","hello");
+        post.put("media",new ArrayList<String>());
+        post.put("comments",new ArrayList<String>());
+        String postID = insertPost(post,userId1);
+        followUser(userId2,userId1);
+        likePost(postID,userId2);
+        String receiverId = userId1;
+        JSONObject notificationJSON = new JSONObject();
+        JSONObject innerJSON = new JSONObject();
+        innerJSON.put("type", "liking_post");
+        innerJSON.put("post_id",postID);
+        notificationJSON.put("activity_type",innerJSON);
+        notificationJSON.put("sender_id", userId2);
+        notificationJSON.put("receiver_id", receiverId);
+        notificationJSON.put("created_at",new java.util.Date());
+        notificationJSON.put("blocked_at","null");
+        notificationJSON.put("id",utilities.Main.generateUUID());
+        insertNotification(notificationJSON);
+        insertActivity(notificationJSON);
+
+        Assert.assertTrue(getNotifications(userId1,0,5).length()==1);
+    }
+
+    @Test
+    public void ActivitiesTest() throws Exception {
+        String userId1 = utilities.Main.generateUUID() ;
+        String userId2 = utilities.Main.generateUUID() ;
+        String userId3 = utilities.Main.generateUUID() ;
+
+        makeUserNode(userId1);
+        makeUserNode(userId2);
+        makeUserNode(userId3);
+
+        JSONObject post = new JSONObject();
+
+        post.put("user_id",userId1);
+        post.put("caption","hello");
+        post.put("media",new ArrayList<String>());
+        post.put("comments",new ArrayList<String>());
+        String postID = insertPost(post,userId1);
+        followUser(userId2,userId1);
+        followUser(userId3,userId2);
+        likePost(postID,userId2);
+        JSONObject comment = new JSONObject();
+        comment.put("content","hello");
+        comment.put("user_id",userId2);
+        insertCommentOnPost(postID,comment);
+        String receiverId = userId1;
+        JSONObject notificationJSON = new JSONObject();
+        JSONObject innerJSON = new JSONObject();
+        innerJSON.put("type", "liking_post");
+        innerJSON.put("post_id",postID);
+        notificationJSON.put("activity_type",innerJSON);
+        notificationJSON.put("sender_id", userId2);
+        notificationJSON.put("receiver_id", receiverId);
+        notificationJSON.put("created_at",new java.util.Date());
+        notificationJSON.put("blocked_at","null");
+        notificationJSON.put("id",utilities.Main.generateUUID());
+        insertNotification(notificationJSON);
+        insertActivity(notificationJSON);
+
+        Assert.assertTrue(getNotifications(userId1,0,5).length()==1);
+
+        ArrayList<String> followings = getAllfollowingIDs(userId3);
+        Assert.assertEquals(getActivities(followings,0,5).length(), 1);
+
+    }
+
 
 }
