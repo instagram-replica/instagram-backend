@@ -114,12 +114,35 @@ public class Cache {
         }
         pool.close();
     }
-
+    public static void insertDiscoverStoriesIntoCache(JSONArray stories, String userId) {
+        System.out.println("INSERTING INTO CACHE");
+        JedisPool pool = new JedisPool(new JedisPoolConfig(), properties.getProperty("host"), Integer.parseInt(properties.getProperty("port")));
+        try (Jedis jedis = pool.getResource()) {
+            String key = "discoverstories$" + userId;
+            jedis.set(key, stories.toString());
+            jedis.expire(key, EXPIRY_TIME);
+        }
+        pool.close();
+    }
     public static JSONArray getUserStoriesFromCache(String userId) {
         System.out.println("READING FROM CACHE");
         JedisPool pool = new JedisPool(new JedisPoolConfig(), properties.getProperty("host"), Integer.parseInt(properties.getProperty("port")));
         try (Jedis jedis = pool.getResource()) {
-            String key = "userstories$" + userId;
+            String key = "friendsstories$" + userId;
+            String jsonStories = jedis.get(key);
+            pool.close();
+            if (jsonStories != null) {
+                return new JSONArray(jsonStories);
+            } else {
+                return null;
+            }
+        }
+    }
+    public static JSONArray getDiscoverStoriesFromCache(String userId) {
+        System.out.println("READING FROM CACHE");
+        JedisPool pool = new JedisPool(new JedisPoolConfig(), properties.getProperty("host"), Integer.parseInt(properties.getProperty("port")));
+        try (Jedis jedis = pool.getResource()) {
+            String key = "discoverstories$" + userId;
             String jsonStories = jedis.get(key);
             pool.close();
             if (jsonStories != null) {

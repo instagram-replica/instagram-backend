@@ -171,7 +171,7 @@ public class ArangoInterfaceTest {
     }
 
     @Test
-    public void insertAndGetThread() {
+    public void insertAndGetThread() throws Exception{
         JSONObject obj = new JSONObject();
         obj.put("creator_id", utilities.Main.generateUUID());
         obj.put("users_ids", new ArrayList<String>());
@@ -194,7 +194,7 @@ public class ArangoInterfaceTest {
     }
 
     @Test
-    public void updateAndDeleteThread() {
+    public void updateAndDeleteThread() throws Exception{
         JSONObject obj = new JSONObject();
         obj.put("creator_id", utilities.Main.generateUUID());
         obj.put("users_ids", new ArrayList<String>());
@@ -225,7 +225,7 @@ public class ArangoInterfaceTest {
     }
 
     @Test
-    public void insertAndGetNotification() {
+    public void insertAndGetNotification() throws Exception{
         JSONObject obj = new JSONObject();
         obj.put("activity_type", "{ type: follow, user_id: 2343-2342");
         obj.put("receiver_id", utilities.Main.generateUUID());
@@ -246,7 +246,7 @@ public class ArangoInterfaceTest {
     }
 
     @Test
-    public void updateAndDeleteNotification() {
+    public void updateAndDeleteNotification() throws Exception{
         JSONObject obj = new JSONObject();
         obj.put("activity_type", "{ type: follow, user_id: 2343-2342 }");
         obj.put("receiver_id", utilities.Main.generateUUID());
@@ -275,7 +275,7 @@ public class ArangoInterfaceTest {
     }
 
     @Test
-    public void insertAndGetActivity() {
+    public void insertAndGetActivity() throws Exception{
         JSONObject obj = new JSONObject();
         obj.put("activity_type", "{ type: follow, user_id: 2343-2342");
         obj.put("receiver_id", utilities.Main.generateUUID());
@@ -296,7 +296,7 @@ public class ArangoInterfaceTest {
     }
 
     @Test
-    public void updateAndDeleteActivity() {
+    public void updateAndDeleteActivity() throws Exception{
         JSONObject obj = new JSONObject();
         obj.put("activity_type", "{ type: follow, user_id: 2343-2342 }");
         obj.put("receiver_id", utilities.Main.generateUUID());
@@ -327,7 +327,7 @@ public class ArangoInterfaceTest {
     }
 
     @Test
-    public void insertAndGetStory() {
+    public void insertAndGetStory() throws Exception{
 
         String UUID = utilities.Main.generateUUID();
         JSONObject obj = new JSONObject();
@@ -353,7 +353,7 @@ public class ArangoInterfaceTest {
     }
 
     @Test
-    public void updateAndDeleteStory() {
+    public void updateAndDeleteStory() throws Exception{
         String UUID = utilities.Main.generateUUID();
         JSONObject obj = new JSONObject();
         obj.put("user_id", UUID);
@@ -461,7 +461,7 @@ public class ArangoInterfaceTest {
     }
 
     @Test
-    public void insertAndGetBookmark() {
+    public void insertAndGetBookmark() throws Exception{
 
         JSONObject obj = new JSONObject();
         obj.put("posts_ids", new ArrayList<String>());
@@ -480,7 +480,7 @@ public class ArangoInterfaceTest {
     }
 
     @Test
-    public void updateAndDeleteBookmark() {
+    public void updateAndDeleteBookmark() throws Exception{
 
         JSONObject obj = new JSONObject();
         obj.put("user_id", utilities.Main.generateUUID());
