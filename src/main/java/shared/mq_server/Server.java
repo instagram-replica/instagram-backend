@@ -92,7 +92,10 @@ public class Server {
                         String uuid = jsonObject.getString("uuid");
                         jsonObject.remove("uuid");
 
-                        JSONObject resObj = controller.execute(jsonObject, "");
+                        String userId = jsonObject.getString("userId");
+                        jsonObject.remove("userId");
+
+                        JSONObject resObj = controller.execute(jsonObject, userId);
                         resObj.put("uuid", uuid);
 
                         channel.queueDeclare(queueName, true, false, false, null);

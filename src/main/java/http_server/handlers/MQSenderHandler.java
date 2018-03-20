@@ -35,7 +35,8 @@ public class MQSenderHandler extends SimpleChannelInboundHandler<HTTPRequest> {
         String uuid = UUID.randomUUID().toString();
         jsonObject
                 .put("uuid", uuid)
-                .put("sender", Settings.getInstance().getInstanceId());
+                .put("sender", Settings.getInstance().getInstanceId())
+                .put("userId", httpRequest.userId);
 
         channel.queueDeclare(serviceName, true, false, false, null);
         channel.basicPublish("", serviceName, null, jsonObject.toString().getBytes("UTF-8"));
