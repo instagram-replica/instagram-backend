@@ -375,12 +375,10 @@ public class ArangoInterfaceMethods {
             String dbQuery = "For story in " + storiesCollectionName + " FILTER story.user_id == \""+ user_id + "\" RETURN story";
             ArangoCursor<BaseDocument> cursor = arangoDB.db(dbName).query(dbQuery, null, null, BaseDocument.class);
             JSONArray result = new JSONArray();
-            System.out.println(dbQuery);
             cursor.forEachRemaining(aDocument -> {
                 JSONObject postJSON = new JSONObject(aDocument.getProperties());
                 result.put(reformatJSON(postJSON));
             });
-            System.out.println(result.toString());
             return result;
         } catch (ArangoDBException e) {
             System.err.println("Failed to execute query. " + e.getMessage());
