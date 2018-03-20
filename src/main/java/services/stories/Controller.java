@@ -90,7 +90,7 @@ public class Controller extends shared.mq_server.Controller {
         JSONObject myStory = new JSONObject();
         JSONArray stories = Cache.getUserStoriesFromCache(userId);
         if(stories==null) {
-            stories = ArangoInterfaceMethods.getStories(userId);
+            stories = ArangoInterfaceMethods.getStoriesForUser(userId);
             Cache.insertUserStoriesIntoCache(stories,userId);
         }
         myStory.put("error","0");
