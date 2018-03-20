@@ -54,6 +54,7 @@ public class ArangoInterfaceMethods {
     private static final String graphPostTaggedCollectionName = "PostTagged";
     private static final String graphUserBlockedCollectionName = "UserBlocked";
     private static final String graphUserReportedCollectionName = "UserReported";
+    private static final String graphUserConnectedToThreadCollectionName = "UserConnectedToThread";
 
 
     private static final String graphName = "InstagramGraph";
@@ -627,12 +628,20 @@ public class ArangoInterfaceMethods {
             edgeUserReported.from(userCollectionName);
             edgeUserReported.to(userCollectionName);
 
+            EdgeDefinition edgeUserThread = new EdgeDefinition();
+
+            edgeUserThread.collection(graphUserConnectedToThreadCollectionName);
+            edgeUserThread.from(userCollectionName);
+            edgeUserThread.to(threadsCollectionName);
+
+
             edgeDefinitions.add(edgeUserFollows);
             edgeDefinitions.add(edgeUserInteracts);
             edgeDefinitions.add(edgeUserTagged);
             edgeDefinitions.add(edgePostTagged);
             edgeDefinitions.add(edgeUserBlocked);
             edgeDefinitions.add(edgeUserReported);
+            edgeDefinitions.add(edgeUserThread);
 
             GraphCreateOptions options = new GraphCreateOptions();
             options.orphanCollections("dummyOptions");
@@ -698,6 +707,25 @@ public class ArangoInterfaceMethods {
 
         try {
             ArangoEdgeCollection edgecollection = arangoDB.db(dbName).graph(graphName).edgeCollection(graphUserReportedCollectionName);
+            edgecollection.insertEdge(edge, null);
+            return true;
+        } catch (ArangoDBException e) {
+            System.err.println("Edge Insertion Failed In Graph: " + e.getMessage());
+            return false;
+        }
+    }
+
+    public static boolean joinThread(String userKey, String threadKey) {
+
+        BaseEdgeDocument edge = new BaseEdgeDocument();
+        String userID = "Users/"+userKey;
+        String threadID = "Threads/"+threadKey;
+        edge.setKey(userKey + threadKey);
+        edge.setFrom(userID);
+        edge.setTo(threadID);
+
+        try {
+            ArangoEdgeCollection edgecollection = arangoDB.db(dbName).graph(graphName).edgeCollection(graphUserConnectedToThreadCollectionName);
             edgecollection.insertEdge(edge, null);
             return true;
         } catch (ArangoDBException e) {
@@ -953,6 +981,34 @@ public class ArangoInterfaceMethods {
             //TODO Mohamed Abouzeid uncomment this line when done :D
 //            IDs = removePrivateIDs(IDs);
             return IDs;
+    }
+
+    public static ArrayList<String> getAllThreadsForUser(String userKey) {
+        String userID = "Users/"+userKey;
+        ArrayList<String> IDs = new ArrayList<>();
+        String query = "FOR vertex IN OUTBOUND \""  + userID+"\" "+ graphUserConnectedToThreadCollectionName + " RETURN vertex " ;
+        System.out.println(query);
+        Map<String, Object> bindVars = new MapBuilder().get();
+        ArangoCursor<BaseDocument> cursor = arangoDB.db(dbName).query(query, bindVars, null,
+                BaseDocument.class);
+        cursor.forEachRemaining(aDocument -> {
+            IDs.add(aDocument.getKey());
+        });
+        return IDs;
+    }
+
+    public static ArrayList<String> getAllUsersInThread(String threadKey){
+        String threadID = "Threads/"+threadKey;
+        ArrayList<String> IDs = new ArrayList<>();
+        String query = "FOR vertex IN INBOUND \""  + threadID+"\" "+ graphUserConnectedToThreadCollectionName + " RETURN vertex " ;
+        Map<String, Object> bindVars = new MapBuilder().get();
+        ArangoCursor<BaseDocument> cursor = arangoDB.db(dbName).query(query, bindVars, null,
+                BaseDocument.class);
+        cursor.forEachRemaining(aDocument -> {
+            IDs.add(aDocument.getKey());
+            System.out.println("ID follower: "+ aDocument.getKey());
+        });
+        return IDs;
     }
 
     public static ArrayList<String> getAllBlockedIDs(String userKey) {

@@ -41,6 +41,7 @@ public class ArangoInterfaceTest {
     private static final String graphPostTaggedCollectionName = "PostTagged";
     private static final String graphUserBlockedCollectionName = "UserBlocked";
     private static final String graphUserReportedCollectionName = "UserReported";
+    private static final String graphUserConnectedToThreadCollectionName = "UserConnectedToThread";
 
     private static final String graphName = "InstagramGraph";
 
@@ -143,12 +144,20 @@ public class ArangoInterfaceTest {
             edgeUserReported.from(userCollectionName);
             edgeUserReported.to(userCollectionName);
 
+            EdgeDefinition edgeUserThread = new EdgeDefinition();
+
+            edgeUserThread.collection(graphUserConnectedToThreadCollectionName);
+            edgeUserThread.from(userCollectionName);
+            edgeUserThread.to(threadsCollectionName);
+
+
             edgeDefinitions.add(edgeUserFollows);
             edgeDefinitions.add(edgeUserInteracts);
             edgeDefinitions.add(edgeUserTagged);
             edgeDefinitions.add(edgePostTagged);
             edgeDefinitions.add(edgeUserBlocked);
             edgeDefinitions.add(edgeUserReported);
+            edgeDefinitions.add(edgeUserThread);
 
 
             GraphCreateOptions options = new GraphCreateOptions();
@@ -641,6 +650,30 @@ public class ArangoInterfaceTest {
 
         Assert.assertTrue(isReported("9087b6df-b6f5-4de5-856b-a965c1e3d829", "768a9e00-3d8e-4274-8f21-de6a76c64456"));
         Assert.assertFalse(isReported("768a9e00-3d8e-4274-8f21-de6a76c64456", "20981745-ca25-483f-a831-edd6c1ffcade"));
+    }
+
+    @Test
+    public void userConnectedToThreadTest() {
+        JSONObject obj = new JSONObject();
+        obj.put("creator_id", utilities.Main.generateUUID());
+        obj.put("users_ids", new ArrayList<String>());
+        obj.put("name", "Ahmed");
+        obj.put("created_at", new Timestamp(System.currentTimeMillis()));
+        obj.put("deleted_at", new Timestamp(System.currentTimeMillis()));
+        obj.put("blocked_at", new Timestamp(System.currentTimeMillis()));
+        obj.put("messages", new ArrayList<String>());
+
+
+        String id = ArangoInterfaceMethods.insertThread(obj);
+
+        joinThread("9087b6df-b6f5-4de5-856b-a965c1e3d829", ""+id);
+        joinThread("20981745-ca25-483f-a831-edd6c1ffcade", ""+id);
+
+        ArrayList<String> threadsForUser = getAllThreadsForUser("9087b6df-b6f5-4de5-856b-a965c1e3d829");
+        Assert.assertEquals(threadsForUser.size(), 1);
+
+        ArrayList<String> usersInThreads = getAllUsersInThread(""+id);
+        Assert.assertEquals(usersInThreads.size(), 2);
     }
 
     @Test
