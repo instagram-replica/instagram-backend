@@ -51,6 +51,8 @@ public class ArangoInterfaceMethods {
     private static final String graphUserInteractsCollectionName = "UserInteracts";
     private static final String graphUserTaggedCollectionName = "UserTagged";
     private static final String graphPostTaggedCollectionName = "PostTagged";
+    private static final String graphUserBlockedCollectionName = "UserBlocked";
+    private static final String graphUserReportedCollectionName = "UserReported";
 
 
     private static final String graphName = "InstagramGraph";
@@ -737,10 +739,24 @@ public class ArangoInterfaceMethods {
             edgePostTagged.from(postsCollectionName);
             edgePostTagged.to(hashtagCollectionName);
 
+            EdgeDefinition edgeUserBlocked = new EdgeDefinition();
+
+            edgeUserBlocked.collection(graphUserBlockedCollectionName);
+            edgeUserBlocked.from(userCollectionName);
+            edgeUserBlocked.to(userCollectionName);
+
+            EdgeDefinition edgeUserReported = new EdgeDefinition();
+
+            edgeUserReported.collection(graphUserReportedCollectionName);
+            edgeUserReported.from(userCollectionName);
+            edgeUserReported.to(userCollectionName);
+
             edgeDefinitions.add(edgeUserFollows);
             edgeDefinitions.add(edgeUserInteracts);
             edgeDefinitions.add(edgeUserTagged);
             edgeDefinitions.add(edgePostTagged);
+            edgeDefinitions.add(edgeUserBlocked);
+            edgeDefinitions.add(edgeUserReported);
 
             GraphCreateOptions options = new GraphCreateOptions();
             options.orphanCollections("dummyOptions");
@@ -772,6 +788,44 @@ public class ArangoInterfaceMethods {
 
         try {
             ArangoEdgeCollection edgecollection = arangoDB.db(dbName).graph(graphName).edgeCollection(graphUserFollowsCollectionName);
+            edgecollection.insertEdge(edge, null);
+            return true;
+        } catch (ArangoDBException e) {
+            System.err.println("Edge Insertion Failed In Graph: " + e.getMessage());
+            return false;
+        }
+    }
+
+    public static boolean blockUser(String blockerKey, String blockedKey) {
+
+        BaseEdgeDocument edge = new BaseEdgeDocument();
+        String blockerID = "Users/"+blockerKey;
+        String blockedID = "Users/"+blockedKey;
+        edge.setKey(blockerKey + blockedKey);
+        edge.setFrom(blockerID);
+        edge.setTo(blockedID);
+
+        try {
+            ArangoEdgeCollection edgecollection = arangoDB.db(dbName).graph(graphName).edgeCollection(graphUserBlockedCollectionName);
+            edgecollection.insertEdge(edge, null);
+            return true;
+        } catch (ArangoDBException e) {
+            System.err.println("Edge Insertion Failed In Graph: " + e.getMessage());
+            return false;
+        }
+    }
+
+    public static boolean reportUser(String reporterKey, String reportedKey) {
+
+        BaseEdgeDocument edge = new BaseEdgeDocument();
+        String reporterID = "Users/"+reporterKey;
+        String reportedID = "Users/"+reportedKey;
+        edge.setKey(reporterKey + reportedKey);
+        edge.setFrom(reporterID);
+        edge.setTo(reportedID);
+
+        try {
+            ArangoEdgeCollection edgecollection = arangoDB.db(dbName).graph(graphName).edgeCollection(graphUserReportedCollectionName);
             edgecollection.insertEdge(edge, null);
             return true;
         } catch (ArangoDBException e) {
@@ -851,8 +905,17 @@ public class ArangoInterfaceMethods {
             System.err.println("Edge Deletion Failed In Graph: " + e.getMessage());
             return false;
         }
+    }
 
-
+    public static boolean unblockUser(String blockerKey, String blockedKey){
+        try {
+            ArangoEdgeCollection edgecollection = arangoDB.db(dbName).graph(graphName).edgeCollection(graphUserBlockedCollectionName);
+            edgecollection.deleteEdge(blockerKey + blockedKey);
+            return true;
+        } catch (ArangoDBException e) {
+            System.err.println("Edge Deletion Failed In Graph: " + e.getMessage());
+            return false;
+        }
     }
 
     public static boolean unFolllowHashtag(String userIDKey, String hashtagNameKey) {
@@ -943,6 +1006,17 @@ public class ArangoInterfaceMethods {
 
     }
 
+    public static boolean isBlocked(String blockerKey, String blockedKey) {
+        ArangoEdgeCollection edgecollection = arangoDB.db(dbName).graph(graphName).edgeCollection(graphUserBlockedCollectionName);
+        BaseEdgeDocument edgeDoc = edgecollection.getEdge(blockerKey + blockedKey, BaseEdgeDocument.class);
+        if (edgeDoc == null) {
+            return false;
+        } else {
+            return true;
+        }
+
+    }
+
     public static boolean isInteracting(String userKey, String hashtagKey) {
         ArangoEdgeCollection edgecollection = arangoDB.db(dbName).graph(graphName).edgeCollection(graphUserInteractsCollectionName);
         BaseEdgeDocument edgeDoc = edgecollection.getEdge(userKey + hashtagKey, BaseEdgeDocument.class);
@@ -969,6 +1043,18 @@ public class ArangoInterfaceMethods {
     public static boolean isTaggedPost(String postIDKey, String hashtagNameKey){
         ArangoEdgeCollection edgecollection = arangoDB.db(dbName).graph(graphName).edgeCollection(graphPostTaggedCollectionName);
         BaseEdgeDocument edgeDoc = edgecollection.getEdge(postIDKey+hashtagNameKey,BaseEdgeDocument.class);
+        if(edgeDoc == null){
+            return false;
+        }
+        else{
+            return true;
+        }
+
+    }
+
+    public static boolean isReported(String reporterKey, String reportedKey){
+        ArangoEdgeCollection edgecollection = arangoDB.db(dbName).graph(graphName).edgeCollection(graphUserReportedCollectionName);
+        BaseEdgeDocument edgeDoc = edgecollection.getEdge(reporterKey+reportedKey,BaseEdgeDocument.class);
         if(edgeDoc == null){
             return false;
         }
@@ -1064,6 +1150,25 @@ public class ArangoInterfaceMethods {
         }
     }
 
+    public static ArrayList<String> getAllBlockedIDs(String userKey) {
+        try {
+            String userID = "Users/"+userKey;
+            ArrayList<String> IDs = new ArrayList<>();
+            String query = "FOR vertex IN OUTBOUND \""  + userID+"\" "+ graphUserBlockedCollectionName + " RETURN vertex " ;
+            System.out.println(query);
+            Map<String, Object> bindVars = new MapBuilder().get();
+            ArangoCursor<BaseDocument> cursor = arangoDB.db(dbName).query(query, bindVars, null,
+                    BaseDocument.class);
+            cursor.forEachRemaining(aDocument -> {
+                IDs.add(aDocument.getKey());
+            });
+            return IDs;
+        } catch (ArangoDBException e) {
+            System.err.println("Failed to execute query. " + e.getMessage());
+            return null;
+        }
+
+    }
 
     public static ArrayList<String> getAllFollowingHashtags(String userKey){
         try{

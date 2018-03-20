@@ -38,6 +38,8 @@ public class ArangoInterfaceTest {
     private static final String graphUserInteractsCollectionName = "UserInteracts";
     private static final String graphUserTaggedCollectionName = "UserTagged";
     private static final String graphPostTaggedCollectionName = "PostTagged";
+    private static final String graphUserBlockedCollectionName = "UserBlocked";
+    private static final String graphUserReportedCollectionName = "UserReported";
 
     private static final String graphName = "InstagramGraph";
 
@@ -128,10 +130,25 @@ public class ArangoInterfaceTest {
             edgePostTagged.from(postsCollectionName);
             edgePostTagged.to(hashtagCollectionName);
 
+            EdgeDefinition edgeUserBlocked = new EdgeDefinition();
+
+            edgeUserBlocked.collection(graphUserBlockedCollectionName);
+            edgeUserBlocked.from(userCollectionName);
+            edgeUserBlocked.to(userCollectionName);
+
+            EdgeDefinition edgeUserReported = new EdgeDefinition();
+
+            edgeUserReported.collection(graphUserReportedCollectionName);
+            edgeUserReported.from(userCollectionName);
+            edgeUserReported.to(userCollectionName);
+
             edgeDefinitions.add(edgeUserFollows);
             edgeDefinitions.add(edgeUserInteracts);
             edgeDefinitions.add(edgeUserTagged);
             edgeDefinitions.add(edgePostTagged);
+            edgeDefinitions.add(edgeUserBlocked);
+            edgeDefinitions.add(edgeUserReported);
+
 
             GraphCreateOptions options = new GraphCreateOptions();
             options.orphanCollections("dummyOptions");
@@ -561,6 +578,39 @@ public class ArangoInterfaceTest {
 
         Assert.assertTrue(isFollowing("9087b6df-b6f5-4de5-856b-a965c1e3d829", "302d0e85-91be-46c2-ac71-2a4991207d3b"));
         Assert.assertFalse(isFollowing("768a9e00-3d8e-4274-8f21-de6a76c64456", "20981745-ca25-483f-a831-edd6c1ffcade"));
+    }
+
+
+    @Test
+    public void blockTest() {
+        blockUser("9087b6df-b6f5-4de5-856b-a965c1e3d829", "20981745-ca25-483f-a831-edd6c1ffcade");
+        blockUser("9087b6df-b6f5-4de5-856b-a965c1e3d829", "768a9e00-3d8e-4274-8f21-de6a76c64456");
+
+        ArrayList<String> blocked = getAllBlockedIDs("9087b6df-b6f5-4de5-856b-a965c1e3d829");
+        Assert.assertEquals(blocked.size(), 2);
+
+        unblockUser("9087b6df-b6f5-4de5-856b-a965c1e3d829", "20981745-ca25-483f-a831-edd6c1ffcade");
+
+        ArrayList<String> blockedAfterUblocking = getAllBlockedIDs("9087b6df-b6f5-4de5-856b-a965c1e3d829");
+        Assert.assertEquals(blockedAfterUblocking.size(), 1);
+
+        String newUserUUID = UUID.randomUUID().toString();
+        makeUserNode(newUserUUID);
+
+        blockUser("9087b6df-b6f5-4de5-856b-a965c1e3d829", "" + newUserUUID);
+        ArrayList<String> newFollowing = getAllBlockedIDs("9087b6df-b6f5-4de5-856b-a965c1e3d829");
+        Assert.assertEquals(newFollowing.size(), 2);
+
+        Assert.assertTrue(isBlocked("9087b6df-b6f5-4de5-856b-a965c1e3d829", "768a9e00-3d8e-4274-8f21-de6a76c64456"));
+        Assert.assertFalse(isBlocked("768a9e00-3d8e-4274-8f21-de6a76c64456", "20981745-ca25-483f-a831-edd6c1ffcade"));
+    }
+
+    @Test
+    public void reportTest() {
+        reportUser("9087b6df-b6f5-4de5-856b-a965c1e3d829", "768a9e00-3d8e-4274-8f21-de6a76c64456");
+
+        Assert.assertTrue(isReported("9087b6df-b6f5-4de5-856b-a965c1e3d829", "768a9e00-3d8e-4274-8f21-de6a76c64456"));
+        Assert.assertFalse(isReported("768a9e00-3d8e-4274-8f21-de6a76c64456", "20981745-ca25-483f-a831-edd6c1ffcade"));
     }
 
     @Test
