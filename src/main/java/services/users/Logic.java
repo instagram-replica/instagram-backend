@@ -35,6 +35,8 @@ public class Logic {
             throw new DatabaseException("Username already exists");
         }
 
+        // TODO @ARANGODB: Make user node
+
         return Database.createUser(modifiedUser);
     }
 
@@ -142,9 +144,9 @@ public class Logic {
             throw new ValidationException(validationResult.message);
         }
 
-        // TODO: Check if viewer is blocking viewed
+        // TODO @ARANGODB: Check if viewer is blocking viewed
         boolean hasViewerBlockedViewed = false;
-        // TODO: Check if viewed is blocking viewer
+        // TODO @ARANGODB: Check if viewed is blocking viewer
         boolean hasViewedBlockedViewer = false;
 
         if (hasViewerBlockedViewed || hasViewedBlockedViewer) {
@@ -157,7 +159,7 @@ public class Logic {
             return true;
         }
 
-        // TODO: Check if viewer is following viewed
+        // TODO @ARANGODB: Check if viewer is following viewed
         boolean hasViewerFollowedViewed = true;
 
         if (hasViewerFollowedViewed) {

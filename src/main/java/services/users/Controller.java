@@ -5,7 +5,6 @@ import auth.JWTPayload;
 import exceptions.CustomException;
 import exceptions.JSONException;
 import json.JSONParser;
-import org.javalite.activejdbc.InitException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import persistence.sql.users.User;
@@ -15,7 +14,6 @@ import java.util.List;
 
 import static persistence.sql.Main.closeConnection;
 import static persistence.sql.Main.openConnection;
-import static services.users.Logic.isAuthorizedToView;
 
 public class Controller extends shared.mq_server.Controller {
     public Controller() {
@@ -70,23 +68,23 @@ public class Controller extends shared.mq_server.Controller {
                 response = Controller.handleIsAuthorizedToView(params);
                 break;
             case "followUser":
-                // TODO: Insert follow edge between nodes in ArangoDB graph database
+                // TODO @ARANGODB
                 response = Helpers.constructErrorResponse();
                 break;
             case "unfollowUser":
-                // TODO: Remove follow edge between nodes in ArangoDB graph database
+                // TODO @ARANGODB
                 response = Helpers.constructErrorResponse();
                 break;
             case "blockUser":
-                // TODO: Insert block edge between nodes in ArangoDB graph database
+                // TODO @ARANGODB
                 response = Helpers.constructErrorResponse();
                 break;
             case "unblockUser":
-                // TODO: Remove block edge between nodes in ArangoDB graph database
+                // TODO @ARANGODB
                 response = Helpers.constructErrorResponse();
                 break;
             case "reportUser":
-                // TODO: Insert report edge between nodes in ArangoDB graph database
+                // TODO @ARANGODB
                 response = Helpers.constructErrorResponse();
                 break;
             default:
