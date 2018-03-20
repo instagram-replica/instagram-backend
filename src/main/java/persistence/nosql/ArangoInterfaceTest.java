@@ -796,9 +796,9 @@ public class ArangoInterfaceTest {
         obj.put("user_id","70b8ebdf-7b70-4534-addc-5fe05a2c6112");
         String id4 = ArangoInterfaceMethods.insertStory(obj);
 
-        ArrayList<JSONArray> friendsStories = getFriendsStories("3a1eeb08-db5c-4a85-8e44-655165a916d4");
-        Assert.assertEquals(4,friendsStories.size());
-        Assert.assertEquals(1,friendsStories.get(0).length());
+        JSONArray friendsStories = getFriendsStories("3a1eeb08-db5c-4a85-8e44-655165a916d4");
+        Assert.assertEquals(4,friendsStories.length());
+        Assert.assertEquals(1, ((JSONArray) ((JSONObject) friendsStories.get(0)).get("stories")).length());
     }
 
 
