@@ -44,7 +44,7 @@ public class Helpers {
         return res;
     }
 
-    public static boolean isAuthorizedToView(String serviceName, String viewerId, String toBeViewedId) throws IOException, InterruptedException {
+    public static boolean isAuthorizedToView(String userId, String serviceName, String viewerId, String toBeViewedId) throws IOException, InterruptedException {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("method", "authorizedToView");
 
@@ -54,7 +54,7 @@ public class Helpers {
 
         jsonObject.put("params", paramsObj);
 
-        JSONObject authorizationJSONObj = Controller.send(serviceName, "users", jsonObject);
+        JSONObject authorizationJSONObj = Controller.send(serviceName, "users", jsonObject, userId);
         return authorizationJSONObj.getBoolean("authorized");
     }
 
@@ -86,20 +86,20 @@ public class Helpers {
         return resJson.get();
     }
 
-    public static JSONArray getUsersByIds(String serviceName, JSONArray jsonArray) throws IOException, InterruptedException {
+    public static JSONArray getUsersByIds(String serviceName, JSONArray jsonArray, String userId) throws IOException, InterruptedException {
         JSONObject usersJsonObject = new JSONObject().put("ids", jsonArray);
         JSONObject jsonObject = new JSONObject()
                 .put("params", usersJsonObject)
                 .put("method", "getUsersByIds");
-        return Controller.send(serviceName, "users", jsonObject).getJSONObject("data").getJSONArray("users");
+        return Controller.send(serviceName, "users", jsonObject, userId).getJSONObject("data").getJSONArray("users");
     }
 
-    public static JSONArray getUsersIdsByUsernames(String serviceName, ArrayList<String> usernames) throws IOException, InterruptedException {
+    public static JSONArray getUsersIdsByUsernames(String serviceName, ArrayList<String> usernames, String userId) throws IOException, InterruptedException {
         JSONObject usersJsonObject = new JSONObject().put("usernames", usernames);
         JSONObject jsonObject = new JSONObject()
                 .put("params", usersJsonObject)
                 .put("method", "getUsersIdsByUsernames");
-        return Controller.send(serviceName, "users", jsonObject).getJSONObject("data").getJSONArray("ids");
+        return Controller.send(serviceName, "users", jsonObject, userId).getJSONObject("data").getJSONArray("ids");
     }
 
 

@@ -6,10 +6,14 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelId;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import org.json.JSONObject;
+import persistence.nosql.ArangoInterfaceMethods;
+import shared.Settings;
+import shared.mq_server.Controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 
 public class ThreadRegistry {
@@ -67,7 +71,27 @@ public class ThreadRegistry {
 
         channel.exchangeDeclare(threadId, "fanout");
 
-        channel.basicPublish(threadId, "", null, (new JSONObject().put("userId", userId).put("value", text).toString()).getBytes());
+        JSONObject jsonObject = new JSONObject().put("userId", userId).put("text", text);
+        channel.basicPublish(threadId, "", null, (jsonObject.toString()).getBytes());
+
+        channel.close();
+        sendToChatService(text, userId, threadId);
+    }
+
+    private static void sendToChatService(String text, String userId, String threadId) throws IOException, TimeoutException {
+        Connection connection = RMQConnection.getSingleton();
+        Channel channel = connection.createChannel();
+
+        JSONObject jsonObject = new JSONObject();
+        jsonObject
+                .put("method", "createMessage")
+                .put("userId", userId)
+                .put("params",
+                        new JSONObject().put("text", text).put("threadId", threadId)
+                );
+
+        channel.queueDeclare("chats", true, false, false, null);
+        channel.basicPublish("", "chats", null, jsonObject.toString().getBytes("UTF-8"));
 
         channel.close();
     }
