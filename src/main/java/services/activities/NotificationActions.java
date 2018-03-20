@@ -50,6 +50,7 @@ public class NotificationActions {
         for(int i=0;i<receivers.length();i++){
             JSONObject taggedPerson = receivers.getJSONObject(i);
             JSONObject notifyReceiver = new JSONObject();
+            // TODO: Make call to users service to request resource
             String recID = Database.getUserByUsername(taggedPerson.getString("username")).id;
             notifyReceiver.put("activity_type","{ type: tag, user_id: " + recID+ "\"");
             notifyReceiver.put("receiver_id", recID);
