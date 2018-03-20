@@ -47,7 +47,7 @@ public class Controller extends shared.mq_server.Controller {
     }
 
 
-    public static void createStory(JSONObject paramsObject) {
+    public static JSONObject createStory(JSONObject paramsObject) {
         JSONObject createStory = new JSONObject();
 
         if (!ArangoInterfaceMethods.insertStory(paramsObject).equals(null)) {
@@ -58,6 +58,7 @@ public class Controller extends shared.mq_server.Controller {
             createStory.put("success", "false");
             createStory.put("error", "Story not created");
         }
+        return createStory;
     }
 
 
