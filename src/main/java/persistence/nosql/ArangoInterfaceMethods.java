@@ -401,6 +401,50 @@ public class ArangoInterfaceMethods {
         return resultStories;
     }
 
+    public static JSONArray getNotifications(String user_id, int start, int limit) {
+
+        try {
+            String dbQuery = "For notification in " + notificationsCollectionName
+                    + " FILTER notification.receiver_id == " + "'"+user_id+"'"
+                    + " SORT notification.created_at"
+                    + " Limit "+ start + ", " + limit
+                    + " RETURN notification";
+            ArangoCursor<BaseDocument> cursor = arangoDB.db(dbName).query(dbQuery, null, null, BaseDocument.class);
+            JSONArray result = new JSONArray();
+            cursor.forEachRemaining(aDocument -> {
+                JSONObject postJSON = new JSONObject(aDocument.getProperties());
+                result.put(reformatJSON(postJSON));
+            });
+            return result;
+        } catch (ArangoDBException e) {
+            System.err.println("Failed to execute query. " + e.getMessage());
+            return null;
+        }
+
+    }
+
+    public static JSONArray getActivities(ArrayList<String> followings, int start, int limit) {
+
+        try {
+            String dbQuery = "For activity in " + activitiesCollectionName
+                    + " FILTER activity.sender_id IN " + new JSONArray(followings)
+                    + " SORT activity.created_at"
+                    + " Limit "+ start + ", " + limit
+                    + " RETURN activity";
+            ArangoCursor<BaseDocument> cursor = arangoDB.db(dbName).query(dbQuery, null, null, BaseDocument.class);
+            JSONArray result = new JSONArray();
+            cursor.forEachRemaining(aDocument -> {
+                JSONObject postJSON = new JSONObject(aDocument.getProperties());
+                result.put(reformatJSON(postJSON));
+            });
+            return result;
+        } catch (ArangoDBException e) {
+            System.err.println("Failed to execute query. " + e.getMessage());
+            return null;
+        }
+
+    }
+
 
     public static ArrayList<JSONObject> getFeed(String userID,int limit, int offset){
         ArrayList<String> followers = getAllfollowingIDs(""+ userID);
@@ -499,6 +543,7 @@ public class ArangoInterfaceMethods {
     }
 
     public static void updatePost(String id, JSONObject postJSON) {
+        System.out.println(postJSON);
         try {
             BaseDocument myObject = new BaseDocument();
             myObject.addAttribute("user_id", postJSON.get("user_id").toString());
@@ -944,7 +989,6 @@ public class ArangoInterfaceMethods {
             System.out.println(cursor.getCount());
             cursor.forEachRemaining(aDocument -> {
                 IDs.add(aDocument.getKey());
-                System.out.println("ID following: " + aDocument.getKey());
             });
             return IDs;
         } catch (ArangoDBException e) {

@@ -36,7 +36,7 @@ public class Main {
     }
 
     public static List<String> getAllUsersIds() {
-        List<UsersModel> results =  UsersModel.findBySQL("SELECT id FROM users");
+        List<UsersModel> results = UsersModel.findBySQL("SELECT id FROM users");
         return results
                 .stream()
                 .map(Main::mapModelToUser)
@@ -262,6 +262,10 @@ public class Main {
 
     public static boolean deleteFollow(String followerId, String followedId) {
         return (UsersFollowModel.delete("follower_id = ? AND followed_id = ?", followerId, followedId) == 1);
+    }
+
+    public static String getUserIdFromUsername(String username){
+        return UsersModel.findFirst("username = ?", username).get("id").toString();
     }
 
 

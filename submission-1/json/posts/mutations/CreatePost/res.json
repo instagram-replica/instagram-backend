@@ -1,7 +1,63 @@
 {
   "method": "createPost",
-  "response":{
-    "postId":1123,
-    "error":null
+  "response": {
+    "post": {
+      "id": 12,
+      "caption": "hello world",
+      "likes": 100000,
+      "location": {
+        "longitiude": "122.3.12.33",
+        "latitude": "122.3.12.33"
+      },
+      "media": [
+        {
+          "id": 123,
+          "type": "img",
+          "url": "https://...",
+          "tags": [
+            {
+              "taggedUsers": [
+                {
+                  "username": "AhmedMagdy",
+                  "location": {
+                    "x": 20,
+                    "y": 10
+                  }
+                },
+                {
+                  "username": "Sawahel",
+                  "location": {
+                    "x": 20,
+                    "y": 10
+                  }
+                },
+                {
+                  "username": "Messiry",
+                  "location": {
+                    "x": 20,
+                    "y": 10
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 111,
+          "type": "video",
+          "url": "https://...",
+          "views": 1000000000
+        }
+      ],
+      "user": {
+        "id": 1,
+        "username": "omartag",
+        "avatar": "https://..."
+      },
+      "createAt": "2012-04-23T18:25:43.511Z",
+      "updatedAt": "2012-04-23T18:25:43.511Z",
+      "deletedAt": "2012-04-23T18:25:43.511Z"
+    },
+    "error": null
   }
 }

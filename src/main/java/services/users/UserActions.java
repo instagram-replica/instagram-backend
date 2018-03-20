@@ -110,7 +110,7 @@ public class UserActions {
 
         return jObject;
     }
-
+    
     public static JSONObject CreateUserReport(JSONObject paramsObject, String loggedInUserId) {
         //TODO: Test this via postman
         JSONObject jsonObject = new JSONObject();
