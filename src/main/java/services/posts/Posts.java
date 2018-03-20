@@ -50,8 +50,6 @@ public class Posts {
     }
 
     //TODO: Returns list of users (actual users not ids) who liked a post
-    //TODO: create JSON req.json and res for this method in submission1 folder
-
     public static JSONObject getPostLikers(JSONObject paramsObject, String loggedInUserId, String methodName) {
         String postId = paramsObject.getString("postId");
         JSONObject post = null;
@@ -192,7 +190,6 @@ public class Posts {
     }
 
     public static JSONObject createPostLike(JSONObject paramsObject, String loggedInUserId, String methodName) {
-
         //DONE: User cannot like a post more than once
         //TODO: Add unlike method and create JSON req and res
         //TODO: Create activity for the post owner @ACTIVITIES_TEAM, except if he is a retard who likes his own image
