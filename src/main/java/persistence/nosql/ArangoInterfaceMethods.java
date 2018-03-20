@@ -1056,7 +1056,7 @@ public class ArangoInterfaceMethods {
     }
 
     public static ArrayList<String> getAllPostsTaggedInHashtag(String hashtagNameKey){
-  
+
             String hashtagName = "Hashtags/"+hashtagNameKey;
             ArrayList<String> posts = new ArrayList<>();
             String query = "FOR vertex IN INBOUND \""  + hashtagName+"\" "+ graphPostTaggedCollectionName + " RETURN vertex " ;
