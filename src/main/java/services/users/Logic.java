@@ -2,6 +2,7 @@ package services.users;
 
 import auth.BCrypt;
 import exceptions.AuthenticationException;
+import persistence.nosql.ArangoInterfaceMethods;
 import persistence.sql.users.Database;
 import exceptions.DatabaseException;
 import persistence.sql.users.User;
@@ -35,7 +36,7 @@ public class Logic {
             throw new DatabaseException("Username already exists");
         }
 
-        // TODO @ARANGODB: Make user node
+        ArangoInterfaceMethods.makeUserNode(modifiedUser.id);
 
         return Database.createUser(modifiedUser);
     }
