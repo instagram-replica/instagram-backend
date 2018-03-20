@@ -44,8 +44,6 @@ public class Authentication {
         newUser.setPhoneNumber(params.getString("phone"));
         newUser.setPasswordHash(hashPassword(params.getString("password")));
 
-        ArangoInterfaceMethods.makeUserNode(newUser.getId());
-
         boolean created = Main.createUser(newUser);
 
            if(created) {
