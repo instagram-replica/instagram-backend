@@ -8,6 +8,7 @@ import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.cors.CorsConfig;
 import io.netty.handler.codec.http.cors.CorsConfigBuilder;
 import io.netty.handler.codec.http.cors.CorsHandler;
+import org.json.JSONException;
 import shared.Settings;
 import com.rabbitmq.client.*;
 import org.json.JSONObject;
@@ -92,8 +93,14 @@ public class Server {
                         String uuid = jsonObject.getString("uuid");
                         jsonObject.remove("uuid");
 
-                        String userId = jsonObject.getString("userId");
-                        jsonObject.remove("userId");
+                        String userId = null;
+
+                        try {
+                            userId = jsonObject.getString("userId");
+                            jsonObject.remove("userId");
+                        } catch (JSONException e) {
+                            // Do nothing
+                        }
 
                         JSONObject resObj = controller.execute(jsonObject, userId);
                         resObj.put("uuid", uuid);
