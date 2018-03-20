@@ -21,7 +21,7 @@ public class Logic {
                 .passwordHash(BCrypt.hashPassword(inputUser.password))
                 .build();
 
-        ValidationResult validationResult = Validator.validateUser(modifiedUser);
+        ValidationResult validationResult = Validator.validateUserForInsert(modifiedUser);
 
         if (validationResult.type == ValidationResultType.FAILURE) {
             throw new ValidationException(validationResult.message);
@@ -87,7 +87,7 @@ public class Logic {
     }
 
     public static User updateUser(User user) throws ValidationException, DatabaseException {
-        ValidationResult validationResult = Validator.validateUser(user);
+        ValidationResult validationResult = Validator.validateUserForUpdate(user);
 
         if (validationResult.type == ValidationResultType.FAILURE) {
             throw new ValidationException(validationResult.message);
@@ -142,6 +142,10 @@ public class Logic {
 
         if (validationResult.type == ValidationResultType.FAILURE) {
             throw new ValidationException(validationResult.message);
+        }
+
+        if (viewerId.equals(viewedId)) {
+            throw new ValidationException("Viewer & viewed IDs cannot both equal: " + viewerId);
         }
 
         // TODO @ARANGODB: Check if viewer is blocking viewed

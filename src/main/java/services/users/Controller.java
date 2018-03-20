@@ -250,8 +250,6 @@ public class Controller extends shared.mq_server.Controller {
 
             return Helpers.constructOKResponse(
                     new JSONObject()
-                            .put("viewerId", viewerId)
-                            .put("viewedId", viewedId)
                             .put("isAuthorizedToView", isAuthorizedToView)
             );
         } catch (CustomException e) {

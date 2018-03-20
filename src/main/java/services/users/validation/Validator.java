@@ -27,7 +27,7 @@ public class Validator {
             "^(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]"
     );
 
-    public static ValidationResult validateUser(User user) {
+    public static ValidationResult validateUserForInsert(User user) {
         if (user.id == null) {
             return new ValidationResult(
                     ValidationResultType.FAILURE,
@@ -113,6 +113,80 @@ public class Validator {
         }
 
         if (!isValidGender(user.gender)) {
+            return new ValidationResult(
+                    ValidationResultType.FAILURE,
+                    "Invalid gender: " + user.gender
+            );
+        }
+
+        if (user.phoneNumber != null && !isValidPhoneNumber(user.phoneNumber)) {
+            return new ValidationResult(
+                    ValidationResultType.FAILURE,
+                    "Invalid phone number: " + user.phoneNumber
+            );
+        }
+
+        if (user.profilePictureUrl != null && !isValidUrl(user.profilePictureUrl)) {
+            return new ValidationResult(
+                    ValidationResultType.FAILURE,
+                    "Invalid profile picture URL: " + user.profilePictureUrl
+            );
+        }
+
+        if (user.websiteUrl != null && !isValidUrl(user.websiteUrl)) {
+            return new ValidationResult(
+                    ValidationResultType.FAILURE,
+                    "Invalid website URL: " + user.websiteUrl
+            );
+        }
+
+        return new ValidationResult(ValidationResultType.SUCCESS);
+    }
+
+    public static ValidationResult validateUserForUpdate(User user) {
+        if (user.id == null) {
+            return new ValidationResult(
+                    ValidationResultType.FAILURE,
+                    "ID cannot be undefined"
+            );
+        }
+
+        if (user.username != null) {
+            return new ValidationResult(
+                    ValidationResultType.FAILURE,
+                    "Username cannot be updated"
+            );
+        }
+
+        if (user.email != null) {
+            return new ValidationResult(
+                    ValidationResultType.FAILURE,
+                    "Email cannot be updated"
+            );
+        }
+
+        if (user.password != null) {
+            return new ValidationResult(
+                    ValidationResultType.FAILURE,
+                    "Password cannot be updated"
+            );
+        }
+
+        if (!isValidId(user.id)) {
+            return new ValidationResult(
+                    ValidationResultType.FAILURE,
+                    "Invalid ID: " + user.id
+            );
+        }
+
+        if (user.fullName != null && !isValidFullName(user.fullName)) {
+            return new ValidationResult(
+                    ValidationResultType.FAILURE,
+                    "Invalid full name: " + user.fullName
+            );
+        }
+
+        if (user.gender != null && !isValidGender(user.gender)) {
             return new ValidationResult(
                     ValidationResultType.FAILURE,
                     "Invalid gender: " + user.gender
