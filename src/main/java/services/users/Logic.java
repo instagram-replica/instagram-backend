@@ -78,7 +78,7 @@ public class Logic {
         User user = Database.getUserById(userId);
 
         if (user == null) {
-            throw new DatabaseException("User cannot be found");
+            throw new DatabaseException("User ID does not exist: " + userId);
         }
 
         return user;
@@ -126,5 +126,44 @@ public class Logic {
         }
 
         return Database.getUsersIdsByUsernames(usernames);
+    }
+
+    public static boolean isAuthorizedToView(String viewerId, String viewedId)
+            throws DatabaseException, ValidationException {
+        ValidationResult validationResult = Validator.validateId(viewerId);
+
+        if (validationResult.type == ValidationResultType.FAILURE) {
+            throw new ValidationException(validationResult.message);
+        }
+
+        validationResult = Validator.validateId(viewedId);
+
+        if (validationResult.type == ValidationResultType.FAILURE) {
+            throw new ValidationException(validationResult.message);
+        }
+
+        // TODO: Check if viewer is blocking viewed
+        boolean hasViewerBlockedViewed = false;
+        // TODO: Check if viewed is blocking viewer
+        boolean hasViewedBlockedViewer = false;
+
+        if (hasViewerBlockedViewed || hasViewedBlockedViewer) {
+            return false;
+        }
+
+        User viewedUser = Logic.getUser(viewedId);
+
+        if (!viewedUser.isPrivate) {
+            return true;
+        }
+
+        // TODO: Check if viewer is following viewed
+        boolean hasViewerFollowedViewed = true;
+
+        if (hasViewerFollowedViewed) {
+            return true;
+        }
+
+        return false;
     }
 }

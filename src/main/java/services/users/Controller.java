@@ -15,6 +15,7 @@ import java.util.List;
 
 import static persistence.sql.Main.closeConnection;
 import static persistence.sql.Main.openConnection;
+import static services.users.Logic.isAuthorizedToView;
 
 public class Controller extends shared.mq_server.Controller {
     public Controller() {
@@ -66,8 +67,7 @@ public class Controller extends shared.mq_server.Controller {
                 response = Controller.handleGetUsersIdsByUsernames(params);
                 break;
             case "isUserAuthorizedToView":
-                // TODO: Implement logic
-                response = Helpers.constructErrorResponse();
+                response = Controller.handleIsAuthorizedToView(params);
                 break;
             case "followUser":
                 // TODO: Insert follow edge between nodes in ArangoDB graph database
@@ -231,6 +231,31 @@ public class Controller extends shared.mq_server.Controller {
             JSONArray usersJSON = Helpers.convertStringsListToJSONArray(usersIds);
 
             return Helpers.constructOKResponse(usersJSON);
+        } catch (CustomException e) {
+            e.printStackTrace();
+            return Helpers.constructErrorResponse(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Helpers.constructErrorResponse();
+        }
+    }
+
+    private static JSONObject handleIsAuthorizedToView(JSONObject params) {
+        try {
+            String viewerId = JSONParser.getString("viewerId", params);
+            String viewedId = JSONParser.getString("viewedId", params);
+
+            boolean isAuthorizedToView = Logic.isAuthorizedToView(
+                    viewerId,
+                    viewedId
+            );
+
+            return Helpers.constructOKResponse(
+                    new JSONObject()
+                            .put("viewerId", viewerId)
+                            .put("viewedId", viewedId)
+                            .put("isAuthorizedToView", isAuthorizedToView)
+            );
         } catch (CustomException e) {
             e.printStackTrace();
             return Helpers.constructErrorResponse(e.getMessage());
