@@ -7,6 +7,10 @@ services:
       - ARANGO_NO_AUTH=1
     ports:
       - "32807:8529"
+  redis:
+    image: redis
+    ports:
+      - "32768:6379"
   postgres:
     image: orchardup/postgresql
     environment:
@@ -18,6 +22,7 @@ services:
   rabbitmq:
     image: rabbitmq
     ports:
+      - "32811:4369"
       - "32810:5671"
       - "32809:5672"
       - "32808:25672"

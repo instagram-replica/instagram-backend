@@ -5,6 +5,7 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.*;
 import io.netty.util.CharsetUtil;
+import org.json.JSONException;
 import org.json.JSONObject;
 import shared.mq_server.Controller;
 import shared.mq_subscriptions.ExecutionPair;
@@ -16,11 +17,18 @@ import java.util.concurrent.atomic.AtomicReference;
 public class Helpers {
     public static void sendJSON(ChannelHandlerContext channelHandlerContext, JSONObject jsonObject) {
         ByteBuf content = Unpooled.copiedBuffer(jsonObject.toString(), CharsetUtil.UTF_8);
+        HttpResponseStatus httpResponseStatus;
+        try {
+            httpResponseStatus = jsonObject.get("error") == JSONObject.NULL
+                    ? HttpResponseStatus.OK
+                    : HttpResponseStatus.INTERNAL_SERVER_ERROR;
+        } catch (JSONException e) {
+            httpResponseStatus = HttpResponseStatus.OK;
+        }
+
         FullHttpResponse response = new DefaultFullHttpResponse(
                 HttpVersion.HTTP_1_1,
-                jsonObject.get("error") == JSONObject.NULL
-                        ? HttpResponseStatus.OK
-                        : HttpResponseStatus.INTERNAL_SERVER_ERROR,
+                httpResponseStatus,
                 content
         );
         response.headers().set(HttpHeaders.Names.CONTENT_TYPE, "application/json");
