@@ -779,7 +779,6 @@ public class ArangoInterfaceTest {
         ArangoInterfaceMethods.insertActivity(notificationJSON);
 
         Assert.assertTrue(ArangoInterfaceMethods.getNotifications(userId1,0,5).length()==1);
-       //================================
 
         ArrayList<String> followings = ArangoInterfaceMethods.getAllfollowingIDs("Users/" + userId3);
         Assert.assertEquals(ArangoInterfaceMethods.getActivities(followings,0,5).length(), 1);
