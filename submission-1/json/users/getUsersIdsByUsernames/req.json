@@ -1,0 +1,6 @@
+{
+  "method" : "getUsersIdsByUsernames",
+  "params": {
+    "usernames" : ["john_doe"]
+  }
+}

@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.util.*;
 
 import static persistence.sql.Main.openConnection;
-import static persistence.sql.users.Main.getAllUsersIds;
+import static persistence.sql.users.Database.getAllUsersIds;
 import static utilities.Main.readPropertiesFile;
 
 public class ArangoInterfaceMethods {

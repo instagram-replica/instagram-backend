@@ -1,0 +1,7 @@
+{
+  "method" : "updateUser",
+  "params": {
+    "id": "cb3d7169-1ae1-4d7b-9fc0-4030bd194e51",
+      "bio": "Got a thing for knowing a thing about everything"
+  }
+}
