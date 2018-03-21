@@ -1,0 +1,36 @@
+{
+  "method" : "createThread",
+  "response":{
+    "threadId" : 12,
+    "threadName" : "A7la Group Da Walla Eh",
+    "messages": [
+      {
+        "id": 213,
+        "text": "7amada ezzayak",
+        "user_id": 123,
+        "created_at": "Timestamp!",
+        "deleted_at": "Timestamp!",
+        "blocked_at": "Timestamp!",
+        "media_id": null
+      },
+      {
+        "id": 233,
+        "text": "el7amdolellah",
+        "user_id": 1223,
+        "created_at": "Timestamp!",
+        "deleted_at": "Timestamp!",
+        "blocked_at": "Timestamp!",
+        "media_id": null
+      },
+      {
+        "id": 2123,
+        "text": "yalla yad",
+        "user_id": 1223,
+        "created_at": "Timestamp!",
+        "deleted_at": "Timestamp!",
+        "blocked_at": "Timestamp!",
+        "media_id": null
+      }
+    ]
+  }
+}
