@@ -57,4 +57,4 @@ Each service consists of an RMQ consumer, RMQ producer & an `ExecutorService`. E
 }
 ```
 
-- Using the returned token, go ahead and create a new tab in Postman, choose the same options mentioned eariler. Before sending the request, go to `Headers` tab and add `x-access-token` with the obtained token _(obviously, we don't add any headers in the case of sending Signup or Signin requests)_
+- Using the returned token, go ahead and create a new tab in Postman, choose the same options mentioned eariler. Before sending the request, go to `Headers` tab and add `x-access-token` with the obtained token _(obviously, we don't add any headers in the case of sending signup or login requests)_
