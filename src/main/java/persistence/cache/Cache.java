@@ -15,7 +15,7 @@ import static utilities.Main.readPropertiesFile;
 public class Cache {
     private static Properties properties;
     public static final int EXPIRY_TIME = 1;
-
+    private static Cache instance = null;
     static {
         try {
             properties = readPropertiesFile("src/main/resources/redis.properties");
@@ -24,6 +24,11 @@ public class Cache {
         }
     }
 
+    public static Cache getInstance() {
+        if(instance == null)
+            instance = new Cache();
+        return instance;
+    }
 
     public static void insertPostIntoCache(JSONObject post, String postId) {
         System.out.println("INSERTING INTO CACHE");
@@ -195,7 +200,7 @@ public class Cache {
             }
         }
     }
-    public static void insertActivityIntoCache(JSONObject activity, String userId) {
+    public static void insertNotificationsIntoCache(JSONObject activity, String userId) {
         System.out.println("INSERTING INTO CACHE");
         JedisPool pool = new JedisPool(new JedisPoolConfig(), properties.getProperty("host"), Integer.parseInt(properties.getProperty("port")));
         try (Jedis jedis = pool.getResource()) {

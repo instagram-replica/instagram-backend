@@ -7,8 +7,6 @@ import persistence.sql.users.Main;
 import persistence.cache.Cache;
 import java.sql.Timestamp;
 
-import static com.sun.corba.se.impl.util.RepositoryId.cache;
-
 public class NotificationActions {
 //TODO: insert in notifications table!!!
     public static void handlePostLikeNotification(JSONObject params, String userId) {
@@ -28,7 +26,7 @@ public class NotificationActions {
         notificationJSON.put("id",utilities.Main.generateUUID());
         ArangoInterfaceMethods.insertNotification(notificationJSON);
         ArangoInterfaceMethods.insertActivity(notificationJSON);
-        Cache.insertActivityIntoCache(notificationJSON,userId);
+        Cache.insertNotificationsIntoCache(notificationJSON,userId);
 
     }
 
@@ -46,7 +44,7 @@ public class NotificationActions {
         notificationJSON.put("id",utilities.Main.generateUUID());
         ArangoInterfaceMethods.insertNotification(notificationJSON);
         ArangoInterfaceMethods.insertActivity(notificationJSON);
-        Cache.insertActivityIntoCache(notificationJSON,userId);
+        Cache.insertNotificationsIntoCache(notificationJSON,userId);
     }
 
     public static void handlePostTagNotification(JSONObject params, String userId) {
@@ -64,7 +62,7 @@ public class NotificationActions {
             notifyReceiver.put("blocked_at",new Timestamp(System.currentTimeMillis()));
             ArangoInterfaceMethods.insertNotification(notifyReceiver);
             ArangoInterfaceMethods.insertActivity(notifyReceiver);
-            Cache.insertActivityIntoCache(notifyReceiver,userId);
+            Cache.insertNotificationsIntoCache(notifyReceiver,userId);
         }
 
         JSONObject notificationJSON =new JSONObject();
@@ -80,7 +78,7 @@ public class NotificationActions {
         notificationJSON.put("id",utilities.Main.generateUUID());
         ArangoInterfaceMethods.insertNotification(notificationJSON);
         ArangoInterfaceMethods.insertActivity(notificationJSON);
-        Cache.insertActivityIntoCache(notificationJSON,userId);
+        Cache.insertNotificationsIntoCache(notificationJSON,userId);
     }
 
 
@@ -100,7 +98,7 @@ public class NotificationActions {
         activityJSON.put("id",utilities.Main.generateUUID());
         ArangoInterfaceMethods.insertNotification(activityJSON);
         ArangoInterfaceMethods.insertActivity(activityJSON);
-        Cache.insertActivityIntoCache(activityJSON,userId);
+        Cache.insertNotificationsIntoCache(activityJSON,userId);
     }
 
     public static void handleCommentReplyNotification(JSONObject params, String userId) {
@@ -119,14 +117,13 @@ public class NotificationActions {
         activityJSON.put("id",utilities.Main.generateUUID());
         ArangoInterfaceMethods.insertActivity(activityJSON);
         ArangoInterfaceMethods.insertActivity(activityJSON);
-        Cache.insertActivityIntoCache(activityJSON,userId);
+        Cache.insertNotificationsIntoCache(activityJSON,userId);
     }
 
     public static JSONObject handleGettingNotifications(JSONObject params, String userId){
         int size = params.getInt("pageSize");
         int start = params.getInt("pageIndex") * size;
         JSONArray notifications= ArangoInterfaceMethods.getNotifications(userId, start, size);
-
         JSONObject result = new JSONObject();
         result.put("notifications", notifications);
         return result;
