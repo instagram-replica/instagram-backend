@@ -1,0 +1,7 @@
+{
+  "method" : "login",
+  "params": {
+    "email" : "john.doe@user.com",
+      "password" : "123456"
+  }
+}

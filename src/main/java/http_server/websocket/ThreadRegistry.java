@@ -71,7 +71,7 @@ public class ThreadRegistry {
 
         channel.exchangeDeclare(threadId, "fanout");
 
-        JSONObject jsonObject = new JSONObject().put("userId", userId).put("text", text);
+        JSONObject jsonObject = new JSONObject().put("user_id", userId).put("text", text);
         channel.basicPublish(threadId, "", null, (jsonObject.toString()).getBytes());
 
         channel.close();

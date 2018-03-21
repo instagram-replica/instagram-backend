@@ -12,6 +12,8 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
+import static shared.Helpers.sendJSON;
+
 @ChannelHandler.Sharable
 public class HTTPHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
     @Override

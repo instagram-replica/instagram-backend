@@ -107,7 +107,11 @@ public class Server {
                         try {
                             uuid = jsonObject.getString("uuid");
                             jsonObject.remove("uuid");
-                            String queueName = getResponseQueue(JSONParser.getString("sender", jsonObject), serviceName);
+
+                            // Check if the sender property exits then send the message back else continue
+                            String sender = JSONParser.getString("sender", jsonObject);
+
+                            String queueName = getResponseQueue(sender, serviceName);
                             resObj.put("uuid", uuid);
 
                             channel.queueDeclare(queueName, true, false, false, null);

@@ -1,7 +1,0 @@
-{
-    "method": "createFollow",
-    "params" : 
-    {
-    	"userId": 12
-    }
-}

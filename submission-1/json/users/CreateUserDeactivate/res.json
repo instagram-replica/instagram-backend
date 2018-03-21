@@ -1,7 +1,0 @@
-{
-  "method": "userDeactivate",
-  "response": {
-    "success": true,
-    "error": null
-  }
-}

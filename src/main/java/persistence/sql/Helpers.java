@@ -1,21 +1,19 @@
 package persistence.sql;
 
-import java.util.ArrayList;
-
 public class Helpers {
     /**
      * Constructs a list of string values that is usable in WHERE IN queries
      */
-    public static String constructList(ArrayList<String> values) {
+    public static String constructList(String[] values) {
         StringBuilder stringBuilder = new StringBuilder();
 
-        for (int i = 0; i < values.size(); i++) {
+        for (int i = 0; i < values.length; i++) {
             stringBuilder
                     .append("'")
-                    .append(values.get(i))
+                    .append(values[i])
                     .append("'");
 
-            if (i != values.size() - 1) {
+            if (i != values.length - 1) {
                 stringBuilder.append(", ");
             }
         }
