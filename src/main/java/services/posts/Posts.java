@@ -235,7 +235,7 @@ public class Posts {
             response.put("error", "null");
             return response;
         } else
-            throw new CustomException("unAuthorized to view");
+            throw new CustomException("Not authorized to view");
 
     }
 
@@ -265,16 +265,16 @@ public class Posts {
 //        obj2.put("deleted_at",new Timestamp(System.currentTimeMillis()));
 //
 //        String id1 = ArangoInterfaceMethods.insertPost(obj2,loggedInUserId);
-//        makeHashtagNode(paramsObject.getString("name"));
+//        makeHashtagNode(""+paramsObject.getString("name"));
 //
-//        tagPostInHashtag(""+loggedInUserId, paramsObject.getString("name"));
-//
-//        ArrayList<String> postIds= ArangoInterfaceMethods.getAllPostsTaggedInHashtag(paramsObject.getString("name"));
-//
+//        tagPostInHashtag(""+id1, ""+paramsObject.getString("name"));
+
+        ArrayList<String> postIds= ArangoInterfaceMethods.getAllPostsTaggedInHashtag(""+paramsObject.getString("name"));
+
         JSONObject response = new JSONObject();
-//        response.put("method",methodName);
-//        response.put("posts",postIds);
-//        response.put("error","null");
+        response.put("method",methodName);
+        response.put("posts",postIds);
+        response.put("error","null");
         return response;
     }
 
