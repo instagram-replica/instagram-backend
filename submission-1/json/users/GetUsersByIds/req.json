@@ -1,0 +1,9 @@
+{
+  "method": "getUsersByIds",
+  "params": {
+    "ids": [
+      "id1",
+      "id2"
+    ]
+  }
+}

@@ -2,7 +2,7 @@ package services.posts;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import persistence.cache.Cache;
+import persistence.cache.PostsCache;
 import persistence.nosql.ArangoInterfaceMethods;
 import shared.Settings;
 import utilities.Main;
@@ -11,6 +11,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 
 import static shared.Helpers.createJSONError;
+import static shared.Helpers.getUsersIdsByUsernames;
 import static shared.Helpers.isAuthorizedToView;
 
 public class Comments {
@@ -34,11 +35,11 @@ public class Comments {
 
             String comment = paramsObject.getString("text");
 
-            //@TODO: @USERS_TEAM send usernames to the user service and get array of user ids back
             ArrayList<String> mentionsUserNames = getMentions(comment);
+            JSONArray mentionedUserIds = getUsersIdsByUsernames("posts", mentionsUserNames, loggedInUserId);
 
             JSONObject commentJSON = createCommentJSON(comment, 0, loggedInUserId, postId);
-            if (isAuthorizedToView(Settings.getInstance().getInstanceId(), loggedInUserId, post.getString("user_id"))) {
+            if (isAuthorizedToView(Settings.getInstance().getInstanceId(), loggedInUserId, post.getString("user_id"), loggedInUserId)) {
                 ArangoInterfaceMethods.insertCommentOnPost(postId, commentJSON);
                 JSONObject jsonValue = new JSONObject();
                 JSONObject response = new JSONObject();
@@ -63,16 +64,16 @@ public class Comments {
     public static JSONObject getCommentsOnPost(JSONObject paramsObject, String loggedInUserId, String methodName) {
         String postId = paramsObject.getString("postId");
         try {
-            JSONObject post = Cache.getPostFromCache(postId);
-            if(post==null){
+            JSONObject post = PostsCache.getPostFromCache(postId);
+            if (post == null) {
                 post = ArangoInterfaceMethods.getPost(postId);
-                Cache.insertPostIntoCache(post,postId);
+                PostsCache.insertPostIntoCache(post, postId);
             }
-            if (isAuthorizedToView(Settings.getInstance().getInstanceId(), loggedInUserId, post.getString("user_id"))) {
-                JSONArray comments = Cache.getCommentsFromCache(postId);
-                if(comments==null) {
+            if (isAuthorizedToView(Settings.getInstance().getInstanceId(), loggedInUserId, post.getString("user_id"), loggedInUserId)) {
+                JSONArray comments = PostsCache.getCommentsFromCache(postId);
+                if (comments == null) {
                     comments = ArangoInterfaceMethods.getPosts(postId);
-                    Cache.insertCommentsIntoCache(comments,postId);
+                    PostsCache.insertCommentsIntoCache(comments, postId);
                 }
                 JSONObject jsonValue = new JSONObject();
                 jsonValue.put("method", methodName);

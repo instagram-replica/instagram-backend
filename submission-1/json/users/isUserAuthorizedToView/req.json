@@ -1,0 +1,7 @@
+{
+  "method" : "isUserAuthorizedToView",
+  "params": {
+      "viewerId" : "cb3d7169-1ae1-4d7b-9fc0-4030bd194e51",
+      "viewedId" : "55086261-ff47-42cb-a960-4cd8cf855769"
+  }
+}

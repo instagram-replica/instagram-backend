@@ -1,195 +1,216 @@
 package persistence.sql.users;
 
-import java.util.Date;
-import java.util.List;
+import org.joda.time.DateTime;
 
 public class User {
-    private String id;
-    private String username;
-    private String email;
-    private String passwordHash;
-    private boolean isPrivate = false;
-    private String fullName;
-    private String gender;
-    private String bio;
-    private String phoneNumber;
-    private String profilePictureUrl;
-    private String websiteUrl;
-    private String numberOfFollowings;
-    private String numberOfFollowers;
-    private String numberOfPosts;
-    private Date verifiedAt;
-    private Date createdAt;
-    private Date updatedAt;
-    private Date blockedAt;
-    private Date deletedAt;
-    private Date dateOfBirth;
+    public final String id;
+    public final String username;
+    public final String email;
+    public final String password;
+    public final String passwordHash;
+    public final Boolean isPrivate;
+    public final String fullName;
+    public final String gender;
+    public final String bio;
+    public final String phoneNumber;
+    public final String profilePictureUrl;
+    public final String websiteUrl;
+    public final DateTime verifiedAt;
+    public final DateTime createdAt;
+    public final DateTime updatedAt;
+    public final DateTime blockedAt;
+    public final DateTime deletedAt;
 
-
-    public String getId() {
-
-        return id;
-    }
-
-    public void setId(String id) {
+    private User(
+            String id,
+            String username,
+            String email,
+            String password,
+            String passwordHash,
+            Boolean isPrivate,
+            String fullName,
+            String gender,
+            String bio,
+            String phoneNumber,
+            String profilePictureUrl,
+            String websiteUrl,
+            DateTime verifiedAt,
+            DateTime createdAt,
+            DateTime updatedAt,
+            DateTime blockedAt,
+            DateTime deletedAt
+    ) {
         this.id = id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
         this.username = username;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
         this.email = email;
-    }
-
-    public String getPasswordHash() {
-        return passwordHash;
-    }
-
-    public void setPasswordHash(String passwordHash) {
+        this.password = password;
         this.passwordHash = passwordHash;
-    }
-
-    public boolean isPrivate() {
-        return isPrivate;
-    }
-
-    public void setPrivate(boolean privacy) {
-        isPrivate = privacy;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setFullName(String fullName) {
+        this.isPrivate = isPrivate;
         this.fullName = fullName;
-    }
-
-    public String getGender() {
-        return gender;
-    }
-
-    public void setGender(String gender) {
         this.gender = gender;
-    }
-
-    public String getBio() {
-        return bio;
-    }
-
-    public void setBio(String bio) {
         this.bio = bio;
-    }
-
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
-    }
-
-    public String getProfilePictureUrl() {
-        return profilePictureUrl;
-    }
-
-    public void setProfilePictureUrl(String profilePictureUrl) {
         this.profilePictureUrl = profilePictureUrl;
-    }
-
-    public String getWebsiteUrl() {
-        return websiteUrl;
-    }
-
-    public void setWebsiteUrl(String websiteUrl) {
         this.websiteUrl = websiteUrl;
-    }
-
-    public String getNumberOfFollowings() {
-        return numberOfFollowings;
-    }
-
-    public void setNumberOfFollowings(String numberOfFollowings) {
-        this.numberOfFollowings = numberOfFollowings;
-    }
-
-    public String getNumberOfFollowers() {
-        return numberOfFollowers;
-    }
-
-    public void setNumberOfFollowers(String numberOfFollowers) {
-        this.numberOfFollowers = numberOfFollowers;
-    }
-
-    public String getNumberOfPosts() {
-        return numberOfPosts;
-    }
-
-    public void setNumberOfPosts(String numberOfPosts) {
-        this.numberOfPosts = numberOfPosts;
-    }
-
-    public Date getVerifiedAt() {
-        return verifiedAt;
-    }
-
-    public void setVerifiedAt(Date verifiedAt) {
         this.verifiedAt = verifiedAt;
-    }
-
-    public Date getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
-    }
-
-    public Date getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
-    }
-
-    public Date getBlockedAt() {
-        return blockedAt;
-    }
-
-    public void setBlockedAt(Date blockedAt) {
         this.blockedAt = blockedAt;
-    }
-
-    public Date getDeletedAt() {
-        return deletedAt;
-    }
-
-    public void setDeletedAt(Date deletedAt) {
         this.deletedAt = deletedAt;
     }
 
-    public Date getDateOfBirth() {
-        return dateOfBirth;
+    public String getId() {
+        return id;
     }
 
-    public void setDateOfBirth(Date dateOfBirth) {
-        this.dateOfBirth = dateOfBirth;
+    public static class Builder {
+        private String id;
+        private String username;
+        private String email;
+        private String password;
+        private String passwordHash;
+        private Boolean isPrivate;
+        private String fullName;
+        private String gender;
+        private String bio;
+        private String phoneNumber;
+        private String profilePictureUrl;
+        private String websiteUrl;
+        private DateTime verifiedAt;
+        private DateTime createdAt;
+        private DateTime updatedAt;
+        private DateTime blockedAt;
+        private DateTime deletedAt;
+
+        public Builder() {}
+
+        public Builder (User user) {
+            this.id = user.id;
+            this.username = user.username;
+            this.email = user.email;
+            this.password = user.password;
+            this.passwordHash = user.passwordHash;
+            this.isPrivate = user.isPrivate;
+            this.fullName = user.fullName;
+            this.gender = user.gender;
+            this.bio = user.bio;
+            this.phoneNumber = user.phoneNumber;
+            this.profilePictureUrl = user.profilePictureUrl;
+            this.websiteUrl = user.websiteUrl;
+            this.verifiedAt = user.verifiedAt;
+            this.createdAt = user.createdAt;
+            this.updatedAt = user.updatedAt;
+            this.blockedAt = user.blockedAt;
+            this.deletedAt = user.deletedAt;
+        }
+
+        public Builder id(String id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder username(String username) {
+            this.username = username;
+            return this;
+        }
+
+        public Builder email(String email) {
+            this.email = email;
+            return this;
+        }
+
+        public Builder password(String password) {
+            this.password = password;
+            return this;
+        }
+
+        public Builder passwordHash(String passwordHash) {
+            this.passwordHash = passwordHash;
+            return this;
+        }
+
+        public Builder isPrivate(Boolean isPrivate) {
+            this.isPrivate = isPrivate;
+            return this;
+        }
+
+        public Builder fullName(String fullName) {
+            this.fullName = fullName;
+            return this;
+        }
+
+        public Builder gender(String gender) {
+            this.gender = gender;
+            return this;
+        }
+
+        public Builder bio(String bio) {
+            this.bio = bio;
+            return this;
+        }
+
+        public Builder phoneNumber(String phoneNumber) {
+            this.phoneNumber = phoneNumber;
+            return this;
+        }
+
+        public Builder profilePictureUrl(String profilePictureUrl) {
+            this.profilePictureUrl = profilePictureUrl;
+            return this;
+        }
+
+        public Builder websiteUrl(String websiteUrl) {
+            this.websiteUrl = websiteUrl;
+            return this;
+        }
+
+        public Builder verifiedAt(DateTime verifiedAt) {
+            this.verifiedAt = verifiedAt;
+            return this;
+        }
+
+        public Builder createdAt(DateTime createdAt) {
+            this.createdAt = createdAt;
+            return this;
+        }
+
+        public Builder updatedAt(DateTime updatedAt) {
+            this.updatedAt = updatedAt;
+            return this;
+        }
+
+        public Builder blockedAt(DateTime blockedAt) {
+            this.blockedAt = blockedAt;
+            return this;
+        }
+
+        public Builder deletedAt(DateTime deletedAt) {
+            this.deletedAt = deletedAt;
+            return this;
+        }
+
+        public User build() {
+            return new User(
+                    this.id,
+                    this.username,
+                    this.email,
+                    this.password,
+                    this.passwordHash,
+                    this.isPrivate,
+                    this.fullName,
+                    this.gender,
+                    this.bio,
+                    this.phoneNumber,
+                    this.profilePictureUrl,
+                    this.websiteUrl,
+                    this.verifiedAt,
+                    this.createdAt,
+                    this.updatedAt,
+                    this.blockedAt,
+                    this.deletedAt
+            );
+        }
     }
-
-    public List getFollowers(){ return Main.getFollowers(this.getId()); }
-
-    public List getFollowings(){ return Main.getFollowings(this.getId()); }
 
     @Override
     public String toString() {
@@ -197,7 +218,6 @@ public class User {
                 "\n\tid='" + id + '\'' +
                 ", \n\tusername='" + username + '\'' +
                 ", \n\temail='" + email + '\'' +
-                ", \n\tpasswordHash='" + passwordHash + '\'' +
                 ", \n\tisPrivate=" + isPrivate +
                 ", \n\tfullName='" + fullName + '\'' +
                 ", \n\tgender='" + gender + '\'' +

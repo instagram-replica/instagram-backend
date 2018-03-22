@@ -2,8 +2,9 @@ package services.activities;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import persistence.cache.ActivitiesCache;
 import persistence.nosql.ArangoInterfaceMethods;
-import persistence.sql.users.Main;
+import persistence.sql.users.Database;
 
 import java.sql.Timestamp;
 
@@ -50,7 +51,8 @@ public class NotificationActions {
         for(int i=0;i<receivers.length();i++){
             JSONObject taggedPerson = receivers.getJSONObject(i);
             JSONObject notifyReceiver = new JSONObject();
-            String recID = Main.getUserIdFromUsername(taggedPerson.getString("username"));
+            // TODO: Make call to users service to request resource
+            String recID = Database.getUserByUsername(taggedPerson.getString("username")).id;
             notifyReceiver.put("activity_type","{ type: tag, user_id: " + recID+ "\"");
             notifyReceiver.put("receiver_id", recID);
             notifyReceiver.put("sender_id", userId);
@@ -112,7 +114,13 @@ public class NotificationActions {
     public static JSONObject handleGettingNotifications(JSONObject params, String userId){
         int size = params.getInt("pageSize");
         int start = params.getInt("pageIndex") * size;
-        JSONArray notifications= ArangoInterfaceMethods.getNotifications(userId, start, size);
+
+        JSONArray notifications = ActivitiesCache.getNotificationsFromCache(userId, start, size);
+        if(notifications==null) {
+            notifications = ArangoInterfaceMethods.getNotifications(userId, start, size);
+            ActivitiesCache.insertNotificationsIntoCache(notifications,userId, start, size);
+        }
+
 
         JSONObject result = new JSONObject();
         result.put("notifications", notifications);

@@ -1,13 +1,11 @@
 {
-	"method" : "signUp",
-	"params": {
-		"username" : "sawahel",
-		"fullname" : "Ahmed Sawahel",
-		"password" : "123456",
-		"email" : "sawahel@magdy.com",
-		"gender" : "male",
-		"dateOfBirth" : "Sun Mar 04 23:05:25 EET 2018",
-		"phone" : "+20 100 977 5576",
-		"avatar" : "https://..."
-	}
+  "method" : "signup",
+  "params": {
+      "username" : "john_doe",
+      "email" : "john.doe@user.com",
+      "password" : "123456",
+      "isPrivate": false,
+      "fullName" : "John Doe",
+      "gender" : "male"
+  }
 }

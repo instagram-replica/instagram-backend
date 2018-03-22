@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.util.*;
 
 import static persistence.sql.Main.openConnection;
-import static persistence.sql.users.Main.getAllUsersIds;
+import static persistence.sql.users.Database.getAllUsersIds;
 import static utilities.Main.readPropertiesFile;
 
 public class ArangoInterfaceMethods {
@@ -114,7 +114,6 @@ public class ArangoInterfaceMethods {
 
             BaseDocument myObject = new BaseDocument();
             myObject.addAttribute("creator_id", threadJSON.get("creator_id").toString());
-            myObject.addAttribute("users_ids", threadJSON.get("users_ids").toString());
             myObject.addAttribute("name", threadJSON.get("name").toString());
             myObject.addAttribute("created_at", threadJSON.get("created_at").toString());
             myObject.addAttribute("deleted_at", threadJSON.get("deleted_at").toString());
@@ -139,7 +138,6 @@ public class ArangoInterfaceMethods {
     public static void updateThread(String id, JSONObject threadJSON) {
             BaseDocument myObject = new BaseDocument();
             myObject.addAttribute("creator_id", threadJSON.get("creator_id").toString());
-            myObject.addAttribute("users_ids", threadJSON.get("users_ids").toString());
             myObject.addAttribute("name", threadJSON.get("name").toString());
             myObject.addAttribute("created_at", threadJSON.get("created_at").toString());
             myObject.addAttribute("deleted_at", threadJSON.get("deleted_at").toString());
@@ -414,7 +412,6 @@ public class ArangoInterfaceMethods {
 
     public static String insertPost(JSONObject postJSON, String userId) throws JSONException {
 
-
             JSONObject myObject = new JSONObject();
             myObject.put("user_id", userId);
             myObject.put("caption", postJSON.get("caption").toString());
@@ -427,7 +424,6 @@ public class ArangoInterfaceMethods {
             myObject.put("updated_at", JSONObject.NULL);
             myObject.put("blocked_at", JSONObject.NULL);
             myObject.put("deleted_at", JSONObject.NULL);
-
             String id = arangoDB.db(dbName).collection(postsCollectionName).insertDocument(myObject.toString()).getKey();
             System.out.println("Post inserted");
             return id;

@@ -1,6 +1,8 @@
 {
-  "method": "searchUsers",
+  "method" : "searchUsers",
   "params": {
-    "term":"ahmed"
+    "term": "John",
+    "offset": 0,
+    "limit": 5
   }
 }

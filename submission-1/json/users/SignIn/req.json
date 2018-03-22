@@ -1,7 +1,0 @@
-{
-	"method" : "signIn",
-	"params": {
-		"username" : "sawahel",
-		"password" : "123456"
-	}
-}

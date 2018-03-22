@@ -3,6 +3,7 @@ package services.chats;
 import exceptions.CustomException;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import persistence.cache.ChatCache;
 import persistence.nosql.ArangoInterfaceMethods;
 import utilities.Main;
 
@@ -57,7 +58,11 @@ public class Messenger {
     public static JSONObject getMessages(JSONObject paramsObject, String userId) throws CustomException {
         JSONObject res = new JSONObject();
         String threadId = paramsObject.getString("threadId");
-        JSONObject thread = ArangoInterfaceMethods.getThread(threadId);
+        JSONObject thread = ChatCache.getThreadFromCache(threadId);
+        if(thread==null) {
+            thread = ArangoInterfaceMethods.getThread(threadId);
+            ChatCache.insertThreadIntoCache(thread,threadId);
+        }
         JSONArray messages = thread.getJSONArray("messages");
 
         int pageSize = paramsObject.getInt("pageSize");
@@ -82,7 +87,12 @@ public class Messenger {
         ArrayList<JSONObject> threads = new ArrayList<>();
         for (int i = 0; i < threadsIds.size(); i++) {
             String id = threadsIds.get(i);
-            String name = ArangoInterfaceMethods.getThread(id).getString("name");
+            JSONObject thread = ChatCache.getThreadFromCache(id);
+            if(thread==null) {
+                thread = ArangoInterfaceMethods.getThread(id);
+                ChatCache.insertThreadIntoCache(thread,id);
+            }
+            String name = thread.getString("name");
             threads.add(new JSONObject().put("threadId", id).put("name", name));
         }
         JSONArray threadsArray = new JSONArray(threads);
