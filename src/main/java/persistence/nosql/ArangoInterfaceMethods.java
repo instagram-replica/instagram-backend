@@ -113,7 +113,6 @@ public class ArangoInterfaceMethods {
 
             BaseDocument myObject = new BaseDocument();
             myObject.addAttribute("creator_id", threadJSON.get("creator_id").toString());
-            myObject.addAttribute("users_ids", threadJSON.get("users_ids").toString());
             myObject.addAttribute("name", threadJSON.get("name").toString());
             myObject.addAttribute("created_at", threadJSON.get("created_at").toString());
             myObject.addAttribute("deleted_at", threadJSON.get("deleted_at").toString());
@@ -138,7 +137,6 @@ public class ArangoInterfaceMethods {
     public static void updateThread(String id, JSONObject threadJSON) {
             BaseDocument myObject = new BaseDocument();
             myObject.addAttribute("creator_id", threadJSON.get("creator_id").toString());
-            myObject.addAttribute("users_ids", threadJSON.get("users_ids").toString());
             myObject.addAttribute("name", threadJSON.get("name").toString());
             myObject.addAttribute("created_at", threadJSON.get("created_at").toString());
             myObject.addAttribute("deleted_at", threadJSON.get("deleted_at").toString());

@@ -8,7 +8,11 @@ import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.cors.CorsConfig;
 import io.netty.handler.codec.http.cors.CorsConfigBuilder;
 import io.netty.handler.codec.http.cors.CorsHandler;
+
+import json.JSONParser;
+
 import org.json.JSONException;
+
 import shared.Settings;
 import com.rabbitmq.client.*;
 import org.json.JSONObject;
@@ -80,18 +84,13 @@ public class Server {
     private static DefaultConsumer handleDelivery(Channel channel, String serviceName, ExecutorService executor, Controller controller) {
         return new DefaultConsumer(channel) {
             @Override
-            public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
+            public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) {
                 Runnable task = () -> {
                     try {
                         System.out.println("Start processing the request");
                         String message = new String(body, "UTF-8");
 
                         JSONObject jsonObject = new JSONObject(message);
-
-                        String queueName = getResponseQueue(jsonObject.getString("sender"), serviceName);
-
-                        String uuid = jsonObject.getString("uuid");
-                        jsonObject.remove("uuid");
 
                         String userId = null;
 
@@ -103,11 +102,24 @@ public class Server {
                         }
 
                         JSONObject resObj = controller.execute(jsonObject, userId);
-                        resObj.put("uuid", uuid);
 
-                        channel.queueDeclare(queueName, true, false, false, null);
+                        String uuid;
+                        try {
+                            uuid = jsonObject.getString("uuid");
+                            jsonObject.remove("uuid");
 
-                        channel.basicPublish("", queueName, null, resObj.toString().getBytes("UTF-8"));
+                            // Check if the sender property exits then send the message back else continue
+                            String sender = JSONParser.getString("sender", jsonObject);
+
+                            String queueName = getResponseQueue(sender, serviceName);
+                            resObj.put("uuid", uuid);
+
+                            channel.queueDeclare(queueName, true, false, false, null);
+                            channel.basicPublish("", queueName, null, resObj.toString().getBytes("UTF-8"));
+
+                        } catch (Exception ignored) {
+                        }
+
 
                     } catch (Exception e) {
                         e.printStackTrace();

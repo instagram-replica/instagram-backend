@@ -11,6 +11,7 @@ import shared.Settings;
 import java.io.IOException;
 
 import static shared.Helpers.createJSONError;
+import static shared.Helpers.getUsersByIds;
 import static shared.Helpers.isAuthorizedToView;
 
 public class Posts {
@@ -18,14 +19,14 @@ public class Posts {
     //Done: create JSON req and res for this method in submission1 folder
     public static JSONObject updatePost(JSONObject paramsObject, String loggedInUserId, String methodName) throws CustomException{
         String postId = paramsObject.getString("postId");
-        JSONObject post=null;
-        JSONObject updatedPost=null;
+        JSONObject post = null;
+        JSONObject updatedPost = null;
         System.out.println(paramsObject);
             post = ArangoInterfaceMethods.getPost(postId);
             String ownerId = post.getString("user_id");
             if (loggedInUserId.equals(ownerId)) {
-                ArangoInterfaceMethods.updatePost(postId,paramsObject);
-                updatedPost =  ArangoInterfaceMethods.getPost(postId);
+                ArangoInterfaceMethods.updatePost(postId, paramsObject);
+                updatedPost = ArangoInterfaceMethods.getPost(postId);
                 JSONObject response = new JSONObject();
 
                 //Replacing likes array with no of likes instead
@@ -37,7 +38,7 @@ public class Posts {
                 postResponse.put("post", updatedPost);
 
                 response.put("method", methodName);
-                response.put("postId",postId);
+                response.put("postId", postId);
                 response.put("response", postResponse);
 
                 return response;
@@ -52,8 +53,12 @@ public class Posts {
         JSONObject post = null;
             post = ArangoInterfaceMethods.getPost(postId);
             String ownerId = post.getString("user_id");
-            if (isAuthorizedToView(Settings.getInstance().getInstanceId(), loggedInUserId, ownerId)) {
-                //TODO: @USERS_TEAM `getUsers`
+            JSONArray userIds = post.getJSONArray("likes");
+            if (isAuthorizedToView("posts", loggedInUserId, ownerId, loggedInUserId)) {
+                JSONObject response = new JSONObject();
+                response.put("method", methodName);
+                response.put("users", getUsersByIds("posts", userIds, loggedInUserId));
+                return response;
             }
             throw new CustomException("Not authorized to view");
     }
@@ -73,13 +78,13 @@ public class Posts {
                 JSONObject response = new JSONObject();
                 post.put("likes",noOfLikes);
 
-                response.put("method", methodName);
-                response.put("post", post);
+            response.put("method", methodName);
+            response.put("post", post);
 
                 String ownerId= post.getString("user_id");
                 System.out.println(loggedInUserId+" :LOGGEDIN");
                 System.out.println(ownerId+" :OWNER");
-                if (isAuthorizedToView("posts", loggedInUserId, ownerId) || loggedInUserId.equals(ownerId)) {
+                if (isAuthorizedToView("posts", loggedInUserId, ownerId, loggedInUserId) || loggedInUserId.equals(ownerId)) {
                     return response;
                }
             throw new CustomException("Not authorized to view");
@@ -94,21 +99,21 @@ public class Posts {
         int pageSize = paramsObject.getInt("pageSize");
         int pageIndex = paramsObject.getInt("pageIndex");
         String ownerId = paramsObject.getString("userId");
-            if (isAuthorizedToView("posts", loggedInUserId, ownerId) || loggedInUserId.equals(ownerId)) {
+            if (isAuthorizedToView("posts", loggedInUserId, ownerId,loggedInUserId) || loggedInUserId.equals(ownerId)) {
                 //@TODO: Check if the user exists
                 JSONArray posts = Cache.getPostsFromCache(ownerId, pageIndex, pageSize);
-                if(posts==null) {
+                if (posts == null) {
                     posts = ArangoInterfaceMethods.getPosts(ownerId);
-                    Cache.insertPostsIntoCache(posts,ownerId,pageIndex,pageSize);
+                    Cache.insertPostsIntoCache(posts, ownerId, pageIndex, pageSize);
                 }
 
                 /// replacing likes array with no of likes instead
-                for(int i=0; i<posts.length();i++){
-                    JSONObject post= posts.getJSONObject(i);
+                for (int i = 0; i < posts.length(); i++) {
+                    JSONObject post = posts.getJSONObject(i);
                     System.out.println(post);
                     JSONArray likes = post.getJSONArray("likes");
-                    int noOfLikes= likes.length();
-                    post.put("likes",noOfLikes);
+                    int noOfLikes = likes.length();
+                    post.put("likes", noOfLikes);
                 }
 
                 JSONObject response = new JSONObject();
@@ -123,8 +128,8 @@ public class Posts {
         //Done: Delete the post iff the creator of the post is the logged in user
         String postId = paramsObject.getString("postId");
             JSONObject postToDelete = ArangoInterfaceMethods.getPost(postId);
-            String ownerId= postToDelete.getString("user_id");
-            if(loggedInUserId.equals(ownerId)) {
+            String ownerId = postToDelete.getString("user_id");
+            if (loggedInUserId.equals(ownerId)) {
                 ArangoInterfaceMethods.deletePost(postId);
                 JSONObject post = new JSONObject();
                 JSONObject response = new JSONObject();
@@ -142,21 +147,21 @@ public class Posts {
             //TODO: Parse tags in media and @ACTIVITIES_TEAM create activities for their users
             //DONE: Return the newly created post instead of the ID only
 
-        //    if(paramsObject.getJSONObject("post").get("user_id").toString().equals(loggedInUserId))
-            postId = ArangoInterfaceMethods.insertPost(paramsObject.getJSONObject("post"),loggedInUserId);
+            //    if(paramsObject.getJSONObject("post").get("user_id").toString().equals(loggedInUserId))
+            postId = ArangoInterfaceMethods.insertPost(paramsObject.getJSONObject("post"), loggedInUserId);
             JSONObject response = new JSONObject();
             JSONObject postCreated = ArangoInterfaceMethods.getPost(postId);
 
             /// Replacing likes array with no of likes instead
             JSONArray likes = postCreated.getJSONArray("likes");
-            int noOfLikes= likes.length();
-            postCreated.put("likes",noOfLikes);
+            int noOfLikes = likes.length();
+            postCreated.put("likes", noOfLikes);
 
             JSONObject postResponse = new JSONObject();
             postResponse.put("post", postCreated);
 
             response.put("method", methodName);
-            response.put("postId",postId);
+            response.put("postId", postId);
             response.put("response", postResponse);
             return response;
 

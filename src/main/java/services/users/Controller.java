@@ -10,6 +10,7 @@ import org.json.JSONObject;
 import persistence.sql.users.User;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static persistence.sql.Main.closeConnection;

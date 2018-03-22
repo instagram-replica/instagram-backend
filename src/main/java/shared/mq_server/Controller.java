@@ -15,11 +15,12 @@ public abstract class Controller {
 
     public abstract JSONObject execute(JSONObject jsonObject, String userId) throws Exception;
 
-    public synchronized static JSONObject send(String serviceName, String receiverName, JSONObject jsonObject) throws IOException, InterruptedException {
+    public synchronized static JSONObject send(String serviceName, String receiverName, JSONObject jsonObject, String userId) throws IOException, InterruptedException {
         String uuid = generateUUID();
 
         jsonObject.put("uuid", uuid);
         jsonObject.put("sender", serviceName);
+        jsonObject.put("userId", userId);
 
         Connection connection = RMQConnection.getSingleton();
         final Channel channel = connection.createChannel();
