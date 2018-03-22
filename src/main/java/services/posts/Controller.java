@@ -46,7 +46,9 @@ public class Controller extends shared.mq_server.Controller{
             case "getDiscoverFeed":
                 data= Posts.getDiscoverFeed(paramsObject,userId,methodName); break;
             case "createPostHashtags":
-                data = Posts.createPostHashtags(paramsObject,userId,methodName);break;
+                data = Posts.createPostHashtags(paramsObject,userId,methodName); break;
+            case "createPostTag":
+                data = Posts.createPostTag(paramsObject,userId,methodName); break;
             default: {
                 JSONObject newJsonObj = new JSONObject();
                 newJsonObj.put("application", "feed/posts");

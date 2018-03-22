@@ -200,36 +200,30 @@ public class Posts {
         }
     }
 
-//    public static JSONObject createPostTag(JSONObject paramsObject, String loggedInUserId, String methodName){
-//
-//    }
+    public static JSONObject createPostTag(JSONObject paramsObject, String loggedInUserId, String methodName) throws Exception {
+        String userId = paramsObject.getString("userId");
+        String postId = paramsObject.getString("postId");
+        JSONObject post = ArangoInterfaceMethods.getPost(postId);
+        String postOwner = post.getString("user_id");
 
-    //TODO:
+        if (isAuthorizedToView("posts", loggedInUserId, userId) && loggedInUserId.equals(postOwner)) {
+            tagUserInPost(""+ userId, ""+postId);
+            JSONObject response = new JSONObject();
+            response.put("method", methodName);
+            response.put("taggedId",userId);
+            return response;
+
+        }
+        throw new CustomException("Not authorized to tag");
+    }
+
     public static JSONObject getTaggedPosts(JSONObject paramsObject, String loggedInUserId, String methodName) throws Exception {
         int pageSize = paramsObject.getInt("pageSize");
         int pageIndex = paramsObject.getInt("pageIndex");
-        String ownerId = paramsObject.getString("userId");
+        String userId = paramsObject.getString("userId");
 
-//        JSONObject obj2= new JSONObject();
-//        obj2.put("user_id",loggedInUserId);
-//        obj2.put("caption","Taken By Mohamed ABouzeid");
-//        obj2.put("media", new ArrayList<String>());
-//        obj2.put("likes", new ArrayList<String>());
-//        obj2.put("tags",new ArrayList<String>());
-//        obj2.put("location","{ name: C1, coordinates:{long: 1.0.01.01, lat: 2.1.0.10} }");
-//        obj2.put("comments", new ArrayList<String>());
-//        obj2.put("created_at",new Timestamp(System.currentTimeMillis()));
-//        obj2.put("updated_at",new Timestamp(System.currentTimeMillis()));
-//        obj2.put("blocked_at",new Timestamp(System.currentTimeMillis()));
-//        obj2.put("deleted_at",new Timestamp(System.currentTimeMillis()));
-//
-//        String id1 = ArangoInterfaceMethods.insertPost(obj2,loggedInUserId);
-//
-//        tagUserInPost(""+ loggedInUserId, ""+id1);
-//
-
-        if(isAuthorizedToView("posts", loggedInUserId, ownerId) || loggedInUserId.equals(ownerId)) {
-            ArrayList<String> postIds = ArangoInterfaceMethods.getAllTaggedPosts(loggedInUserId);
+        if(isAuthorizedToView("posts", loggedInUserId, userId) || loggedInUserId.equals(userId)) {
+            ArrayList<String> postIds = ArangoInterfaceMethods.getAllTaggedPosts(userId);
             JSONArray posts = ArangoInterfaceMethods.getPosts(postIds);
             JSONObject response = new JSONObject();
             response.put("method", methodName);
@@ -245,7 +239,6 @@ public class Posts {
     public static JSONObject getDiscoverFeed(JSONObject paramsObject, String loggedInUserId, String methodName) {
         int pageSize = paramsObject.getInt("pageSize");
         int pageIndex = paramsObject.getInt("pageIndex");
-
 
         ArrayList<JSONObject> feed= ArangoInterfaceMethods.getDiscoveryFeed(""+loggedInUserId,pageSize,pageIndex);
         JSONObject response= new JSONObject();
@@ -279,24 +272,6 @@ public class Posts {
     }
 
     public static JSONObject getHashtagPosts(JSONObject paramsObject, String loggedInUserId, String methodName) {
-
-//        JSONObject obj2= new JSONObject();
-//        obj2.put("user_id",loggedInUserId);
-//        obj2.put("caption","Taken By Mohamed ABouzeid");
-//        obj2.put("media", new ArrayList<String>());
-//        obj2.put("likes", new ArrayList<String>());
-//        obj2.put("tags",new ArrayList<String>());
-//        obj2.put("location","{ name: C1, coordinates:{long: 1.0.01.01, lat: 2.1.0.10} }");
-//        obj2.put("comments", new ArrayList<String>());
-//        obj2.put("created_at",new Timestamp(System.currentTimeMillis()));
-//        obj2.put("updated_at",new Timestamp(System.currentTimeMillis()));
-//        obj2.put("blocked_at",new Timestamp(System.currentTimeMillis()));
-//        obj2.put("deleted_at",new Timestamp(System.currentTimeMillis()));
-//
-//        String id1 = ArangoInterfaceMethods.insertPost(obj2,loggedInUserId);
-//        makeHashtagNode(""+paramsObject.getString("name"));
-//
-//        tagPostInHashtag(""+id1, ""+paramsObject.getString("name"));
 
         ArrayList<String> postIds= ArangoInterfaceMethods.getAllPostsTaggedInHashtag(""+paramsObject.getString("name"));
         JSONArray posts= ArangoInterfaceMethods.getPosts(postIds);
