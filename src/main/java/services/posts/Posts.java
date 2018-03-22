@@ -9,6 +9,7 @@ import persistence.nosql.ArangoInterfaceMethods;
 
 import java.io.IOException;
 
+import static shared.Helpers.createJSONError;
 import static shared.Helpers.getUsersByIds;
 import static shared.Helpers.isAuthorizedToView;
 
@@ -78,13 +79,14 @@ public class Posts {
 
             response.put("method", methodName);
             response.put("post", post);
+
                 String ownerId= post.getString("user_id");
                 System.out.println(loggedInUserId+" :LOGGEDIN");
                 System.out.println(ownerId+" :OWNER");
-//                if (isAuthorizedToView("posts", loggedInUserId, ownerId, loggedInUserId) || loggedInUserId.equals(ownerId)) {
+                if (isAuthorizedToView("posts", loggedInUserId, ownerId, loggedInUserId) || loggedInUserId.equals(ownerId)) {
                     return response;
-//               }
-//            throw new CustomException("Not authorized to view");
+               }
+            throw new CustomException("Not authorized to view");
 
     }
 
@@ -103,7 +105,6 @@ public class Posts {
                     posts = ArangoInterfaceMethods.getPosts(ownerId);
                     PostsCache.insertPostsIntoCache(posts, ownerId, pageIndex, pageSize);
                 }
-
                 /// replacing likes array with no of likes instead
                 for (int i = 0; i < posts.length(); i++) {
                     JSONObject post = posts.getJSONObject(i);
