@@ -1,0 +1,16 @@
+{
+  "method": "createPostHashtags",
+  "response": {
+    "post": {
+      "comments": [],
+      "user_id": "245",
+      "caption": "hastgahs:)",
+      "created_at": "2018-03-22 20:44:58.803",
+      "media": [],
+      "id": "1275",
+      "likes": []
+    },
+    "name": ["Mosalah","Soccer","UK"]
+  },
+  "error": null
+}

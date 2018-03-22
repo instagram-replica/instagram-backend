@@ -1,0 +1,8 @@
+{
+  "method": "createPostHashtags",
+  "params" :
+  {
+    "postId": "12",
+    "name": ["MoSalah","Soccer","UK"]
+  }
+}
