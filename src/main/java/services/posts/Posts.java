@@ -4,7 +4,7 @@ import com.arangodb.ArangoDBException;
 import exceptions.CustomException;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import persistence.cache.Cache;
+import persistence.cache.PostsCache;
 import persistence.nosql.ArangoInterfaceMethods;
 import persistence.nosql.PostMethods;
 import shared.Settings;
@@ -69,10 +69,15 @@ public class Posts {
         //DONE: Calculate number of likes and return it, instead of the likes array
         String postId = paramsObject.getString("postId");
                 JSONObject post = null;
-                post = Cache.getPostFromCache(postId);
+                post = PostsCache.getPostFromCache(postId);
                 if(post==null){
+<<<<<<< HEAD
+                    post = ArangoInterfaceMethods.getPost(postId);
+                    PostsCache.insertPostIntoCache(post,postId);
+=======
                     post = PostMethods.getPost(postId);
                     Cache.insertPostIntoCache(post,postId);
+>>>>>>> 2c0d90c7aeff2c4e2cfa75a2fc1237802b70a2d7
                 }
                 JSONArray likes = post.getJSONArray("likes");
                 int noOfLikes= likes.length();
@@ -102,12 +107,16 @@ public class Posts {
         String ownerId = paramsObject.getString("userId");
             if (isAuthorizedToView("posts", loggedInUserId, ownerId,loggedInUserId) || loggedInUserId.equals(ownerId)) {
                 //@TODO: Check if the user exists
-                JSONArray posts = Cache.getPostsFromCache(ownerId, pageIndex, pageSize);
+                JSONArray posts = PostsCache.getPostsFromCache(ownerId, pageIndex, pageSize);
                 if (posts == null) {
+<<<<<<< HEAD
+                    posts = ArangoInterfaceMethods.getPosts(ownerId);
+                    PostsCache.insertPostsIntoCache(posts, ownerId, pageIndex, pageSize);
+=======
                     posts = PostMethods.getPosts(ownerId);
                     Cache.insertPostsIntoCache(posts, ownerId, pageIndex, pageSize);
+>>>>>>> 2c0d90c7aeff2c4e2cfa75a2fc1237802b70a2d7
                 }
-
                 /// replacing likes array with no of likes instead
                 for (int i = 0; i < posts.length(); i++) {
                     JSONObject post = posts.getJSONObject(i);

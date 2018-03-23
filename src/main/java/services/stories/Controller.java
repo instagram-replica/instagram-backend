@@ -3,11 +3,9 @@ package services.stories;
 import exceptions.CustomException;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import persistence.cache.Cache;
+import persistence.cache.StoriesCache;
 import persistence.nosql.ArangoInterfaceMethods;
 import persistence.nosql.StoriesMethods;
-
-import java.util.ArrayList;
 
 public class Controller extends shared.mq_server.Controller {
 
@@ -68,7 +66,6 @@ public class Controller extends shared.mq_server.Controller {
 
     }
 
-
     public static JSONObject createStory(JSONObject paramsObject) {
         JSONObject createStory = new JSONObject();
         createStory.put("story_id", StoriesMethods.insertStory(paramsObject));
@@ -86,7 +83,7 @@ public class Controller extends shared.mq_server.Controller {
     public static JSONObject getStory(JSONObject paramsObject) throws CustomException{
         JSONObject story = new JSONObject();
         String storyID = paramsObject.getString("id");
-        JSONObject storyResponse = Cache.getStoryFromCache(storyID);
+        JSONObject storyResponse = StoriesCache.getStoryFromCache(storyID);
         if(storyResponse==null) {
             storyResponse = StoriesMethods.getStory(storyID);
             Cache.insertStoryIntoCache(storyResponse,storyID);
@@ -98,7 +95,7 @@ public class Controller extends shared.mq_server.Controller {
     public static JSONObject getMyStories(String userId) {
         //        @TODO: validate expiry time
         JSONObject myStory = new JSONObject();
-        JSONArray stories = Cache.getMyStoriesFromCache(userId);
+        JSONArray stories = StoriesCache.getMyStoriesFromCache(userId);
         if(stories==null) {
             stories = StoriesMethods.getStoriesForUser(userId);
             Cache.insertUserStoriesIntoCache(stories,userId);
@@ -110,7 +107,7 @@ public class Controller extends shared.mq_server.Controller {
     public static JSONObject getStories(String userId) {
 //        @TODO: validate expiry time
         JSONObject resultStories = new JSONObject();
-        JSONArray allStories = Cache.getUserStoriesFromCache(userId);
+        JSONArray allStories = StoriesCache.getUserStoriesFromCache(userId);
         if(allStories==null){
            allStories = StoriesMethods.getFriendsStories(userId);
            Cache.insertUserStoriesIntoCache(allStories,userId);
@@ -121,7 +118,7 @@ public class Controller extends shared.mq_server.Controller {
 
     public static JSONObject getDiscoverStories(String userId) {
         JSONObject discoverStories = new JSONObject();
-        JSONArray allStories = Cache.getDiscoverStoriesFromCache(userId);
+        JSONArray allStories = StoriesCache.getDiscoverStoriesFromCache(userId);
         if(allStories==null){
             allStories = StoriesMethods.getDiscoverStories(userId);
             Cache.insertDiscoverStoriesIntoCache(allStories,userId);

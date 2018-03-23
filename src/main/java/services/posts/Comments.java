@@ -2,7 +2,7 @@ package services.posts;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import persistence.cache.Cache;
+import persistence.cache.PostsCache;
 import persistence.nosql.ArangoInterfaceMethods;
 import persistence.nosql.PostMethods;
 import shared.Settings;
@@ -65,16 +65,16 @@ public class Comments {
     public static JSONObject getCommentsOnPost(JSONObject paramsObject, String loggedInUserId, String methodName) {
         String postId = paramsObject.getString("postId");
         try {
-            JSONObject post = Cache.getPostFromCache(postId);
+            JSONObject post = PostsCache.getPostFromCache(postId);
             if (post == null) {
                 post = PostMethods.getPost(postId);
-                Cache.insertPostIntoCache(post, postId);
+                PostsCache.insertPostIntoCache(post, postId);
             }
             if (isAuthorizedToView(Settings.getInstance().getInstanceId(), loggedInUserId, post.getString("user_id"), loggedInUserId)) {
-                JSONArray comments = Cache.getCommentsFromCache(postId);
+                JSONArray comments = PostsCache.getCommentsFromCache(postId);
                 if (comments == null) {
                     comments = PostMethods.getPosts(postId);
-                    Cache.insertCommentsIntoCache(comments, postId);
+                    PostsCache.insertCommentsIntoCache(comments, postId);
                 }
                 JSONObject jsonValue = new JSONObject();
                 jsonValue.put("method", methodName);

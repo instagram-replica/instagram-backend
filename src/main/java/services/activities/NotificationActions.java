@@ -2,6 +2,7 @@ package services.activities;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import persistence.cache.ActivitiesCache;
 import persistence.nosql.ActivityMethods;
 import persistence.nosql.ArangoInterfaceMethods;
 import persistence.sql.users.Database;
@@ -114,7 +115,12 @@ public class NotificationActions {
     public static JSONObject handleGettingNotifications(JSONObject params, String userId){
         int size = params.getInt("pageSize");
         int start = params.getInt("pageIndex") * size;
-        JSONArray notifications= ActivityMethods.getNotifications(userId, start, size);
+
+        JSONArray notifications = ActivitiesCache.getNotificationsFromCache(userId, start, size);
+        if(notifications==null) {
+            notifications= ActivityMethods.getNotifications(userId, start, size);
+            ActivitiesCache.insertNotificationsIntoCache(notifications,userId, start, size);
+        }
 
         JSONObject result = new JSONObject();
         result.put("notifications", notifications);
