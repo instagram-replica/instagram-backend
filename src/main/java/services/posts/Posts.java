@@ -71,13 +71,8 @@ public class Posts {
                 JSONObject post = null;
                 post = PostsCache.getPostFromCache(postId);
                 if(post==null){
-<<<<<<< HEAD
-                    post = ArangoInterfaceMethods.getPost(postId);
-                    PostsCache.insertPostIntoCache(post,postId);
-=======
                     post = PostMethods.getPost(postId);
-                    Cache.insertPostIntoCache(post,postId);
->>>>>>> 2c0d90c7aeff2c4e2cfa75a2fc1237802b70a2d7
+                    PostsCache.insertPostIntoCache(post,postId);
                 }
                 JSONArray likes = post.getJSONArray("likes");
                 int noOfLikes= likes.length();
@@ -109,13 +104,8 @@ public class Posts {
                 //@TODO: Check if the user exists
                 JSONArray posts = PostsCache.getPostsFromCache(ownerId, pageIndex, pageSize);
                 if (posts == null) {
-<<<<<<< HEAD
-                    posts = ArangoInterfaceMethods.getPosts(ownerId);
-                    PostsCache.insertPostsIntoCache(posts, ownerId, pageIndex, pageSize);
-=======
                     posts = PostMethods.getPosts(ownerId);
-                    Cache.insertPostsIntoCache(posts, ownerId, pageIndex, pageSize);
->>>>>>> 2c0d90c7aeff2c4e2cfa75a2fc1237802b70a2d7
+                    PostsCache.insertPostsIntoCache(posts, ownerId, pageIndex, pageSize);
                 }
                 /// replacing likes array with no of likes instead
                 for (int i = 0; i < posts.length(); i++) {

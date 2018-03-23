@@ -32,7 +32,7 @@ public class PostMethods {
         //TODO: @MAGDY location gets inserted in a wrong way (with key "map")
 //            myObject.addAttribute("location", postJSON.getJSONObject("location"));
         myObject.put("comments", new ArrayList<>());
-        myObject.put("likes", new ArrayList<>());
+        myObject.put("likes", postJSON.get("likes"));
         myObject.put("created_at", new Timestamp(System.currentTimeMillis()));
         myObject.put("updated_at", JSONObject.NULL);
         myObject.put("blocked_at", JSONObject.NULL);
@@ -129,6 +129,27 @@ public class PostMethods {
 
         String dbQuery = "FOR post in Posts LET willUpdateDocument = ( FOR comment IN post.comments FILTER comment.id == '" + commentID + "' LIMIT 1 RETURN 1) FILTER LENGTH(willUpdateDocument) > 0 LET alteredList = ( FOR comment IN post.comments LET newItem = (comment.id == '" + commentID + "' ? merge(comment, { 'comments' : append(comment.comments," + commentReply.toString() + ")}) : comment) RETURN newItem) UPDATE post WITH { comments:  alteredList } IN Posts";
         arangoDB.db(dbName).query(dbQuery, null, null, null);
+    }
+
+    public static JSONArray getTrendingPosts(){
+        try{
+            String query = "FOR post IN " + postsCollectionName + " FILTER LENGTH(post.likes) >= 50 RETURN post";
+            System.out.println(query);
+            Map<String, Object> bindVars = new MapBuilder().get();
+            ArangoCursor<BaseDocument> cursor = arangoDB.db(dbName).query(query, bindVars, null,
+                    BaseDocument.class);
+            JSONArray result = new JSONArray();
+            cursor.forEachRemaining(aDocument -> {
+                JSONObject postJSON = new JSONObject(aDocument.getProperties());
+                postJSON.put("id", aDocument.getKey());
+                result.put(postJSON);
+            });
+            return result;
+        } catch (ArangoDBException e) {
+            System.err.println("Failed to execute query. " + e.getMessage());
+            return null;
+        }
+
     }
 
 

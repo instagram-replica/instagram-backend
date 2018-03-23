@@ -86,7 +86,7 @@ public class Controller extends shared.mq_server.Controller {
         JSONObject storyResponse = StoriesCache.getStoryFromCache(storyID);
         if(storyResponse==null) {
             storyResponse = StoriesMethods.getStory(storyID);
-            Cache.insertStoryIntoCache(storyResponse,storyID);
+            StoriesCache.insertStoryIntoCache(storyResponse,storyID);
         }
         story.put("response",storyResponse);
         return story;
@@ -98,7 +98,7 @@ public class Controller extends shared.mq_server.Controller {
         JSONArray stories = StoriesCache.getMyStoriesFromCache(userId);
         if(stories==null) {
             stories = StoriesMethods.getStoriesForUser(userId);
-            Cache.insertUserStoriesIntoCache(stories,userId);
+            StoriesCache.insertUserStoriesIntoCache(stories,userId);
         }
         myStory.put("response",stories);
         return myStory;
@@ -110,7 +110,7 @@ public class Controller extends shared.mq_server.Controller {
         JSONArray allStories = StoriesCache.getUserStoriesFromCache(userId);
         if(allStories==null){
            allStories = StoriesMethods.getFriendsStories(userId);
-           Cache.insertUserStoriesIntoCache(allStories,userId);
+            StoriesCache.insertUserStoriesIntoCache(allStories,userId);
         }
         resultStories.put("response",allStories);
         return resultStories;
@@ -121,7 +121,7 @@ public class Controller extends shared.mq_server.Controller {
         JSONArray allStories = StoriesCache.getDiscoverStoriesFromCache(userId);
         if(allStories==null){
             allStories = StoriesMethods.getDiscoverStories(userId);
-            Cache.insertDiscoverStoriesIntoCache(allStories,userId);
+            StoriesCache.insertDiscoverStoriesIntoCache(allStories,userId);
         }
         discoverStories.put("response",allStories);
         return discoverStories;

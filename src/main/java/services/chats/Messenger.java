@@ -91,7 +91,7 @@ public class Messenger {
             String id = threadsIds.get(i);
             JSONObject thread = ChatCache.getThreadFromCache(id);
             if(thread==null) {
-                thread = name = ThreadMethods.getThread(id);
+                thread = ThreadMethods.getThread(id);
                 ChatCache.insertThreadIntoCache(thread,id);
             }
             String name = thread.getString("name");
