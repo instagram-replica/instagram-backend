@@ -14,7 +14,7 @@ public class StoriesMethods {
     static ArangoDB arangoDB= ArangoInterfaceMethods.arangoDB;
     static String dbName = ArangoInterfaceMethods.dbName;
 
-    static final String storiesCollectionName = "Stories";
+    static final String storiesCollectionName = ArangoInterfaceMethods.storiesCollectionName;
     //STORY CRUD
     public static String insertStory(JSONObject storyJSON) {
 

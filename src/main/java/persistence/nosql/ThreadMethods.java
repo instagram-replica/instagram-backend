@@ -11,7 +11,7 @@ public class ThreadMethods {
     static ArangoDB arangoDB= ArangoInterfaceMethods.arangoDB;
     static String dbName = ArangoInterfaceMethods.dbName;
 
-    public static final String threadsCollectionName = "Threads";
+    public static final String threadsCollectionName = ArangoInterfaceMethods.threadsCollectionName;
 
     //Thread CRUD
     public static String insertThread(JSONObject threadJSON) {

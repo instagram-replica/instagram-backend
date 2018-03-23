@@ -95,6 +95,9 @@ public class ArangoInterfaceMethods {
 
                 CollectionEntity bookmarksCollection = arangoDB.db(dbName).createCollection(bookmarksCollectionName);
                 System.out.println("Collection created: " + bookmarksCollection.getName());
+
+                CollectionEntity hashtagsCollection = arangoDB.db(dbName).createCollection(hashtagCollectionName);
+                System.out.println("Collection created: " + hashtagsCollection.getName());
             }
 
 
@@ -195,6 +198,7 @@ public class ArangoInterfaceMethods {
             return;
         }
     }
+
 
     public static JSONObject reformatJSON(JSONObject json) {
         String openingArray = "\"\\[";
