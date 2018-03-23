@@ -3,6 +3,7 @@
     "params" : 
     {
     	"commentId": 12,
+        "commentOwnerId": 111,
     	"text": "merci ya habebty :*"	
     }
 }
