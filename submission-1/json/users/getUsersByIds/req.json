@@ -1,6 +1,9 @@
 {
   "method" : "getUsersByIds",
   "params": {
-    "ids" : ["cb3d7169-1ae1-4d7b-9fc0-4030bd194e51"]
+    "ids": [
+      "id1",
+      "id2"
+    ]
   }
 }

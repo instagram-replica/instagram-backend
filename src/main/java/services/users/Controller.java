@@ -81,7 +81,7 @@ public class Controller extends shared.mq_server.Controller {
                 break;
             case "unblockUser":
                 // TODO @ARANGODB
-                response = Helpers.constructErrorResponse();
+                response = Controller.handleUnblockUser(params, viewerId);
                 break;
             case "reportUser":
                 // TODO @ARANGODB
@@ -297,7 +297,40 @@ public class Controller extends shared.mq_server.Controller {
     }
 
     public static JSONObject handleBlockUser(JSONObject params, String viewerId){
-        return null;
+        String blockedUser = params.getString("userId");
+        boolean blockedSuccess = ArangoInterfaceMethods.blockUser(viewerId,blockedUser);
+        boolean unfollowSuccess =ArangoInterfaceMethods.unFollowUser(blockedUser,viewerId);
+        JSONObject data = new JSONObject();
+        JSONObject error = new JSONObject();
+        data.put("blockSuccess", blockedSuccess&&unfollowSuccess);
+        return new JSONObject()
+                .put("data", data)
+                .put("error", error);
+
+    }
+
+    public static JSONObject handleUnblockUser(JSONObject params, String viewerId){
+        String unblockedUser = params.getString("userId");
+        boolean unblockedSuccess = ArangoInterfaceMethods.unblockUser(viewerId,unblockedUser);
+        JSONObject data = new JSONObject();
+        JSONObject error = new JSONObject();
+        data.put("unblockSuccess", unblockedSuccess);
+        return new JSONObject()
+                .put("data", data)
+                .put("error", error);
+
+    }
+
+    public static JSONObject handleReportUser(JSONObject params, String viewerId){
+        String reportedUsers = params.getString("userId");
+        boolean reportedSuccess = ArangoInterfaceMethods.reportUser(viewerId,reportedUsers);
+        JSONObject data = new JSONObject();
+        JSONObject error = new JSONObject();
+        data.put("reportSuccess", reportedSuccess);
+        return new JSONObject()
+                .put("data", data)
+                .put("error", error);
+
     }
 
 }

@@ -121,7 +121,7 @@ public class NotificationActions {
         return result;
     }
 
-    public static JSONObject handleGettingActivities(JSONObject params, String userId){
+    public static JSONObject handleGettingActivities(JSONObject params, String userId) {
         int size = params.getInt("pageSize");
         int start = params.getInt("pageIndex") * size;
         ArrayList<String> followings = ArangoInterfaceMethods.getAllfollowingIDs(userId);
