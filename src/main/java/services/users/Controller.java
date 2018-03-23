@@ -7,6 +7,7 @@ import exceptions.JSONException;
 import json.JSONParser;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import persistence.nosql.ArangoInterfaceMethods;
 import persistence.sql.users.User;
 
 import java.io.IOException;
@@ -69,12 +70,10 @@ public class Controller extends shared.mq_server.Controller {
                 response = Controller.handleIsAuthorizedToView(params);
                 break;
             case "followUser":
-                // TODO @ARANGODB
-                response = Controller.handleIsAuthorizedToView(params);
+                response = Controller.handleFollowUser(params, viewerId);
                 break;
             case "unfollowUser":
-                // TODO @ARANGODB
-                response = Helpers.constructErrorResponse();
+                response = Controller.handleUnFollowUser(params, viewerId);
                 break;
             case "blockUser":
                 // TODO @ARANGODB
@@ -260,5 +259,40 @@ public class Controller extends shared.mq_server.Controller {
             e.printStackTrace();
             return Helpers.constructErrorResponse();
         }
+    }
+
+    private static JSONObject handleUnFollowUser(JSONObject params, String viewer){
+        String unfollowedUser = params.getString("userId");
+        boolean followDone = ArangoInterfaceMethods.unFollowUser(viewer, unfollowedUser);
+        JSONObject data = new JSONObject();
+        JSONObject error = new JSONObject();
+        data.put("unfollowSuccess", followDone);
+
+        return new JSONObject()
+                .put("data", data)
+                .put("error", error);
+    }
+}
+    private static JSONObject handleFollowUser(JSONObject params, String viewer){
+        String followedUser = params.getString("userId");
+        boolean followDone = ArangoInterfaceMethods.followUser(viewer, followedUser);
+        JSONObject data = new JSONObject();
+        JSONObject error = new JSONObject();
+        data.put("followSuccess", followDone);
+
+        JSONObject jsonForActivities = new JSONObject();
+        JSONObject paramsForActivities = new JSONObject();
+        paramsForActivities.put("userId", followedUser);
+        jsonForActivities.put("method", "createFollow");
+        jsonForActivities.put("params", paramsForActivities);
+
+        try {
+            Controller.send("activities", "users", jsonForActivities, viewer);
+        } catch (Exception e) {
+            error =  Helpers.constructErrorResponse();
+        }
+        return new JSONObject()
+                .put("data", data)
+                .put("error", error);
     }
 }

@@ -101,6 +101,4 @@ public class Helpers {
                 .put("method", "getUsersIdsByUsernames");
         return Controller.send(serviceName, "users", jsonObject, userId).getJSONObject("data").getJSONArray("ids");
     }
-
-
 }
