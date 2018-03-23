@@ -167,6 +167,7 @@ public class ArangoInterfaceTest {
 
 
             user_ids.forEach(GraphMethods::makeUserNode);
+            user_ids.forEach(System.out::println);
 
         } catch (ArangoDBException e) {
             System.err.println("Faild to intilize graph: " + e.getMessage());
@@ -677,7 +678,7 @@ public class ArangoInterfaceTest {
     }
 
     @Test
-    public void interactTest() {
+    public void interactTest() throws CustomException {
 
         GraphMethods.makeHashtagNode("manU");
         GraphMethods.makeHashtagNode("pancakes");
@@ -1087,5 +1088,29 @@ public class ArangoInterfaceTest {
 
     }
 
+    @Test
+    public void trendingHashtagsTest() throws CustomException {
+        GraphMethods.makeHashtagNode("MoSalah");
+        GraphMethods.makeHashtagNode("FIFA");
+        GraphMethods.makeHashtagNode("Gedo");
+
+        GraphMethods.followHashtag("9087b6df-b6f5-4de5-856b-a965c1e3d829", "MoSalah");
+        GraphMethods.followHashtag("2af9121b-89a1-4365-83e8-96be1a7f2847", "MoSalah");
+        GraphMethods.followHashtag("302d0e85-91be-46c2-ac71-2a4991207d3b", "MoSalah");
+        GraphMethods.followHashtag("20981745-ca25-483f-a831-edd6c1ffcade", "MoSalah");
+        GraphMethods.followHashtag("768a9e00-3d8e-4274-8f21-de6a76c64456", "MoSalah");
+        GraphMethods.followHashtag("aaa106a4-42f7-4eb2-b99f-f6de6863e005", "MoSalah");
+        GraphMethods.followHashtag("9d1d757a-6f35-4302-8e88-eb14e952af23", "MoSalah");
+        GraphMethods.followHashtag("38ce150a-64c0-4859-9542-334b4757061a", "MoSalah");
+        GraphMethods.followHashtag("4a4df3f7-8802-4d0a-a52f-4776ead2e12a", "MoSalah");
+        GraphMethods.followHashtag("ab1bcadd-d4de-4fd9-aea5-aa0920eba624", "MoSalah");
+        GraphMethods.followHashtag("ef58c348-1195-4d83-a4bc-8bd68214c6f6", "MoSalah");
+
+        ArrayList<String> trending = HashtagMethods.getAllTrendingHashtags(0,10);
+        Assert.assertEquals("MoSalah", trending.get(0));
+
+
+
+    }
 
 }

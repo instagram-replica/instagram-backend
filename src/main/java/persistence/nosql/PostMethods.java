@@ -19,7 +19,7 @@ public class PostMethods {
     static String dbName = ArangoInterfaceMethods.dbName;
 
 
-    public static final String postsCollectionName = "Posts";
+    public static final String postsCollectionName = ArangoInterfaceMethods.postsCollectionName;
     //POSTS CRUD
 
     public static String insertPost(JSONObject postJSON, String userId) throws JSONException {

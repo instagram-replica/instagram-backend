@@ -10,7 +10,7 @@ public class BookmarkPosts {
     static ArangoDB arangoDB= ArangoInterfaceMethods.arangoDB;
     static String dbName = ArangoInterfaceMethods.dbName;
 
-    public static final String bookmarksCollectionName = "Bookmarks";
+    public static final String bookmarksCollectionName = ArangoInterfaceMethods.bookmarksCollectionName;
 
     //BOOKMARKS CRUD
     public static String insertBookmark(JSONObject bookmarkJSON) {

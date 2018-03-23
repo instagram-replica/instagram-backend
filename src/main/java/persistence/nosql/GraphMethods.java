@@ -7,6 +7,8 @@ import com.arangodb.ArangoEdgeCollection;
 import com.arangodb.entity.BaseDocument;
 import com.arangodb.entity.BaseEdgeDocument;
 import com.arangodb.util.MapBuilder;
+import exceptions.CustomException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -18,13 +20,13 @@ public class GraphMethods {
     public static final String userCollectionName = "Users";
     public static final String hashtagCollectionName = "Hashtags";
 
-    public static final String graphUserFollowsCollectionName = "UserFollows";
-    public static final String graphUserInteractsCollectionName = "UserInteracts";
-    public static final String graphUserTaggedCollectionName = "UserTagged";
-    public static final String graphPostTaggedCollectionName = "PostTagged";
-    public static final String graphUserBlockedCollectionName = "UserBlocked";
-    public static final String graphUserReportedCollectionName = "UserReported";
-    public static final String graphUserConnectedToThreadCollectionName = "UserConnectedToThread";
+    public static final String graphUserFollowsCollectionName = ArangoInterfaceMethods.graphUserFollowsCollectionName;
+    public static final String graphUserInteractsCollectionName = ArangoInterfaceMethods.graphUserInteractsCollectionName;
+    public static final String graphUserTaggedCollectionName = ArangoInterfaceMethods.graphUserTaggedCollectionName;
+    public static final String graphPostTaggedCollectionName = ArangoInterfaceMethods.graphPostTaggedCollectionName;
+    public static final String graphUserBlockedCollectionName = ArangoInterfaceMethods.graphUserBlockedCollectionName;
+    public static final String graphUserReportedCollectionName = ArangoInterfaceMethods.graphUserReportedCollectionName;
+    public static final String graphUserConnectedToThreadCollectionName = ArangoInterfaceMethods.graphUserConnectedToThreadCollectionName;
 
     private static final String graphName = "InstagramGraph";
 
@@ -100,7 +102,7 @@ public class GraphMethods {
         }
     }
 
-    public static boolean followHashtag(String userIdKey, String hashtagNameKey){
+    public static boolean followHashtag(String userIdKey, String hashtagNameKey) throws CustomException {
 
         BaseEdgeDocument edge = new BaseEdgeDocument();
         String userID = "Users/"+userIdKey;
@@ -110,6 +112,12 @@ public class GraphMethods {
         edge.setTo(hashtagName);
         ArangoEdgeCollection edgecollection = arangoDB.db(dbName).graph(graphName).edgeCollection(graphUserInteractsCollectionName);
         edgecollection.insertEdge(edge, null);
+
+        JSONObject hashtagJSON = HashtagMethods.getHashtag(hashtagNameKey);
+        int new_followers_number = hashtagJSON.getInt("followers_number") + 1;
+        hashtagJSON.put("followers_number", new_followers_number);
+        HashtagMethods.updateHashtag(hashtagNameKey,hashtagJSON);
+
         return true;
 
     }
@@ -194,6 +202,8 @@ public class GraphMethods {
         BaseDocument hashtagDocument = new BaseDocument();
         hashtagDocument.setKey(hashtagName);
         arangoDB.db(dbName).graph(graphName).vertexCollection(hashtagCollectionName).insertVertex(hashtagDocument, null);
+
+        HashtagMethods.insertHashtag(hashtagName);
         return true;
     }
 
@@ -491,4 +501,5 @@ public class GraphMethods {
         });
         return posts;
     }
+
 }
