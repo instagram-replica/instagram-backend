@@ -6,7 +6,9 @@ import persistence.cache.PostsCache;
 import persistence.nosql.ArangoInterfaceMethods;
 import shared.Settings;
 import utilities.Main;
+import shared.mq_server.Controller;
 
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 
@@ -29,6 +31,9 @@ public class Comments {
 
     public static JSONObject createComment(JSONObject paramsObject, String loggedInUserId, String methodName) {
         //TODO: Create activity for the post's owner, and check for mentions @ACTIVITIES_TEAM
+        JSONObject params = new JSONObject();
+        JSONObject activities = new JSONObject();
+
         try {
             String postId = paramsObject.getString("postId");
             JSONObject post = ArangoInterfaceMethods.getPost(postId);
@@ -53,6 +58,11 @@ public class Comments {
                 response.put("error", "null");
                 jsonValue.put("method", methodName);
                 jsonValue.put("response", response);
+                params.put("commentID",newComment.get("id"));
+                params.put("receiverId",post.get("user_id"));
+                activities.put("method",methodName);
+                activities.put("params",params);
+                Controller.send("posts","activities",activities,loggedInUserId);
                 return jsonValue;
             }
             return createJSONError("Not authorized to view");
@@ -103,11 +113,12 @@ public class Comments {
         return jsonObject;
     }
 
-    public static JSONObject createCommentReply(JSONObject paramsObject, String userId, String methodName) {
+    public static JSONObject createCommentReply(JSONObject paramsObject, String userId, String methodName) throws IOException, InterruptedException {
         //TODO: Create activity for the post's owner, and check for mentions @ACTIVITIES_TEAM
         String commentId = paramsObject.getString("commentId");
         String reply = paramsObject.getString("text");
-
+        JSONObject params = new JSONObject();
+        JSONObject activities = new JSONObject();
         JSONObject replyJson = createCommentJSON(reply, 1, userId, null);
 
 
@@ -134,7 +145,11 @@ public class Comments {
 
         jsonValue.put("method", methodName);
         jsonValue.put("response", response);
-
+        params.put("commentID",newReply.get("id"));
+        params.put("receiverId",paramsObject.getString("commentOwnerId"));
+        activities.put("method",methodName);
+        activities.put("params", params);
+        Controller.send("posts","activities",activities,userId);
         return jsonValue;
 
     }

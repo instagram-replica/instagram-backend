@@ -6,9 +6,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import persistence.cache.PostsCache;
 import persistence.nosql.ArangoInterfaceMethods;
-
+import shared.mq_server.Controller;
 import java.io.IOException;
-
 import static shared.Helpers.createJSONError;
 import static shared.Helpers.getUsersByIds;
 import static shared.Helpers.isAuthorizedToView;
@@ -170,20 +169,27 @@ public class Posts {
         //TODO: Add unlike method and create JSON req and res
         //TODO: Create activity for the post owner @ACTIVITIES_TEAM, except if he is a retard who likes his own image
         String postId = paramsObject.getString("postId");
-
-            JSONObject post = ArangoInterfaceMethods.getPost(postId);
-            JSONArray likes = post.getJSONArray("likes");
-            for(int i=0; i<likes.length();i++){
-                if(likes.get(i).equals(loggedInUserId))
-                    throw new CustomException("You already liked this post");
-            }
-            ArangoInterfaceMethods.likePost(postId, loggedInUserId);
-            JSONObject res = new JSONObject();
-            JSONObject response = new JSONObject();
-            response.put("method", methodName);
-            res.put("postID", postId);
-            response.put("response", res);
-            return response;
+        JSONObject params = new JSONObject();
+        JSONObject activities = new JSONObject();
+        JSONObject post = ArangoInterfaceMethods.getPost(postId);
+        String receiverId = post.getString("user_id");
+        JSONArray likes = post.getJSONArray("likes");
+        for(int i=0; i<likes.length();i++){
+            if(likes.get(i).equals(loggedInUserId))
+                throw new CustomException("You already liked this post");
+        }
+        ArangoInterfaceMethods.likePost(postId, loggedInUserId);
+        JSONObject res = new JSONObject();
+        JSONObject response = new JSONObject();
+        response.put("method", methodName);
+        res.put("postID", postId);
+        response.put("response", res);
+        params.put("postID",postId);
+        params.put("receiverId",receiverId);
+        activities.put("method",methodName);
+        activities.put("params",params);
+        Controller.send("posts","activities",activities,loggedInUserId);
+        return response;
     }
 
 //    public static JSONObject deletePostLike(JSONObject paramsObject, String loggedInUserId, String methodName){
