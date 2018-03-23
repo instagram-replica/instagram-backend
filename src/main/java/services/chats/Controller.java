@@ -1,5 +1,6 @@
 package services.chats;
 
+import exceptions.CustomException;
 import org.json.JSONObject;
 
 public class Controller extends shared.mq_server.Controller {
@@ -12,14 +13,32 @@ public class Controller extends shared.mq_server.Controller {
     @Override
     public JSONObject execute(JSONObject jsonObject, String userId) {
         JSONObject newJsonObj = new JSONObject();
-        if(jsonObject.getString("name").equals("Ants")) {
-            try {
-                Thread.sleep(100000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+        newJsonObj.put("application", "activities");
+        String methodName = jsonObject.getString("method");
+        JSONObject paramsObject = jsonObject.getJSONObject("params");
+
+        //interface insert method, change params of json object to match different activity
+        //types
+        try {
+            switch (methodName) {
+                case "createMessage":
+                    newJsonObj = Messenger.createMessage(paramsObject, userId);
+                    break;
+                case "createThread":
+                    newJsonObj = Messenger.createThread(paramsObject, userId);
+                    break;
+                case "getMessages":
+                    newJsonObj = Messenger.getMessages(paramsObject, userId);
+                    break;
+                case "getThreads":
+                    newJsonObj = Messenger.getThreads(paramsObject, userId);
+                    break;
+                default:
+                    break;
             }
+        } catch (CustomException e) {
+            e.printStackTrace();
         }
-        newJsonObj.put("application", "chats");
         return newJsonObj;
     }
 }

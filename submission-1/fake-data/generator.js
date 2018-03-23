@@ -110,10 +110,10 @@ const usersXML = users
       full_name,
       created_at,
     }) =>
-      `${id},${username},${email},${password_hash},${is_private},${full_name},${created_at}`,
+      `INSERT INTO users (id,username,gender,email,password_hash,is_private,full_name,created_at) VALUES ('${id}','${username}','male','${email}','${password_hash}',${is_private},'${full_name}','${created_at}');`,
   )
   .join('\n');
-fs.writeFileSync('./users.csv', usersXML);
+fs.writeFileSync('./users.sql', usersXML);
 
 // ################################## Generate Posts File ##################################
 

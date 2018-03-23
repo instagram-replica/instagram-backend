@@ -1,10 +1,8 @@
 package services.users;
 
-
 import shared.Settings;
 
 public class Server {
-
     private static final String DEFAULT_CONFIG_URI_LOC = "src/main/configs/users/default_config.json";
 
     public static void main(String[] args) {

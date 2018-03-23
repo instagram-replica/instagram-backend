@@ -1,9 +1,11 @@
 package services.stories;
 
+import exceptions.CustomException;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import persistence.cache.Cache;
+import persistence.cache.StoriesCache;
 import persistence.nosql.ArangoInterfaceMethods;
+import persistence.nosql.StoriesMethods;
 
 public class Controller extends shared.mq_server.Controller {
 
@@ -15,72 +17,77 @@ public class Controller extends shared.mq_server.Controller {
     @Override
     public JSONObject execute(JSONObject jsonObject, String userId) {
         JSONObject newJsonObj = new JSONObject();
-
+        JSONObject data = new JSONObject();
+        JSONObject error = new JSONObject();
         String methodName = jsonObject.getString("method");
         JSONObject paramsObject = jsonObject.getJSONObject("params");
+        try {
+            switch (methodName) {
+                case "createStory":
+                    data = createStory(paramsObject);
+                    break;
+                case "deleteStory":
+                    data = deleteStory(paramsObject);
+                    break;
+                case "getMyStory":
+                    data = getMyStories(userId);
+                    break;
+                case "getMyStories":
+                    data = getStories(userId);
+                    break;
+                case "getStory":
+                    data = getStory(paramsObject);
+                    break;
+                case "getDiscoverStories":
+                    data = getDiscoverStories(userId);
+                    break;
+            }
+        }
+        catch(org.json.JSONException e){
+            e.printStackTrace();
+            error.put("description",utilities.Main.stringifyJSONException(e));
+        }
+        catch(CustomException e){
+            e.printStackTrace();
+            error.put("description", e.getMessage());
+        }
+        catch(Exception e){
+            e.printStackTrace();
+            System.err.println(e.getMessage());
+            error.put("description","Internal Server Error");
+        }
+        finally {
+            JSONObject response = new JSONObject();
+            response.put("error",error);
+            response.put("data",data);
+            return response;
 
-        switch (methodName) {
-            case "createStory":
-                createStory(paramsObject);
-                break;
-            case "deleteStory":
-                deleteStory(paramsObject);
-                break;
-            case "getMyStory":
-                getMyStories(userId);
-                break;
-            case "getMyStories":
-                getStories();
-                break;
-            case "getStory":
-                getStory(paramsObject);
-                break;
-            case "getDiscoverStories":
-                getDiscoverStories();
-                break;
         }
 
-        newJsonObj.put("application", methodName);
-        return newJsonObj;
     }
 
-
-    public static void createStory(JSONObject paramsObject) {
+    public static JSONObject createStory(JSONObject paramsObject) {
         JSONObject createStory = new JSONObject();
-
-        if (!ArangoInterfaceMethods.insertStory(paramsObject).equals(null)) {
-            createStory.put("success", "true");
-            createStory.put("error", "0");
-
-        } else {
-            createStory.put("success", "false");
-            createStory.put("error", "Story not created");
-        }
+        createStory.put("story_id", StoriesMethods.insertStory(paramsObject));
+        return createStory;
     }
 
 
     public static JSONObject deleteStory(JSONObject paramsObject) {
-
-        JSONObject delteStory = new JSONObject();
-        if (ArangoInterfaceMethods.deleteStory(paramsObject.getString("id"))) {
-            delteStory.put("success", "true");
-            delteStory.put("error", "0");
-        } else {
-            delteStory.put("success", "false");
-            delteStory.put("error", "Story not deleted");
-        }
-        return delteStory;
+        JSONObject deleteStory = new JSONObject();
+        StoriesMethods.deleteStory(paramsObject.getString("id"));
+        deleteStory.put("message","Story Deleted");
+        return deleteStory;
     }
 
-    public static JSONObject getStory(JSONObject paramsObject) {
+    public static JSONObject getStory(JSONObject paramsObject) throws CustomException{
         JSONObject story = new JSONObject();
         String storyID = paramsObject.getString("id");
-        JSONObject storyResponse = Cache.getStoryFromCache(storyID);
+        JSONObject storyResponse = StoriesCache.getStoryFromCache(storyID);
         if(storyResponse==null) {
-            storyResponse = ArangoInterfaceMethods.getStory(storyID);
-            Cache.insertStoryIntoCache(storyResponse,storyID);
+            storyResponse = StoriesMethods.getStory(storyID);
+            StoriesCache.insertStoryIntoCache(storyResponse,storyID);
         }
-        story.put("error","0");
         story.put("response",storyResponse);
         return story;
     }
@@ -88,22 +95,36 @@ public class Controller extends shared.mq_server.Controller {
     public static JSONObject getMyStories(String userId) {
         //        @TODO: validate expiry time
         JSONObject myStory = new JSONObject();
-        JSONArray stories = Cache.getUserStoriesFromCache(userId);
+        JSONArray stories = StoriesCache.getMyStoriesFromCache(userId);
         if(stories==null) {
-            stories = ArangoInterfaceMethods.getStoriesForUser(userId);
-            Cache.insertUserStoriesIntoCache(stories,userId);
+            stories = StoriesMethods.getStoriesForUser(userId);
+            StoriesCache.insertUserStoriesIntoCache(stories,userId);
         }
-        myStory.put("error","0");
         myStory.put("response",stories);
         return myStory;
     }
 
-    public static void getStories() {
+    public static JSONObject getStories(String userId) {
 //        @TODO: validate expiry time
+        JSONObject resultStories = new JSONObject();
+        JSONArray allStories = StoriesCache.getUserStoriesFromCache(userId);
+        if(allStories==null){
+           allStories = StoriesMethods.getFriendsStories(userId);
+            StoriesCache.insertUserStoriesIntoCache(allStories,userId);
+        }
+        resultStories.put("response",allStories);
+        return resultStories;
     }
 
-    public static void getDiscoverStories() {
-
+    public static JSONObject getDiscoverStories(String userId) {
+        JSONObject discoverStories = new JSONObject();
+        JSONArray allStories = StoriesCache.getDiscoverStoriesFromCache(userId);
+        if(allStories==null){
+            allStories = StoriesMethods.getDiscoverStories(userId);
+            StoriesCache.insertDiscoverStoriesIntoCache(allStories,userId);
+        }
+        discoverStories.put("response",allStories);
+        return discoverStories;
     }
 
 }

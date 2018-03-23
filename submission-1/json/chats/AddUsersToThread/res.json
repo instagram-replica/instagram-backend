@@ -1,0 +1,20 @@
+{
+  "method": "createThread",
+  "response": {
+    "threadId": 123355,
+    "users": [
+      {
+        "id": 132
+      },
+      {
+        "id": 12314
+      },
+      {
+        "id": 4754
+      },
+      {
+        "id": 4224
+      }
+    ]
+  }
+}

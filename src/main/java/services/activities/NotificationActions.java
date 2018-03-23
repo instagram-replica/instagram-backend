@@ -2,8 +2,10 @@ package services.activities;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import persistence.cache.ActivitiesCache;
+import persistence.nosql.ActivityMethods;
 import persistence.nosql.ArangoInterfaceMethods;
-import persistence.sql.users.Main;
+import persistence.sql.users.Database;
 
 import java.sql.Timestamp;
 
@@ -23,8 +25,8 @@ public class NotificationActions {
         notificationJSON.put("created_at",new java.util.Date());
         notificationJSON.put("blocked_at","null");
         notificationJSON.put("id",utilities.Main.generateUUID());
-        ArangoInterfaceMethods.insertNotification(notificationJSON);
-        ArangoInterfaceMethods.insertActivity(notificationJSON);
+        ActivityMethods.insertNotification(notificationJSON);
+        ActivityMethods.insertActivity(notificationJSON);
     }
 
     public static void handleFollowNotification(JSONObject params, String userId) {
@@ -39,8 +41,8 @@ public class NotificationActions {
         notificationJSON.put("created_at",new java.util.Date());
         notificationJSON.put("blocked_at","null");
         notificationJSON.put("id",utilities.Main.generateUUID());
-        ArangoInterfaceMethods.insertNotification(notificationJSON);
-        ArangoInterfaceMethods.insertActivity(notificationJSON);
+        ActivityMethods.insertNotification(notificationJSON);
+        ActivityMethods.insertActivity(notificationJSON);
     }
 
     public static void handlePostTagNotification(JSONObject params, String userId) {
@@ -50,13 +52,14 @@ public class NotificationActions {
         for(int i=0;i<receivers.length();i++){
             JSONObject taggedPerson = receivers.getJSONObject(i);
             JSONObject notifyReceiver = new JSONObject();
-            String recID = Main.getUserIdFromUsername(taggedPerson.getString("username"));
+            // TODO: Make call to users service to request resource
+            String recID = Database.getUserByUsername(taggedPerson.getString("username")).id;
             notifyReceiver.put("activity_type","{ type: tag, user_id: " + recID+ "\"");
             notifyReceiver.put("receiver_id", recID);
             notifyReceiver.put("sender_id", userId);
             notifyReceiver.put("created_at", new Timestamp(System.currentTimeMillis()));
             notifyReceiver.put("blocked_at",new Timestamp(System.currentTimeMillis()));
-            ArangoInterfaceMethods.insertNotification(notifyReceiver);
+            ActivityMethods.insertNotification(notifyReceiver);
         }
 
         JSONObject notificationJSON =new JSONObject();
@@ -71,7 +74,7 @@ public class NotificationActions {
         notificationJSON.put("created_at",new java.util.Date());
         notificationJSON.put("blocked_at","null");
         notificationJSON.put("id",utilities.Main.generateUUID());
-        ArangoInterfaceMethods.insertNotification(notificationJSON);
+        ActivityMethods.insertNotification(notificationJSON);
     }
 
 
@@ -89,7 +92,7 @@ public class NotificationActions {
         activityJSON.put("created_at",new java.util.Date());
         activityJSON.put("blocked_at","null");
         activityJSON.put("id",utilities.Main.generateUUID());
-        ArangoInterfaceMethods.insertNotification(activityJSON);
+        ActivityMethods.insertNotification(activityJSON);
     }
 
     public static void handleCommentReplyNotification(JSONObject params, String userId) {
@@ -106,13 +109,18 @@ public class NotificationActions {
         activityJSON.put("created_at",new java.util.Date());
         activityJSON.put("blocked_at","null");
         activityJSON.put("id",utilities.Main.generateUUID());
-        ArangoInterfaceMethods.insertActivity(activityJSON);
+        ActivityMethods.insertActivity(activityJSON);
     }
 
     public static JSONObject handleGettingNotifications(JSONObject params, String userId){
         int size = params.getInt("pageSize");
         int start = params.getInt("pageIndex") * size;
-        JSONArray notifications= ArangoInterfaceMethods.getNotifications(userId, start, size);
+
+        JSONArray notifications = ActivitiesCache.getNotificationsFromCache(userId, start, size);
+        if(notifications==null) {
+            notifications= ActivityMethods.getNotifications(userId, start, size);
+            ActivitiesCache.insertNotificationsIntoCache(notifications,userId, start, size);
+        }
 
         JSONObject result = new JSONObject();
         result.put("notifications", notifications);

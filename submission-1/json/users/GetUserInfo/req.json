@@ -1,6 +1,0 @@
-{
-  "method": "getUserInfo",
-  "params": {
-    "userId": 1
-  }
-}
