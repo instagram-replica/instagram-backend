@@ -14,6 +14,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.sql.Array;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Map;
@@ -107,7 +108,6 @@ public class ArangoInterfaceMethods {
     public static void closeConnection() {
         arangoDB.shutdown();
     }
-
 
     public static void initializeGraphCollections() throws IOException {
         for (GraphEntity graphEntity : arangoDB.db(dbName).getGraphs()) {
