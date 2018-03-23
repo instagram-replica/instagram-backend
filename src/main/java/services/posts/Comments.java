@@ -40,8 +40,10 @@ public class Comments {
 
             String comment = paramsObject.getString("text");
 
-            ArrayList<String> mentionsUserNames = getMentions(comment);
-            JSONArray mentionedUserIds = getUsersIdsByUsernames("posts", mentionsUserNames, loggedInUserId);
+
+            //TODO mentions
+//            ArrayList<String> mentionsUserNames = getMentions(comment);
+            //JSONArray mentionedUserIds = getUsersIdsByUsernames("posts", mentionsUserNames, loggedInUserId);
 
             JSONObject commentJSON = createCommentJSON(comment, 0, loggedInUserId, postId);
             if (isAuthorizedToView(Settings.getInstance().getInstanceId(), loggedInUserId, post.getString("user_id"), loggedInUserId)) {

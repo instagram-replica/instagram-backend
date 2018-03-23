@@ -125,7 +125,7 @@ public class NotificationActions {
         activityJSON.put("created_at",new java.util.Date());
         activityJSON.put("blocked_at","null");
         activityJSON.put("id",utilities.Main.generateUUID());
-        ArangoInterfaceMethods.insertActivity(activityJSON);
+        ArangoInterfaceMethods.insertNotification(activityJSON);
     }
 
     public static JSONObject handleGettingNotifications(JSONObject params, String userId){

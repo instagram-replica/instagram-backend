@@ -188,7 +188,7 @@ public class Posts {
         params.put("receiverId",receiverId);
         activities.put("method",methodName);
         activities.put("params",params);
-        Controller.send("posts","activities",activities,loggedInUserId);
+       Controller.send("posts","activities",activities,loggedInUserId);
         return response;
     }
 
