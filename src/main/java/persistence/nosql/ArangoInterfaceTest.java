@@ -895,7 +895,7 @@ public class ArangoInterfaceTest {
         obj.put("seen_by_users_ids", new ArrayList<String>());
         obj.put("created_at", new Timestamp(System.currentTimeMillis()));
         obj.put("deleted_at", new Timestamp(System.currentTimeMillis()));
-        obj.put("expired_at", new Timestamp(System.currentTimeMillis()));
+        obj.put("expired_at", new Timestamp(System.currentTimeMillis()+86400000));
         obj.put("blocked_at", new Timestamp(System.currentTimeMillis()));
 
         String id1 = ArangoInterfaceMethods.insertStory(obj);
@@ -989,7 +989,7 @@ public class ArangoInterfaceTest {
         obj.put("seen_by_users_ids", new ArrayList<String>());
         obj.put("created_at", new Timestamp(System.currentTimeMillis()));
         obj.put("deleted_at", new Timestamp(System.currentTimeMillis()));
-        obj.put("expired_at", new Timestamp(System.currentTimeMillis()));
+        obj.put("expired_at", new Timestamp(System.currentTimeMillis()+86400000));
         obj.put("blocked_at", new Timestamp(System.currentTimeMillis()));
 
         String id1 = ArangoInterfaceMethods.insertStory(obj);

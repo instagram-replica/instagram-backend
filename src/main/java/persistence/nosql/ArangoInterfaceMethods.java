@@ -14,6 +14,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.sql.Array;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Map;
@@ -258,9 +259,9 @@ public class ArangoInterfaceMethods {
             myObject.addAttribute("media_id", storyJSON.get("media_id").toString());
             myObject.addAttribute("reports", storyJSON.get("reports").toString());
             myObject.addAttribute("seen_by_users_ids", storyJSON.get("seen_by_users_ids").toString());
-            myObject.addAttribute("created_at", storyJSON.get("created_at").toString());
+            myObject.addAttribute("created_at", new Timestamp(System.currentTimeMillis()));
             myObject.addAttribute("deleted_at", storyJSON.get("deleted_at").toString());
-            myObject.addAttribute("expired_at", storyJSON.get("expired_at").toString());
+            myObject.addAttribute("expired_at", new Timestamp(System.currentTimeMillis()+86400000));
             myObject.addAttribute("blocked_at", storyJSON.get("blocked_at").toString());
             String id = arangoDB.db(dbName).collection(storiesCollectionName).insertDocument(storyJSON.toString()).getKey();
             System.out.println("Story inserted");
@@ -302,8 +303,8 @@ public class ArangoInterfaceMethods {
     }
 
     public static JSONArray getStoriesForUser(String user_id) {
-
-            String dbQuery = "For story in " + storiesCollectionName + " FILTER story.user_id == \""+ user_id + "\" RETURN story";
+            Timestamp now = new Timestamp(System.currentTimeMillis());
+            String dbQuery = "For story in " + storiesCollectionName + " FILTER story.user_id == \""+ user_id + "\" AND story.expired_at >='"+now+"' RETURN story";
             ArangoCursor<BaseDocument> cursor = arangoDB.db(dbName).query(dbQuery, null, null, BaseDocument.class);
             JSONArray result = new JSONArray();
             cursor.forEachRemaining(aDocument -> {
@@ -311,42 +312,38 @@ public class ArangoInterfaceMethods {
                 result.put(reformatJSON(postJSON));
             });
             return result;
+    }
 
+    public static JSONArray getStoriesForUsers(ArrayList<String> users_ids) {
+        Timestamp now = new Timestamp(System.currentTimeMillis());
+        String dbQuery = "For story in " + storiesCollectionName + " FILTER story.user_id IN "+ new JSONArray(users_ids) + " AND story.expired_at >='"+now+"' COLLECT user_id = story.user_id INTO g RETURN { user_id: user_id, stories: g }";
+        System.out.println(dbQuery);
+        ArangoCursor<BaseDocument> cursor = arangoDB.db(dbName).query(dbQuery, null, null, BaseDocument.class);
+        JSONArray result = new JSONArray();
+        cursor.forEachRemaining(aDocument -> {
+            JSONObject postJSON = new JSONObject(aDocument.getProperties());
+            result.put(reformatJSON(postJSON));
+        });
+        System.out.println("RESULT:  "+result);
+        return result;
     }
 
     public static JSONArray getFriendsStories(String userID){
-        JSONArray resultStories = new JSONArray();
         ArrayList<String> friends = getAllfollowingIDs(""+ userID);
-        JSONArray friendStories;
-        for(int  i =0 ; i< friends.size();i++){
-            friendStories = getStoriesForUser(friends.get(i));
-            JSONObject userStories = new JSONObject();
-            userStories.put("user_id",friends.get(i));
-            userStories.put("stories",friendStories);
-            if(friendStories.length() != 0){
-                resultStories.put(userStories);
-            }
-        }
-        return resultStories;
+        return getStoriesForUsers(friends);
     }
 
     public static JSONArray getDiscoverStories(String userID){
-        JSONArray resultStories = new JSONArray();
         ArrayList<String> publicFriendOfFriends = getAllfollowingPublicIDsSecondDegree(""+ userID);
 
         Collections.shuffle(publicFriendOfFriends);
-        JSONArray friendStories;
         int min = Math.min(10,publicFriendOfFriends.size());
+        ArrayList<String> usersIds = new ArrayList<String>();
+
         for(int  i =0 ; i< min;i++){
-            friendStories = getStoriesForUser(publicFriendOfFriends.get(i));
-            JSONObject JSONUserStories = new JSONObject();
-            JSONUserStories.put("user_id",publicFriendOfFriends.get(i));
-            JSONUserStories.put("stories",friendStories);
-            if(friendStories.length() != 0){
-                resultStories.put(JSONUserStories);
-            }
+            usersIds.add(publicFriendOfFriends.get(i));
         }
-        return resultStories;
+        return getStoriesForUsers(usersIds);
     }
 
     public static JSONArray getNotifications(String user_id, int start, int limit) {
