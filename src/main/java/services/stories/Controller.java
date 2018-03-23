@@ -5,6 +5,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import persistence.cache.StoriesCache;
 import persistence.nosql.ArangoInterfaceMethods;
+import persistence.nosql.StoriesMethods;
 
 public class Controller extends shared.mq_server.Controller {
 
@@ -67,14 +68,14 @@ public class Controller extends shared.mq_server.Controller {
 
     public static JSONObject createStory(JSONObject paramsObject) {
         JSONObject createStory = new JSONObject();
-        createStory.put("story_id",ArangoInterfaceMethods.insertStory(paramsObject));
+        createStory.put("story_id", StoriesMethods.insertStory(paramsObject));
         return createStory;
     }
 
 
     public static JSONObject deleteStory(JSONObject paramsObject) {
         JSONObject deleteStory = new JSONObject();
-        ArangoInterfaceMethods.deleteStory(paramsObject.getString("id"));
+        StoriesMethods.deleteStory(paramsObject.getString("id"));
         deleteStory.put("message","Story Deleted");
         return deleteStory;
     }
@@ -84,8 +85,8 @@ public class Controller extends shared.mq_server.Controller {
         String storyID = paramsObject.getString("id");
         JSONObject storyResponse = StoriesCache.getStoryFromCache(storyID);
         if(storyResponse==null) {
-            storyResponse = ArangoInterfaceMethods.getStory(storyID);
-            StoriesCache.insertStoryIntoCache(storyResponse,storyID);
+            storyResponse = StoriesMethods.getStory(storyID);
+            Cache.insertStoryIntoCache(storyResponse,storyID);
         }
         story.put("response",storyResponse);
         return story;
@@ -96,8 +97,8 @@ public class Controller extends shared.mq_server.Controller {
         JSONObject myStory = new JSONObject();
         JSONArray stories = StoriesCache.getMyStoriesFromCache(userId);
         if(stories==null) {
-            stories = ArangoInterfaceMethods.getStoriesForUser(userId);
-            StoriesCache.insertUserStoriesIntoCache(stories,userId);
+            stories = StoriesMethods.getStoriesForUser(userId);
+            Cache.insertUserStoriesIntoCache(stories,userId);
         }
         myStory.put("response",stories);
         return myStory;
@@ -108,8 +109,8 @@ public class Controller extends shared.mq_server.Controller {
         JSONObject resultStories = new JSONObject();
         JSONArray allStories = StoriesCache.getUserStoriesFromCache(userId);
         if(allStories==null){
-           allStories = ArangoInterfaceMethods.getFriendsStories(userId);
-            StoriesCache.insertUserStoriesIntoCache(allStories,userId);
+           allStories = StoriesMethods.getFriendsStories(userId);
+           Cache.insertUserStoriesIntoCache(allStories,userId);
         }
         resultStories.put("response",allStories);
         return resultStories;
@@ -119,8 +120,8 @@ public class Controller extends shared.mq_server.Controller {
         JSONObject discoverStories = new JSONObject();
         JSONArray allStories = StoriesCache.getDiscoverStoriesFromCache(userId);
         if(allStories==null){
-            allStories = ArangoInterfaceMethods.getDiscoverStories(userId);
-            StoriesCache.insertDiscoverStoriesIntoCache(allStories,userId);
+            allStories = StoriesMethods.getDiscoverStories(userId);
+            Cache.insertDiscoverStoriesIntoCache(allStories,userId);
         }
         discoverStories.put("response",allStories);
         return discoverStories;
