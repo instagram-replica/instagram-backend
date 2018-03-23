@@ -13,7 +13,7 @@ public class Controller extends shared.mq_server.Controller {
     public Controller(){
         super();
         try {
-            props = readPropertiesFile("src/main/resources/controllers_mapper.properties.properties");
+            props = readPropertiesFile("src/main/resources/activities_mapper.properties");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -46,39 +46,5 @@ public class Controller extends shared.mq_server.Controller {
         response.put("error",error);
         response.put("data",newJsonObj);
         return response;
-//
-//        //interface insert method, change params of json object to match different activity
-//        //types
-//        switch (methodName) {
-//            case "createPostWithTag":
-//                handlePostTagNotification(paramsObject, userId);
-//                break;
-//            case "createPostLike":
-//                NotificationActions.handlePostLikeNotification(paramsObject, userId);
-//                break;
-//            case "createComment":
-//                NotificationActions.handleCommentNotification(paramsObject, userId);
-//                break;
-//            case "createCommentLike":
-//                NotificationActions.handleCommentNotification(paramsObject, userId);
-//                break;
-//            case "createCommentReply":
-//                NotificationActions.handleCommentReplyNotification(paramsObject, userId);
-//                break;
-//            case "createFollow":
-//                NotificationActions.handleFollowNotification(paramsObject, userId);
-//                break;
-//            case "getNotifications":
-//                newJsonObj = NotificationActions.handleGettingNotifications(paramsObject, userId);
-//                break;
-//            case "getActivities":
-//                newJsonObj = ActivityActions.handleGettingActivities(paramsObject, userId);
-//                break;
-//
-//            default:
-//                break;
-//        }
-//        return newJsonObj;
     }
-
 }
