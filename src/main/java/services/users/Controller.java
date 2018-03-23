@@ -70,7 +70,7 @@ public class Controller extends shared.mq_server.Controller {
                 break;
             case "followUser":
                 // TODO @ARANGODB
-                response = Helpers.constructErrorResponse();
+                response = Controller.handleIsAuthorizedToView(params);
                 break;
             case "unfollowUser":
                 // TODO @ARANGODB
