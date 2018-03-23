@@ -21,7 +21,7 @@ public class Controller extends shared.mq_server.Controller {
 
     @Override
     public JSONObject execute(JSONObject jsonObject, String userId) {
-        JSONObject newJsonObj = new JSONObject();
+        JSONObject data = new JSONObject();
         JSONObject error = new JSONObject();
 
         String methodName = jsonObject.getString("method");
@@ -30,7 +30,7 @@ public class Controller extends shared.mq_server.Controller {
 
         try {
             Method method = NotificationActions.class.getMethod(methodSignature, JSONObject.class, String.class);
-            newJsonObj = (JSONObject) method.invoke(null,paramsObject, userId);
+            data = (JSONObject) method.invoke(null,paramsObject, userId);
         }
         catch(org.json.JSONException e){
             e.printStackTrace();
@@ -44,7 +44,7 @@ public class Controller extends shared.mq_server.Controller {
 
         JSONObject response = new JSONObject();
         response.put("error",error);
-        response.put("data",newJsonObj);
+        response.put("data",data);
         return response;
     }
 }
