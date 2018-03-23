@@ -13,7 +13,7 @@ public class Controller extends shared.mq_server.Controller {
     public Controller(){
         super();
         try {
-            props = readPropertiesFile("src/main/resources/requests_mapping.properties");
+            props = readPropertiesFile("src/main/resources/controllers_mapper.properties.properties");
         } catch (IOException e) {
             e.printStackTrace();
         }

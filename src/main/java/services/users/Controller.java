@@ -77,7 +77,7 @@ public class Controller extends shared.mq_server.Controller {
                 break;
             case "blockUser":
                 // TODO @ARANGODB
-                response = Helpers.constructErrorResponse();
+                response = Controller.handleBlockUser(params, viewerId);
                 break;
             case "unblockUser":
                 // TODO @ARANGODB
@@ -287,7 +287,7 @@ public class Controller extends shared.mq_server.Controller {
         jsonForActivities.put("params", paramsForActivities);
 
         try {
-            Controller.send("activities", "users", jsonForActivities, viewer);
+            Controller.send("users", "activities", jsonForActivities, viewer);
         } catch (Exception e) {
             error = Helpers.constructErrorResponse();
         }
@@ -295,4 +295,9 @@ public class Controller extends shared.mq_server.Controller {
                 .put("data", data)
                 .put("error", error);
     }
+
+    public static JSONObject handleBlockUser(JSONObject params, String viewerId){
+        return null;
+    }
+
 }
