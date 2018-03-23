@@ -9,21 +9,33 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import persistence.nosql.ArangoInterfaceMethods;
 import persistence.sql.users.User;
+import services.posts.PostsActions;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import static persistence.sql.Main.closeConnection;
 import static persistence.sql.Main.openConnection;
+import static utilities.Main.readPropertiesFile;
 
 public class Controller extends shared.mq_server.Controller {
-    public Controller() {
+
+    private Properties props;
+
+    public Controller(){
         super();
+        try {
+            props = readPropertiesFile("src/main/resources/posts_mapper.properties");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
-    public JSONObject execute(JSONObject payload, String viewerId) {
+    public JSONObject execute(JSONObject jsonObject, String userId) {
         try {
             Controller.initialize();
         } catch (Exception e) {
@@ -31,65 +43,39 @@ public class Controller extends shared.mq_server.Controller {
             return Helpers.constructErrorResponse();
         }
 
-        String method;
-        JSONObject params;
-        JSONObject response;
+        JSONObject data = new JSONObject();
+        JSONObject error = new JSONObject();
+        String methodName;
+        String methodSignature;
+        JSONObject paramsObject;
 
         try {
-            method = JSONParser.getString("method", payload);
-            params = JSONParser.getJSONObject("params", payload);
-        } catch (JSONException e) {
+            methodName = jsonObject.getString("method");
+            methodSignature = props.getProperty(methodName);
+            paramsObject = jsonObject.getJSONObject("params");
+        } catch (Exception e) {
             e.printStackTrace();
             Controller.teardown();
             return Helpers.constructErrorResponse(e.getMessage());
         }
 
-        switch (method) {
-            case "signup":
-                response = Controller.handleSignup(params);
-                break;
-            case "login":
-                response = Controller.handleLogin(params);
-                break;
-            case "getUser":
-                response = Controller.handleGetUser(params);
-                break;
-            case "updateUser":
-                response = Controller.handleUpdateUser(params);
-                break;
-            case "searchUsers":
-                response = Controller.handleSearchUsers(params);
-                break;
-            case "getUsersByIds":
-                response = Controller.handleGetUsersByIds(params);
-                break;
-            case "getUsersIdsByUsernames":
-                response = Controller.handleGetUsersIdsByUsernames(params);
-                break;
-            case "isUserAuthorizedToView":
-                response = Controller.handleIsAuthorizedToView(params);
-                break;
-            case "followUser":
-                response = Controller.handleFollowUser(params, viewerId);
-                break;
-            case "unfollowUser":
-                response = Controller.handleUnFollowUser(params, viewerId);
-                break;
-            case "blockUser":
-                // TODO @ARANGODB
-                response = Controller.handleBlockUser(params, viewerId);
-                break;
-            case "unblockUser":
-                // TODO @ARANGODB
-                response = Controller.handleUnblockUser(params, viewerId);
-                break;
-            case "reportUser":
-                // TODO @ARANGODB
-                response = Helpers.constructErrorResponse();
-                break;
-            default:
-                response = Helpers.constructErrorResponse();
+        try {
+            Method method = PostsActions.class.getMethod(methodSignature, JSONObject.class, String.class);
+            data = (JSONObject) method.invoke(null,paramsObject, userId);
         }
+        catch(org.json.JSONException e){
+            e.printStackTrace();
+            error.put("description",utilities.Main.stringifyJSONException(e));
+        }
+        catch(Exception e){
+            e.printStackTrace();
+            System.err.println(e.getMessage());
+            error.put("description", Helpers.constructErrorResponse());
+        }
+
+        JSONObject response = new JSONObject();
+        response.put("error",error);
+        response.put("data",data);
 
         Controller.teardown();
         return response;
@@ -103,7 +89,7 @@ public class Controller extends shared.mq_server.Controller {
         closeConnection();
     }
 
-    private static JSONObject handleSignup(JSONObject params) {
+    private static JSONObject handleSignup(JSONObject params, String viewerId) {
         try {
             User user = Logic.signup(Helpers.mapJSONToUser(params));
 
@@ -127,7 +113,7 @@ public class Controller extends shared.mq_server.Controller {
         }
     }
 
-    private static JSONObject handleLogin(JSONObject params) {
+    private static JSONObject handleLogin(JSONObject params, String viewerId) {
         try {
             User user = Logic.login(
                     JSONParser.getString("email", params),
@@ -154,7 +140,7 @@ public class Controller extends shared.mq_server.Controller {
         }
     }
 
-    private static JSONObject handleGetUser(JSONObject params) {
+    private static JSONObject handleGetUser(JSONObject params, String viewerId) {
         try {
             User user = Logic.getUser(JSONParser.getString("id", params));
             return Helpers.constructOKResponse(Helpers.mapUserToJSON(user));
@@ -167,7 +153,7 @@ public class Controller extends shared.mq_server.Controller {
         }
     }
 
-    private static JSONObject handleUpdateUser(JSONObject params) {
+    private static JSONObject handleUpdateUser(JSONObject params, String viewerId) {
         // TODO: Verify rightful ownership
         try {
             User user = Logic.updateUser(Helpers.mapJSONToUser(params));
@@ -181,7 +167,7 @@ public class Controller extends shared.mq_server.Controller {
         }
     }
 
-    private static JSONObject handleSearchUsers(JSONObject params) {
+    private static JSONObject handleSearchUsers(JSONObject params, String viewerId) {
         try {
             List<User> users = Logic.searchUsers(
                     JSONParser.getString("term", params),
@@ -200,7 +186,7 @@ public class Controller extends shared.mq_server.Controller {
         }
     }
 
-    private static JSONObject handleGetUsersByIds(JSONObject params) {
+    private static JSONObject handleGetUsersByIds(JSONObject params, String viewerId) {
         try {
             String[] ids = Helpers.convertJSONArrayToList(
                     JSONParser.getJSONArray("ids", params)
@@ -219,7 +205,7 @@ public class Controller extends shared.mq_server.Controller {
         }
     }
 
-    private static JSONObject handleGetUsersIdsByUsernames(JSONObject params) {
+    private static JSONObject handleGetUsersIdsByUsernames(JSONObject params, String viewerId) {
         try {
             String[] usernames = Helpers.convertJSONArrayToList(
                     JSONParser.getJSONArray("usernames", params)
@@ -238,7 +224,7 @@ public class Controller extends shared.mq_server.Controller {
         }
     }
 
-    private static JSONObject handleIsAuthorizedToView(JSONObject params) {
+    private static JSONObject handleIsAuthorizedToView(JSONObject params, String viewer) {
         try {
             String viewerId = JSONParser.getString("viewerId", params);
             String viewedId = JSONParser.getString("viewedId", params);

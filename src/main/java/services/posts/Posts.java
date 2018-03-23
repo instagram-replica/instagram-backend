@@ -17,7 +17,7 @@ import static shared.Helpers.isAuthorizedToView;
 public class Posts {
     //TODO: Updates a post, take care of permissions
     //Done: create JSON req and res for this method in submission1 folder
-    public static JSONObject updatePost(JSONObject paramsObject, String loggedInUserId, String methodName) throws CustomException{
+    public static JSONObject updatePost(JSONObject paramsObject, String loggedInUserId) throws CustomException{
         String postId = paramsObject.getString("postId");
         JSONObject post = null;
         JSONObject updatedPost = null;
@@ -37,7 +37,6 @@ public class Posts {
                 JSONObject postResponse = new JSONObject();
                 postResponse.put("post", updatedPost);
 
-                response.put("method", methodName);
                 response.put("postId", postId);
                 response.put("response", postResponse);
 
@@ -48,7 +47,7 @@ public class Posts {
     }
 
     //TODO: Returns list of users (actual users not ids) who liked a post
-    public static JSONObject getPostLikers(JSONObject paramsObject, String loggedInUserId, String methodName) throws CustomException, IOException, InterruptedException{
+    public static JSONObject getPostLikers(JSONObject paramsObject, String loggedInUserId) throws CustomException, IOException, InterruptedException{
         String postId = paramsObject.getString("postId");
         JSONObject post = null;
             post = ArangoInterfaceMethods.getPost(postId);
@@ -56,14 +55,13 @@ public class Posts {
             JSONArray userIds = post.getJSONArray("likes");
             if (isAuthorizedToView("posts", loggedInUserId, ownerId, loggedInUserId)) {
                 JSONObject response = new JSONObject();
-                response.put("method", methodName);
                 response.put("users", getUsersByIds("posts", userIds, loggedInUserId));
                 return response;
             }
             throw new CustomException("Not authorized to view");
     }
 
-    public static JSONObject getPost(JSONObject paramsObject, String loggedInUserId, String methodName) throws Exception {
+    public static JSONObject getPost(JSONObject paramsObject, String loggedInUserId) throws Exception {
         //DONE LOGICALLY: Get the post if the logged in user has permission to view it, otherwise return error
         //DONE: Calculate number of likes and return it, instead of the likes array
         String postId = paramsObject.getString("postId");
@@ -78,7 +76,6 @@ public class Posts {
                 JSONObject response = new JSONObject();
                 post.put("likes",noOfLikes);
 
-            response.put("method", methodName);
             response.put("post", post);
 
                 String ownerId= post.getString("user_id");
@@ -92,7 +89,7 @@ public class Posts {
     }
 
 
-    public static JSONObject getPosts(JSONObject paramsObject, String loggedInUserId, String methodName) throws ArangoDBException, CustomException, IOException, InterruptedException{
+    public static JSONObject getPosts(JSONObject paramsObject, String loggedInUserId) throws ArangoDBException, CustomException, IOException, InterruptedException{
 
         //DONE: Calculate number of likes and return it, instead of the likes array
         //TODO: Make use of the pagination params (do not spend much time on this)
@@ -117,14 +114,13 @@ public class Posts {
                 }
 
                 JSONObject response = new JSONObject();
-                response.put("method", methodName);
                 response.put("posts", posts);
                 return response;
             }
             throw new CustomException("Not authorized to view");
     }
 
-    public static JSONObject deletePost(JSONObject paramsObject, String loggedInUserId, String methodName) throws Exception {
+    public static JSONObject deletePost(JSONObject paramsObject, String loggedInUserId) throws Exception {
         //Done: Delete the post iff the creator of the post is the logged in user
         String postId = paramsObject.getString("postId");
             JSONObject postToDelete = ArangoInterfaceMethods.getPost(postId);
@@ -133,7 +129,6 @@ public class Posts {
                 ArangoInterfaceMethods.deletePost(postId);
                 JSONObject post = new JSONObject();
                 JSONObject response = new JSONObject();
-                response.put("method", methodName);
                 post.put("id", postId);
                 response.put("post", post);
                 return response;
@@ -141,7 +136,7 @@ public class Posts {
             throw new CustomException("Not authorized to delete");
     }
 
-    public static JSONObject createPost(JSONObject paramsObject, String loggedInUserId, String methodName) throws Exception{
+    public static JSONObject createPost(JSONObject paramsObject, String loggedInUserId) throws Exception{
         String postId = null;
 
             //TODO: Parse tags in media and @ACTIVITIES_TEAM create activities for their users
@@ -160,14 +155,13 @@ public class Posts {
             JSONObject postResponse = new JSONObject();
             postResponse.put("post", postCreated);
 
-            response.put("method", methodName);
             response.put("postId", postId);
             response.put("response", postResponse);
             return response;
 
     }
 
-    public static JSONObject createPostLike(JSONObject paramsObject, String loggedInUserId, String methodName) throws Exception{
+    public static JSONObject createPostLike(JSONObject paramsObject, String loggedInUserId) throws Exception{
         //DONE: User cannot like a post more than once
         //TODO: Add unlike method and create JSON req and res
         //TODO: Create activity for the post owner @ACTIVITIES_TEAM, except if he is a retard who likes his own image
@@ -182,7 +176,6 @@ public class Posts {
             ArangoInterfaceMethods.likePost(postId, loggedInUserId);
             JSONObject res = new JSONObject();
             JSONObject response = new JSONObject();
-            response.put("method", methodName);
             res.put("postID", postId);
             response.put("response", res);
             return response;
@@ -211,7 +204,7 @@ public class Posts {
 //    }s
 
     //TODO:
-    public static JSONObject getTaggedPosts(JSONObject paramsObject, String loggedInUserId, String methodName) {
+    public static JSONObject getTaggedPosts(JSONObject paramsObject, String loggedInUserId) {
         //@TODO: Check if the user has permission to view the other user's profile
         int pageSize = paramsObject.getInt("pageSize");
         int pageIndex = paramsObject.getInt("pageIndex");
@@ -244,5 +237,4 @@ public class Posts {
         int pageIndex = paramsObject.getInt("pageIndex");
         return new JSONObject();
     }
-
 }

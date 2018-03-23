@@ -8,7 +8,7 @@ import static utilities.Main.readPropertiesFile;
 
 public class Controller extends shared.mq_server.Controller {
 
-    Properties props;
+    private Properties props;
 
     public Controller(){
         super();
