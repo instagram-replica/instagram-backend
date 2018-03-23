@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.util.*;
 
 import static persistence.sql.Main.openConnection;
-import static persistence.sql.users.Main.getAllUsersIds;
+import static persistence.sql.users.Database.getAllUsersIds;
 import static utilities.Main.readPropertiesFile;
 
 public class ArangoInterfaceMethods {
@@ -113,7 +113,6 @@ public class ArangoInterfaceMethods {
 
             BaseDocument myObject = new BaseDocument();
             myObject.addAttribute("creator_id", threadJSON.get("creator_id").toString());
-            myObject.addAttribute("users_ids", threadJSON.get("users_ids").toString());
             myObject.addAttribute("name", threadJSON.get("name").toString());
             myObject.addAttribute("created_at", threadJSON.get("created_at").toString());
             myObject.addAttribute("deleted_at", threadJSON.get("deleted_at").toString());
@@ -138,7 +137,6 @@ public class ArangoInterfaceMethods {
     public static void updateThread(String id, JSONObject threadJSON) {
             BaseDocument myObject = new BaseDocument();
             myObject.addAttribute("creator_id", threadJSON.get("creator_id").toString());
-            myObject.addAttribute("users_ids", threadJSON.get("users_ids").toString());
             myObject.addAttribute("name", threadJSON.get("name").toString());
             myObject.addAttribute("created_at", threadJSON.get("created_at").toString());
             myObject.addAttribute("deleted_at", threadJSON.get("deleted_at").toString());
@@ -584,10 +582,10 @@ public class ArangoInterfaceMethods {
     }
 
 
-    public static void insertMessageOnThread(String threadID, JSONObject message) throws CustomException{
-        JSONObject post = getThread(threadID);
-        ((JSONArray) post.get("messages")).put(message);
-        updatePost(threadID,post);
+    public static void insertMessageOnThread(String threadID, JSONObject message) throws CustomException {
+        JSONObject thread = getThread(threadID);
+        ((JSONArray) thread.get("messages")).put(message);
+        updateThread(threadID, thread);
     }
 
 

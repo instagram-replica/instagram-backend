@@ -17,7 +17,7 @@ type Message {
 type Thread {
     id: ID!,
     creator_id: ID!,
-    users_ids String[]!,
+    users_ids: String[]!,
     name: String,
     created_at: TIMESTAMP!,
     deleted_at: TIMESTAMP!,

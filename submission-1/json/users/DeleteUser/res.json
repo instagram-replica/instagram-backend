@@ -1,7 +1,0 @@
-{
-    "method":"deleteUser",
-    "user":{
-        "id":1
-    },
-    "error":null
-}

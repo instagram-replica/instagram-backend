@@ -5,6 +5,7 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.*;
 import io.netty.util.CharsetUtil;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import shared.mq_server.Controller;
@@ -12,6 +13,7 @@ import shared.mq_subscriptions.ExecutionPair;
 import shared.mq_subscriptions.MQSubscriptions;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class Helpers {
@@ -42,18 +44,19 @@ public class Helpers {
         return res;
     }
 
-    public static boolean isAuthorizedToView(String serviceName, String viewerId, String toBeViewedId) throws IOException, InterruptedException {
+    public static boolean isAuthorizedToView(String userId, String serviceName, String viewerId, String toBeViewedId) throws IOException, InterruptedException {
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("method", "authorizedToView");
+        jsonObject.put("method", "isUserAuthorizedToView");
 
         JSONObject paramsObj = new JSONObject();
         paramsObj.put("viewerId", viewerId);
-        paramsObj.put("toBeViewedId", toBeViewedId);
+        paramsObj.put("viewedId", toBeViewedId);
 
         jsonObject.put("params", paramsObj);
 
-        JSONObject authorizationJSONObj = Controller.send(serviceName, "users", jsonObject);
-        return authorizationJSONObj.getBoolean("authorized");
+        JSONObject authorizationJSONObj = Controller.send(serviceName, "users", jsonObject, userId);
+        System.out.println("authObj: "+authorizationJSONObj);
+        return authorizationJSONObj.getJSONObject("data").getBoolean("isAuthorizedToView");
     }
 
     public static String getResponseQueue(String senderServiceName, String receiverServiceName) {
@@ -83,4 +86,22 @@ public class Helpers {
         }
         return resJson.get();
     }
+
+    public static JSONArray getUsersByIds(String serviceName, JSONArray jsonArray, String userId) throws IOException, InterruptedException {
+        JSONObject usersJsonObject = new JSONObject().put("ids", jsonArray);
+        JSONObject jsonObject = new JSONObject()
+                .put("params", usersJsonObject)
+                .put("method", "getUsersByIds");
+        return Controller.send(serviceName, "users", jsonObject, userId).getJSONObject("data").getJSONArray("users");
+    }
+
+    public static JSONArray getUsersIdsByUsernames(String serviceName, ArrayList<String> usernames, String userId) throws IOException, InterruptedException {
+        JSONObject usersJsonObject = new JSONObject().put("usernames", usernames);
+        JSONObject jsonObject = new JSONObject()
+                .put("params", usersJsonObject)
+                .put("method", "getUsersIdsByUsernames");
+        return Controller.send(serviceName, "users", jsonObject, userId).getJSONObject("data").getJSONArray("ids");
+    }
+
+
 }
