@@ -55,7 +55,7 @@ public class Helpers {
         jsonObject.put("params", paramsObj);
 
         JSONObject authorizationJSONObj = Controller.send(serviceName, "users", jsonObject, userId);
-        return ((JSONObject)authorizationJSONObj.get("data")).getBoolean("authorized");
+        return authorizationJSONObj.getJSONObject("data").getBoolean("isAuthorizedToView");
     }
 
     public static String getResponseQueue(String senderServiceName, String receiverServiceName) {

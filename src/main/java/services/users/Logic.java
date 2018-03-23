@@ -72,7 +72,8 @@ public class Logic {
     }
 
     public static User getUser(String userId) throws ValidationException, DatabaseException {
-        ValidationResult validationResult = Validator.validateId(userId);
+        ValidationResult
+                validationResult = Validator.validateId(userId);
 
         if (validationResult.type == ValidationResultType.FAILURE) {
             throw new ValidationException(validationResult.message);
@@ -145,9 +146,6 @@ public class Logic {
             throw new ValidationException(validationResult.message);
         }
 
-        if (viewerId.equals(viewedId)) {
-            throw new ValidationException("Viewer & viewed IDs cannot both equal: " + viewerId);
-        }
 
         // TODO @ARANGODB: Check if viewer is blocking viewed
         boolean hasViewerBlockedViewed = false;

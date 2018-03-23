@@ -379,6 +379,18 @@ public class ArangoInterfaceMethods {
             return result;
     }
 
+    public static JSONArray getPosts(ArrayList<String> postIds) {
+        String dbQuery = "FOR post IN " + postsCollectionName + " FILTER post._key IN "+new JSONArray(postIds)+" RETURN post";
+        ArangoCursor<BaseDocument> cursor = arangoDB.db(dbName).query(dbQuery, null, null, BaseDocument.class);
+        JSONArray result = new JSONArray();
+        cursor.forEachRemaining(aDocument -> {
+            JSONObject postJSON = new JSONObject(aDocument.getProperties());
+            result.put(reformatJSON(postJSON));
+        });
+        return result;
+    }
+
+
 
     public static ArrayList<JSONObject> getFeed(String userID,int limit, int offset){
         ArrayList<String> friends = getAllfollowingIDs(""+ userID);
@@ -461,6 +473,11 @@ public class ArangoInterfaceMethods {
         JSONArray likes = (JSONArray) post.get("likes");
         likes.put(userID);
         updatePost(postID, post);
+    }
+
+    public static void unlikePost(String postID, String userID) throws Exception {
+        String dbQuery = "FOR post IN Posts FILTER post._key == '"+postID+"' UPDATE post WITH { likes: REMOVE_VALUE( post.likes, '"+userID+"' ) } IN Posts";
+        arangoDB.db(dbName).query(dbQuery, null, null, null);
     }
 
     public static void updatePost(String id, JSONObject postJSON) {
@@ -656,7 +673,6 @@ public class ArangoInterfaceMethods {
 
 
     public static boolean followUser(String followerKey, String followedKey) {
-
         BaseEdgeDocument edge = new BaseEdgeDocument();
         String followerID = "Users/"+followerKey;
         String followedID = "Users/"+followedKey;
@@ -822,6 +838,15 @@ public class ArangoInterfaceMethods {
             hashtagDocument.setKey(hashtagName);
             arangoDB.db(dbName).graph(graphName).vertexCollection(hashtagCollectionName).insertVertex(hashtagDocument, null);
             return true;
+    }
+    public static boolean isHashtagNode(String hashtagName){
+      //  BaseDocument hashtagDocument = new BaseDocument();
+       // hashtagDocument.setKey(hashtagName);
+        BaseDocument vertex= arangoDB.db(dbName).graph(graphName).vertexCollection(hashtagCollectionName).getVertex(hashtagName, null);
+        if(vertex==null) {
+            return true;
+        }
+       return false;
     }
 
 //    public static boolean makePostNode(String postID){

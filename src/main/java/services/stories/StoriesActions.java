@@ -3,7 +3,7 @@ package services.stories;
 import exceptions.CustomException;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import persistence.cache.Cache;
+import persistence.cache.StoriesCache;
 import persistence.nosql.ArangoInterfaceMethods;
 
 public class StoriesActions {
@@ -24,10 +24,10 @@ public class StoriesActions {
     private static JSONObject getStory(JSONObject paramsObject, String userId) throws CustomException {
         JSONObject story = new JSONObject();
         String storyID = paramsObject.getString("id");
-        JSONObject storyResponse = Cache.getStoryFromCache(storyID);
+        JSONObject storyResponse = StoriesCache.getStoryFromCache(storyID);
         if(storyResponse==null) {
             storyResponse = ArangoInterfaceMethods.getStory(storyID);
-            Cache.insertStoryIntoCache(storyResponse,storyID);
+            StoriesCache.insertStoryIntoCache(storyResponse,storyID);
         }
         story.put("response",storyResponse);
         return story;
@@ -36,10 +36,10 @@ public class StoriesActions {
     private static JSONObject getMyStories(JSONObject paramsObject, String userId) {
         //        @TODO: validate expiry time
         JSONObject myStory = new JSONObject();
-        JSONArray stories = Cache.getMyStoriesFromCache(userId);
+        JSONArray stories = StoriesCache.getMyStoriesFromCache(userId);
         if(stories==null) {
             stories = ArangoInterfaceMethods.getStoriesForUser(userId);
-            Cache.insertUserStoriesIntoCache(stories,userId);
+            StoriesCache.insertUserStoriesIntoCache(stories,userId);
         }
         myStory.put("response",stories);
         return myStory;
@@ -47,10 +47,10 @@ public class StoriesActions {
 
     private static JSONObject getStories(JSONObject paramsObject, String userId) {
         JSONObject resultStories = new JSONObject();
-        JSONArray allStories = Cache.getUserStoriesFromCache(userId);
+        JSONArray allStories = StoriesCache.getUserStoriesFromCache(userId);
         if(allStories==null){
             allStories = ArangoInterfaceMethods.getFriendsStories(userId);
-            Cache.insertUserStoriesIntoCache(allStories,userId);
+            StoriesCache.insertUserStoriesIntoCache(allStories,userId);
         }
         resultStories.put("response",allStories);
         return resultStories;
@@ -58,10 +58,10 @@ public class StoriesActions {
 
     private static JSONObject getDiscoverStories(JSONObject paramsObject, String userId) {
         JSONObject discoverStories = new JSONObject();
-        JSONArray allStories = Cache.getDiscoverStoriesFromCache(userId);
+        JSONArray allStories = StoriesCache.getDiscoverStoriesFromCache(userId);
         if(allStories==null){
             allStories = ArangoInterfaceMethods.getDiscoverStories(userId);
-            Cache.insertDiscoverStoriesIntoCache(allStories,userId);
+            StoriesCache.insertDiscoverStoriesIntoCache(allStories,userId);
         }
         discoverStories.put("response",allStories);
         return discoverStories;
