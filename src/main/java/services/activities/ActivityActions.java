@@ -3,7 +3,9 @@ package services.activities;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import persistence.nosql.ActivityMethods;
 import persistence.nosql.ArangoInterfaceMethods;
+import persistence.nosql.GraphMethods;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -25,7 +27,7 @@ public class ActivityActions {
 		activityJSON.put("created_at",new java.util.Date());
 		//activityJSON.put("blocked_at",null);
 		activityJSON.put("id",utilities.Main.generateUUID());
-		ArangoInterfaceMethods.insertActivity(activityJSON);
+		ActivityMethods.insertActivity(activityJSON);
 		
 	}
 	
@@ -65,14 +67,14 @@ public class ActivityActions {
 		activityJSON.put("created_at",new java.util.Date());
 		//activityJSON.put("blocked_at",null);
 		activityJSON.put("id",utilities.Main.generateUUID());
-		ArangoInterfaceMethods.insertActivity(activityJSON);
+		ActivityMethods.insertActivity(activityJSON);
 	}	
 
 	public static JSONObject handleGettingActivities(JSONObject params, String userId){
 		int size = params.getInt("pageSize");
 		int start = params.getInt("pageIndex") * size;
-		ArrayList<String> followings = ArangoInterfaceMethods.getAllfollowingIDs(userId);
-		JSONArray activities= ArangoInterfaceMethods.getActivities(followings, start, size);
+		ArrayList<String> followings = GraphMethods.getAllfollowingIDs(userId);
+		JSONArray activities= ActivityMethods.getActivities(followings, start, size);
 		JSONObject result = new JSONObject();
 		result.put("activities", activities);
 		return result;
