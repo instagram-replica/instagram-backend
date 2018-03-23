@@ -2,11 +2,13 @@ package services.posts;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import persistence.cache.Cache;
+import persistence.cache.PostsCache;
 import persistence.nosql.ArangoInterfaceMethods;
 import shared.Settings;
 import utilities.Main;
+import shared.mq_server.Controller;
 
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 
@@ -29,14 +31,19 @@ public class Comments {
 
     public static JSONObject createComment(JSONObject paramsObject, String loggedInUserId, String methodName) {
         //TODO: Create activity for the post's owner, and check for mentions @ACTIVITIES_TEAM
+        JSONObject params = new JSONObject();
+        JSONObject activities = new JSONObject();
+
         try {
             String postId = paramsObject.getString("postId");
             JSONObject post = ArangoInterfaceMethods.getPost(postId);
 
             String comment = paramsObject.getString("text");
 
-            ArrayList<String> mentionsUserNames = getMentions(comment);
-            JSONArray mentionedUserIds = getUsersIdsByUsernames("posts", mentionsUserNames, loggedInUserId);
+
+            //TODO mentions
+//            ArrayList<String> mentionsUserNames = getMentions(comment);
+            //JSONArray mentionedUserIds = getUsersIdsByUsernames("posts", mentionsUserNames, loggedInUserId);
 
             JSONObject commentJSON = createCommentJSON(comment, 0, loggedInUserId, postId);
             if (isAuthorizedToView(Settings.getInstance().getInstanceId(), loggedInUserId, post.getString("user_id"), loggedInUserId)) {
@@ -53,6 +60,11 @@ public class Comments {
                 response.put("error", "null");
                 jsonValue.put("method", methodName);
                 jsonValue.put("response", response);
+                params.put("commentID",newComment.get("id"));
+                params.put("receiverId",post.get("user_id"));
+                activities.put("method",methodName);
+                activities.put("params",params);
+                Controller.send("posts","activities",activities,loggedInUserId);
                 return jsonValue;
             }
             return createJSONError("Not authorized to view");
@@ -64,16 +76,16 @@ public class Comments {
     public static JSONObject getCommentsOnPost(JSONObject paramsObject, String loggedInUserId, String methodName) {
         String postId = paramsObject.getString("postId");
         try {
-            JSONObject post = Cache.getPostFromCache(postId);
+            JSONObject post = PostsCache.getPostFromCache(postId);
             if (post == null) {
                 post = ArangoInterfaceMethods.getPost(postId);
-                Cache.insertPostIntoCache(post, postId);
+                PostsCache.insertPostIntoCache(post, postId);
             }
             if (isAuthorizedToView(Settings.getInstance().getInstanceId(), loggedInUserId, post.getString("user_id"), loggedInUserId)) {
-                JSONArray comments = Cache.getCommentsFromCache(postId);
+                JSONArray comments = PostsCache.getCommentsFromCache(postId);
                 if (comments == null) {
                     comments = ArangoInterfaceMethods.getPosts(postId);
-                    Cache.insertCommentsIntoCache(comments, postId);
+                    PostsCache.insertCommentsIntoCache(comments, postId);
                 }
                 JSONObject jsonValue = new JSONObject();
                 jsonValue.put("method", methodName);
@@ -103,11 +115,12 @@ public class Comments {
         return jsonObject;
     }
 
-    public static JSONObject createCommentReply(JSONObject paramsObject, String userId, String methodName) {
+    public static JSONObject createCommentReply(JSONObject paramsObject, String userId, String methodName) throws IOException, InterruptedException {
         //TODO: Create activity for the post's owner, and check for mentions @ACTIVITIES_TEAM
         String commentId = paramsObject.getString("commentId");
         String reply = paramsObject.getString("text");
-
+        JSONObject params = new JSONObject();
+        JSONObject activities = new JSONObject();
         JSONObject replyJson = createCommentJSON(reply, 1, userId, null);
 
 
@@ -134,7 +147,11 @@ public class Comments {
 
         jsonValue.put("method", methodName);
         jsonValue.put("response", response);
-
+        params.put("commentID",newReply.get("id"));
+        params.put("receiverId",paramsObject.getString("commentOwnerId"));
+        activities.put("method",methodName);
+        activities.put("params", params);
+        Controller.send("posts","activities",activities,userId);
         return jsonValue;
 
     }

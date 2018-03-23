@@ -4,12 +4,10 @@ import com.arangodb.ArangoDBException;
 import exceptions.CustomException;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import persistence.cache.Cache;
+import persistence.cache.PostsCache;
 import persistence.nosql.ArangoInterfaceMethods;
-import shared.Settings;
-
+import shared.mq_server.Controller;
 import java.io.IOException;
-
 import static shared.Helpers.createJSONError;
 import static shared.Helpers.getUsersByIds;
 import static shared.Helpers.isAuthorizedToView;
@@ -66,10 +64,10 @@ public class Posts {
         //DONE: Calculate number of likes and return it, instead of the likes array
         String postId = paramsObject.getString("postId");
                 JSONObject post = null;
-                post = Cache.getPostFromCache(postId);
+                post = PostsCache.getPostFromCache(postId);
                 if(post==null){
                     post = ArangoInterfaceMethods.getPost(postId);
-                    Cache.insertPostIntoCache(post,postId);
+                    PostsCache.insertPostIntoCache(post,postId);
                 }
                 JSONArray likes = post.getJSONArray("likes");
                 int noOfLikes= likes.length();
@@ -98,12 +96,11 @@ public class Posts {
         String ownerId = paramsObject.getString("userId");
             if (isAuthorizedToView("posts", loggedInUserId, ownerId,loggedInUserId) || loggedInUserId.equals(ownerId)) {
                 //@TODO: Check if the user exists
-                JSONArray posts = Cache.getPostsFromCache(ownerId, pageIndex, pageSize);
+                JSONArray posts = PostsCache.getPostsFromCache(ownerId, pageIndex, pageSize);
                 if (posts == null) {
                     posts = ArangoInterfaceMethods.getPosts(ownerId);
-                    Cache.insertPostsIntoCache(posts, ownerId, pageIndex, pageSize);
+                    PostsCache.insertPostsIntoCache(posts, ownerId, pageIndex, pageSize);
                 }
-
                 /// replacing likes array with no of likes instead
                 for (int i = 0; i < posts.length(); i++) {
                     JSONObject post = posts.getJSONObject(i);
@@ -167,18 +164,26 @@ public class Posts {
         //TODO: Create activity for the post owner @ACTIVITIES_TEAM, except if he is a retard who likes his own image
         String postId = paramsObject.getString("postId");
 
-            JSONObject post = ArangoInterfaceMethods.getPost(postId);
-            JSONArray likes = post.getJSONArray("likes");
-            for(int i=0; i<likes.length();i++){
-                if(likes.get(i).equals(loggedInUserId))
-                    throw new CustomException("You already liked this post");
-            }
-            ArangoInterfaceMethods.likePost(postId, loggedInUserId);
-            JSONObject res = new JSONObject();
-            JSONObject response = new JSONObject();
-            res.put("postID", postId);
-            response.put("response", res);
-            return response;
+        JSONObject params = new JSONObject();
+        JSONObject activities = new JSONObject();
+        JSONObject post = ArangoInterfaceMethods.getPost(postId);
+        String receiverId = post.getString("user_id");
+        JSONArray likes = post.getJSONArray("likes");
+        for(int i=0; i<likes.length();i++){
+            if(likes.get(i).equals(loggedInUserId))
+                throw new CustomException("You already liked this post");
+        }
+        ArangoInterfaceMethods.likePost(postId, loggedInUserId);
+        JSONObject res = new JSONObject();
+        JSONObject response = new JSONObject();
+        res.put("postID", postId);
+        response.put("response", res);
+        params.put("postID",postId);
+        params.put("receiverId",receiverId);
+        activities.put("method","createPostLike");
+        activities.put("params",params);
+       Controller.send("posts","activities",activities,loggedInUserId);
+        return response;
     }
 
 //    public static JSONObject deletePostLike(JSONObject paramsObject, String loggedInUserId, String methodName){

@@ -236,7 +236,7 @@ public class Controller extends shared.mq_server.Controller {
 
             return Helpers.constructOKResponse(
                     new JSONObject()
-                            .put("isAuthorizedToView", isAuthorizedToView)
+                            .put("authorized", isAuthorizedToView)
             );
         } catch (CustomException e) {
             e.printStackTrace();
