@@ -272,7 +272,7 @@ public class Controller extends shared.mq_server.Controller {
                 .put("data", data)
                 .put("error", error);
     }
-}
+
     private static JSONObject handleFollowUser(JSONObject params, String viewer){
         String followedUser = params.getString("userId");
         boolean followDone = ArangoInterfaceMethods.followUser(viewer, followedUser);
@@ -289,7 +289,7 @@ public class Controller extends shared.mq_server.Controller {
         try {
             Controller.send("activities", "users", jsonForActivities, viewer);
         } catch (Exception e) {
-            error =  Helpers.constructErrorResponse();
+            error = Helpers.constructErrorResponse();
         }
         return new JSONObject()
                 .put("data", data)
