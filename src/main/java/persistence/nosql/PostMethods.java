@@ -32,7 +32,7 @@ public class PostMethods {
         //TODO: @MAGDY location gets inserted in a wrong way (with key "map")
 //            myObject.addAttribute("location", postJSON.getJSONObject("location"));
         myObject.put("comments", new ArrayList<>());
-        myObject.put("likes", new ArrayList<>());
+        myObject.put("likes", postJSON.get("likes"));
         myObject.put("created_at", new Timestamp(System.currentTimeMillis()));
         myObject.put("updated_at", JSONObject.NULL);
         myObject.put("blocked_at", JSONObject.NULL);
@@ -133,7 +133,8 @@ public class PostMethods {
 
     public static JSONArray getTrendingPosts(){
         try{
-            String query = "FOR post IN " + postsCollectionName + " FILTER LENGTH(post.likes) >= 10 RETURN post";
+            String query = "FOR post IN " + postsCollectionName + " FILTER LENGTH(post.likes) >= 50 RETURN post";
+            System.out.println(query);
             Map<String, Object> bindVars = new MapBuilder().get();
             ArangoCursor<BaseDocument> cursor = arangoDB.db(dbName).query(query, bindVars, null,
                     BaseDocument.class);

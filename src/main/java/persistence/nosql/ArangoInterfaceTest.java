@@ -1021,6 +1021,7 @@ public class ArangoInterfaceTest {
         post.put("caption","hello");
         post.put("media",new ArrayList<String>());
         post.put("comments",new ArrayList<String>());
+        post.put("likes",new ArrayList<String>());
         String postID = PostMethods.insertPost(post,userId1);
         GraphMethods.followUser(userId2,userId1);
         PostMethods.likePost(postID,userId2);
@@ -1052,26 +1053,13 @@ public class ArangoInterfaceTest {
         post.put("media",new ArrayList<String>());
         post.put("comments",new ArrayList<String>());
         ArrayList<String> likes = new ArrayList<String>();
-        likes.add(utilities.Main.generateUUID());
-        likes.add(utilities.Main.generateUUID());
-        likes.add(utilities.Main.generateUUID());
-        likes.add(utilities.Main.generateUUID());
-        likes.add(utilities.Main.generateUUID());
-        likes.add(utilities.Main.generateUUID());
-        likes.add(utilities.Main.generateUUID());
-        likes.add(utilities.Main.generateUUID());
-        likes.add(utilities.Main.generateUUID());
-        likes.add(utilities.Main.generateUUID());
-        likes.add(utilities.Main.generateUUID());
-        likes.add(utilities.Main.generateUUID());
-        likes.add(utilities.Main.generateUUID());
-        likes.add(utilities.Main.generateUUID());
-        likes.add(utilities.Main.generateUUID());
-        likes.add(utilities.Main.generateUUID());
+        for(int i =0;i<51;i++){
+            likes.add(utilities.Main.generateUUID());
+        }
         post.put("likes",likes);
         String postID = PostMethods.insertPost(post,userId1);
         Assert.assertEquals(1,PostMethods.getTrendingPosts().length());
-        System.out.println(PostMethods.getTrendingPosts().get(0));
+        System.out.println(PostMethods.getTrendingPosts());
     }
 
     @Test
@@ -1090,6 +1078,7 @@ public class ArangoInterfaceTest {
         post.put("caption","hello");
         post.put("media",new ArrayList<String>());
         post.put("comments",new ArrayList<String>());
+        post.put("likes",new ArrayList<String>());
         String postID = PostMethods.insertPost(post,userId1);
         GraphMethods.followUser(userId2,userId1);
         GraphMethods.followUser(userId3,userId2);
@@ -1139,7 +1128,7 @@ public class ArangoInterfaceTest {
         GraphMethods.followHashtag("ef58c348-1195-4d83-a4bc-8bd68214c6f6", "MoSalah");
 
         ArrayList<String> trending = HashtagMethods.getAllTrendingHashtags(0,10);
-        Assert.assertEquals("MoSalah", trending.get(0));
+        Assert.assertEquals(1, trending.size());
 
 
 
