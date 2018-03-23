@@ -831,6 +831,25 @@ public class ArangoInterfaceTest {
 
         Assert.assertTrue(getNotifications(userId1,0,5).length()==1);
     }
+    @Test
+    public void trendingPostsTest() throws Exception {
+        String userId1 = utilities.Main.generateUUID() ;
+
+        JSONObject post = new JSONObject();
+
+        post.put("user_id",userId1);
+        post.put("caption","hello");
+        post.put("media",new ArrayList<String>());
+        post.put("comments",new ArrayList<String>());
+        ArrayList<String> likes = new ArrayList<String>();
+        likes.add(utilities.Main.generateUUID());
+        likes.add(utilities.Main.generateUUID());
+        likes.add(utilities.Main.generateUUID());
+        post.put("likes",likes);
+        String postID = insertPost(post,userId1);
+        Assert.assertTrue(getTrendingPosts().length()>=1);
+        System.out.println(getTrendingPosts().get(0));
+    }
 
     @Test
     public void ActivitiesTest() throws Exception {

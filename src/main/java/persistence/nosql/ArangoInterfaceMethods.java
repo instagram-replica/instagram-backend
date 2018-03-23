@@ -269,6 +269,8 @@ public class ArangoInterfaceMethods {
         }
     }
 
+
+
     public static void updateActivity(String id, JSONObject activityJSON) {
         try {
             BaseDocument myObject = new BaseDocument();
@@ -532,6 +534,7 @@ public class ArangoInterfaceMethods {
 
 
     }
+
 
     public static void likePost(String postID, String userID) throws Exception {
         JSONObject post = getPost(postID);
@@ -1147,6 +1150,27 @@ public class ArangoInterfaceMethods {
                 .replaceAll(backslash, "");
 
         return new JSONObject(jsonString);
+
+    }
+
+    public static JSONArray getTrendingPosts(){
+        try{
+            String query = "FOR l IN " + postsCollectionName + " FILTER LENGTH(l.likes) >= 5000 RETURN l";
+            Map<String, Object> bindVars = new MapBuilder().get();
+            ArangoCursor<BaseDocument> cursor = arangoDB.db(dbName).query(query, bindVars, null,
+                    BaseDocument.class);
+            JSONArray result = new JSONArray();
+            cursor.forEachRemaining(aDocument -> {
+                JSONObject postJSON = new JSONObject(aDocument.getProperties());
+                postJSON.put("id", aDocument.getKey());
+                result.put(postJSON);
+            });
+            System.out.println(result);
+            return result;
+        } catch (ArangoDBException e) {
+            System.err.println("Failed to execute query. " + e.getMessage());
+            return null;
+        }
 
     }
 
