@@ -2,6 +2,7 @@ package services.activities;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import persistence.nosql.ActivityMethods;
 import persistence.nosql.ArangoInterfaceMethods;
 import persistence.sql.users.Database;
 
@@ -23,8 +24,8 @@ public class NotificationActions {
         notificationJSON.put("created_at",new java.util.Date());
         notificationJSON.put("blocked_at","null");
         notificationJSON.put("id",utilities.Main.generateUUID());
-        ArangoInterfaceMethods.insertNotification(notificationJSON);
-        ArangoInterfaceMethods.insertActivity(notificationJSON);
+        ActivityMethods.insertNotification(notificationJSON);
+        ActivityMethods.insertActivity(notificationJSON);
     }
 
     public static void handleFollowNotification(JSONObject params, String userId) {
@@ -39,8 +40,8 @@ public class NotificationActions {
         notificationJSON.put("created_at",new java.util.Date());
         notificationJSON.put("blocked_at","null");
         notificationJSON.put("id",utilities.Main.generateUUID());
-        ArangoInterfaceMethods.insertNotification(notificationJSON);
-        ArangoInterfaceMethods.insertActivity(notificationJSON);
+        ActivityMethods.insertNotification(notificationJSON);
+        ActivityMethods.insertActivity(notificationJSON);
     }
 
     public static void handlePostTagNotification(JSONObject params, String userId) {
@@ -57,7 +58,7 @@ public class NotificationActions {
             notifyReceiver.put("sender_id", userId);
             notifyReceiver.put("created_at", new Timestamp(System.currentTimeMillis()));
             notifyReceiver.put("blocked_at",new Timestamp(System.currentTimeMillis()));
-            ArangoInterfaceMethods.insertNotification(notifyReceiver);
+            ActivityMethods.insertNotification(notifyReceiver);
         }
 
         JSONObject notificationJSON =new JSONObject();
@@ -72,7 +73,7 @@ public class NotificationActions {
         notificationJSON.put("created_at",new java.util.Date());
         notificationJSON.put("blocked_at","null");
         notificationJSON.put("id",utilities.Main.generateUUID());
-        ArangoInterfaceMethods.insertNotification(notificationJSON);
+        ActivityMethods.insertNotification(notificationJSON);
     }
 
 
@@ -90,7 +91,7 @@ public class NotificationActions {
         activityJSON.put("created_at",new java.util.Date());
         activityJSON.put("blocked_at","null");
         activityJSON.put("id",utilities.Main.generateUUID());
-        ArangoInterfaceMethods.insertNotification(activityJSON);
+        ActivityMethods.insertNotification(activityJSON);
     }
 
     public static void handleCommentReplyNotification(JSONObject params, String userId) {
@@ -107,13 +108,13 @@ public class NotificationActions {
         activityJSON.put("created_at",new java.util.Date());
         activityJSON.put("blocked_at","null");
         activityJSON.put("id",utilities.Main.generateUUID());
-        ArangoInterfaceMethods.insertActivity(activityJSON);
+        ActivityMethods.insertActivity(activityJSON);
     }
 
     public static JSONObject handleGettingNotifications(JSONObject params, String userId){
         int size = params.getInt("pageSize");
         int start = params.getInt("pageIndex") * size;
-        JSONArray notifications= ArangoInterfaceMethods.getNotifications(userId, start, size);
+        JSONArray notifications= ActivityMethods.getNotifications(userId, start, size);
 
         JSONObject result = new JSONObject();
         result.put("notifications", notifications);

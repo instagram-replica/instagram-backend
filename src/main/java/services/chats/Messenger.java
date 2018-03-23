@@ -4,6 +4,8 @@ import exceptions.CustomException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import persistence.nosql.ArangoInterfaceMethods;
+import persistence.nosql.GraphMethods;
+import persistence.nosql.ThreadMethods;
 import utilities.Main;
 
 import java.sql.Timestamp;
@@ -23,7 +25,7 @@ public class Messenger {
         message.put("deleted_at", "null");
         message.put("blocked_at", "null");
 
-        ArangoInterfaceMethods.insertMessageOnThread(threadId, message);
+        ThreadMethods.insertMessageOnThread(threadId, message);
 
         JSONObject res = new JSONObject();
         res.put("id", messageId);
@@ -44,12 +46,12 @@ public class Messenger {
         thread.put("blocked_at", "null");
         thread.put("messages", new ArrayList<String>());
 
-        String threadId = ArangoInterfaceMethods.insertThread(thread);
+        String threadId = ThreadMethods.insertThread(thread);
 
         //get users and join them
         JSONArray users = paramsObject.getJSONArray("threadUsers");
         for (int i = 0; i < users.length(); i++) {
-            ArangoInterfaceMethods.joinThread(users.getJSONObject(i).getString("id"), threadId);
+            GraphMethods.joinThread(users.getJSONObject(i).getString("id"), threadId);
         }
         return new JSONObject().put("threadId", threadId);
     }
@@ -57,7 +59,7 @@ public class Messenger {
     public static JSONObject getMessages(JSONObject paramsObject, String userId) throws CustomException {
         JSONObject res = new JSONObject();
         String threadId = paramsObject.getString("threadId");
-        JSONObject thread = ArangoInterfaceMethods.getThread(threadId);
+        JSONObject thread = ThreadMethods.getThread(threadId);
         JSONArray messages = thread.getJSONArray("messages");
 
         int pageSize = paramsObject.getInt("pageSize");
@@ -78,11 +80,11 @@ public class Messenger {
     }
 
     public static JSONObject getThreads(JSONObject paramsObject, String userId) throws CustomException {
-        ArrayList<String> threadsIds = ArangoInterfaceMethods.getAllThreadsForUser(userId);
+        ArrayList<String> threadsIds = GraphMethods.getAllThreadsForUser(userId);
         ArrayList<JSONObject> threads = new ArrayList<>();
         for (int i = 0; i < threadsIds.size(); i++) {
             String id = threadsIds.get(i);
-            String name = ArangoInterfaceMethods.getThread(id).getString("name");
+            String name = ThreadMethods.getThread(id).getString("name");
             threads.add(new JSONObject().put("threadId", id).put("name", name));
         }
         JSONArray threadsArray = new JSONArray(threads);
