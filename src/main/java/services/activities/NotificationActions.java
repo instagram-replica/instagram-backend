@@ -6,6 +6,7 @@ import persistence.nosql.ArangoInterfaceMethods;
 import persistence.sql.users.Database;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 
 public class NotificationActions {
 //TODO: insert in notifications table!!!
@@ -117,6 +118,16 @@ public class NotificationActions {
 
         JSONObject result = new JSONObject();
         result.put("notifications", notifications);
+        return result;
+    }
+
+    public static JSONObject handleGettingActivities(JSONObject params, String userId){
+        int size = params.getInt("pageSize");
+        int start = params.getInt("pageIndex") * size;
+        ArrayList<String> followings = ArangoInterfaceMethods.getAllfollowingIDs(userId);
+        JSONArray activities= ArangoInterfaceMethods.getActivities(followings, start, size);
+        JSONObject result = new JSONObject();
+        result.put("activities", activities);
         return result;
     }
 }
