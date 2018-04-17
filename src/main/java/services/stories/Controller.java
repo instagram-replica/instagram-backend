@@ -26,12 +26,13 @@ public class Controller extends shared.mq_server.Controller {
         JSONObject data = new JSONObject();
         JSONObject error = new JSONObject();
 
-        String methodName = jsonObject.getString("method");
-        String methodSignature = props.getProperty(methodName);
+        String className = jsonObject.getString("method");
+        String classSignature = "services.stories.Actions." + props.getProperty(className);
         JSONObject paramsObject = jsonObject.getJSONObject("params");
 
         try {
-            Method method = StoriesActions.class.getMethod(methodSignature, JSONObject.class, String.class);
+            Class actionClass = Class.forName(classSignature);
+            Method method = actionClass.getMethod("execute", JSONObject.class, String.class);
             data = (JSONObject) method.invoke(null,paramsObject, userId);
         }
         catch(org.json.JSONException e){
