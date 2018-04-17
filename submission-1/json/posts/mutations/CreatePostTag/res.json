@@ -1,0 +1,8 @@
+{
+  "method": "createPostTag",
+  "response": {
+    "postID": "12",
+    "taggedId":"1",
+    "error": null
+  }
+}

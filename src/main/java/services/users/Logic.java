@@ -147,7 +147,7 @@ public class Logic {
         }
 
         if (viewerId.equals(viewedId)) {
-            throw new ValidationException("Viewer & viewed IDs cannot both equal: " + viewerId);
+           return true;
         }
 
         // TODO @ARANGODB: Check if viewer is blocking viewed

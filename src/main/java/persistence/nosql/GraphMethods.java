@@ -386,6 +386,15 @@ public class GraphMethods {
         });
         return IDs;
     }
+    public static boolean isHashtagNode(String hashtagName){
+        //  BaseDocument hashtagDocument = new BaseDocument();
+        // hashtagDocument.setKey(hashtagName);
+        BaseDocument vertex= arangoDB.db(dbName).graph(graphName).vertexCollection(hashtagCollectionName).getVertex(hashtagName, null);
+        if(vertex==null) {
+            return true;
+        }
+        return false;
+    }
 
     public static ArrayList<String> getAllBlockedIDs(String userKey) {
         try {
