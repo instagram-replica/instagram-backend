@@ -1,0 +1,7 @@
+{
+  "method": "createPostTag",
+  "params": {
+    "postId": "12",
+    "userId":"1"
+  }
+}

@@ -46,16 +46,17 @@ public class Helpers {
 
     public static boolean isAuthorizedToView(String userId, String serviceName, String viewerId, String toBeViewedId) throws IOException, InterruptedException {
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("method", "authorizedToView");
+        jsonObject.put("method", "isUserAuthorizedToView");
 
         JSONObject paramsObj = new JSONObject();
         paramsObj.put("viewerId", viewerId);
-        paramsObj.put("toBeViewedId", toBeViewedId);
+        paramsObj.put("viewedId", toBeViewedId);
 
         jsonObject.put("params", paramsObj);
 
         JSONObject authorizationJSONObj = Controller.send(serviceName, "users", jsonObject, userId);
-        return authorizationJSONObj.getBoolean("authorized");
+        System.out.println("authObj: "+authorizationJSONObj);
+        return authorizationJSONObj.getJSONObject("data").getBoolean("isAuthorizedToView");
     }
 
     public static String getResponseQueue(String senderServiceName, String receiverServiceName) {

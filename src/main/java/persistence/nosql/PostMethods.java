@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.Map;
 
 public class PostMethods {
-    static ArangoDB arangoDB= ArangoInterfaceMethods.arangoDB;
+    static ArangoDB arangoDB = ArangoInterfaceMethods.arangoDB;
     static String dbName = ArangoInterfaceMethods.dbName;
 
 
@@ -56,7 +56,7 @@ public class PostMethods {
 
     }
 
-    public static JSONArray getPosts(String userId) throws ArangoDBException{
+    public static JSONArray getPosts(String userId) throws ArangoDBException {
         String query = "FOR t IN " + postsCollectionName + " FILTER t.user_id == @id RETURN t";
         Map<String, Object> bindVars = new MapBuilder().put("id", userId).get();
         ArangoCursor<BaseDocument> cursor = arangoDB.db(dbName).query(query, bindVars, null,
@@ -69,6 +69,23 @@ public class PostMethods {
         });
         return result;
     }
+
+    public static JSONArray getPosts(ArrayList<String> postIds) {
+        String dbQuery = "FOR post IN " + postsCollectionName + " FILTER post._key IN " + new JSONArray(postIds) + " RETURN post";
+        ArangoCursor<BaseDocument> cursor = arangoDB.db(dbName).query(dbQuery, null, null, BaseDocument.class);
+        JSONArray result = new JSONArray();
+        cursor.forEachRemaining(aDocument -> {
+            JSONObject postJSON = new JSONObject(aDocument.getProperties());
+            result.put(ArangoInterfaceMethods.reformatJSON(postJSON));
+        });
+        return result;
+    }
+
+    public static void unlikePost(String postID, String userID) throws Exception {
+        String dbQuery = "FOR post IN Posts FILTER post._key == '" + postID + "' UPDATE post WITH { likes: REMOVE_VALUE( post.likes, '" + userID + "' ) } IN Posts";
+        arangoDB.db(dbName).query(dbQuery, null, null, null);
+    }
+
 
     public static void likePost(String postID, String userID) throws Exception {
         JSONObject post = getPost(postID);
@@ -96,7 +113,7 @@ public class PostMethods {
         System.out.println("Post Updated");
     }
 
-    public static void deletePost(String id) throws CustomException{
+    public static void deletePost(String id) throws CustomException {
         try {
             arangoDB.db(dbName).collection(postsCollectionName).deleteDocument(id);
             System.out.println("Post Deleted: " + id);
@@ -111,14 +128,14 @@ public class PostMethods {
         updatePost(postID, post);
     }
 
-    public static JSONArray getCommentsOnPost(String postID) throws CustomException{
+    public static JSONArray getCommentsOnPost(String postID) throws CustomException {
 
         BaseDocument postDoc = arangoDB.db(dbName).collection(postsCollectionName).getDocument(postID,
                 BaseDocument.class);
-        if(postDoc == null){
-            throw new CustomException("Post with ID: " + postID +" Not Found");
+        if (postDoc == null) {
+            throw new CustomException("Post with ID: " + postID + " Not Found");
         }
-        JSONObject postJSON  = new JSONObject(postDoc.getProperties());
+        JSONObject postJSON = new JSONObject(postDoc.getProperties());
         return (JSONArray) ArangoInterfaceMethods.reformatJSON(postJSON).get("comments");
 
     }
@@ -131,8 +148,8 @@ public class PostMethods {
         arangoDB.db(dbName).query(dbQuery, null, null, null);
     }
 
-    public static JSONArray getTrendingPosts(){
-        try{
+    public static JSONArray getTrendingPosts() {
+        try {
             String query = "FOR post IN " + postsCollectionName + " FILTER LENGTH(post.likes) >= 50 RETURN post";
             System.out.println(query);
             Map<String, Object> bindVars = new MapBuilder().get();
