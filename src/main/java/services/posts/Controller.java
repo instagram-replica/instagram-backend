@@ -1,7 +1,7 @@
 package services.posts;
 
+import exceptions.CustomException;
 import org.json.JSONObject;
-
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Properties;
@@ -33,7 +33,6 @@ public class Controller extends shared.mq_server.Controller{
         try {
             Method method = PostsActions.class.getMethod(methodSignature, JSONObject.class, String.class, String.class);
             data = (JSONObject) method.invoke(null,paramsObject, userId, methodName);
-
         }
         catch(org.json.JSONException e){
             e.printStackTrace();
@@ -42,7 +41,10 @@ public class Controller extends shared.mq_server.Controller{
         catch(Exception e){
             e.printStackTrace();
             System.err.println(e.getMessage());
-            error.put("description","Internal Server Error");
+            if(e.getClass() == CustomException.class)
+                error.put("description", e.getMessage());
+            else
+                error.put("description","Internal Server Error");
         } finally {
             JSONObject response = new JSONObject();
             response.put("error", error);
