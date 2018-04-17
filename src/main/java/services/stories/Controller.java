@@ -1,14 +1,8 @@
 package services.stories;
 
-import exceptions.CustomException;
-import org.json.JSONArray;
 import org.json.JSONObject;
-import persistence.cache.StoriesCache;
-import persistence.nosql.ArangoInterfaceMethods;
-import services.activities.NotificationActions;
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Properties;
 
 import static utilities.Main.readPropertiesFile;

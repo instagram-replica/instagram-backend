@@ -55,6 +55,7 @@ public class Helpers {
         jsonObject.put("params", paramsObj);
 
         JSONObject authorizationJSONObj = Controller.send(serviceName, "users", jsonObject, userId);
+        System.out.println("authObj: "+authorizationJSONObj);
         return authorizationJSONObj.getJSONObject("data").getBoolean("isAuthorizedToView");
     }
 
@@ -101,4 +102,6 @@ public class Helpers {
                 .put("method", "getUsersIdsByUsernames");
         return Controller.send(serviceName, "users", jsonObject, userId).getJSONObject("data").getJSONArray("ids");
     }
+
+
 }

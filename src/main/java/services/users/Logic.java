@@ -3,6 +3,7 @@ package services.users;
 import auth.BCrypt;
 import exceptions.AuthenticationException;
 import persistence.nosql.ArangoInterfaceMethods;
+import persistence.nosql.GraphMethods;
 import persistence.sql.users.Database;
 import exceptions.DatabaseException;
 import persistence.sql.users.User;
@@ -36,7 +37,7 @@ public class Logic {
             throw new DatabaseException("Username already exists");
         }
 
-        ArangoInterfaceMethods.makeUserNode(modifiedUser.id);
+        GraphMethods.makeUserNode(modifiedUser.id);
 
         return Database.createUser(modifiedUser);
     }
@@ -146,6 +147,9 @@ public class Logic {
             throw new ValidationException(validationResult.message);
         }
 
+        if (viewerId.equals(viewedId)) {
+           return true;
+        }
 
         // TODO @ARANGODB: Check if viewer is blocking viewed
         boolean hasViewerBlockedViewed = false;

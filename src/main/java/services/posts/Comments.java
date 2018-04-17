@@ -4,6 +4,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import persistence.cache.PostsCache;
 import persistence.nosql.ArangoInterfaceMethods;
+import persistence.nosql.PostMethods;
 import shared.Settings;
 import utilities.Main;
 import shared.mq_server.Controller;
@@ -36,7 +37,7 @@ public class Comments {
 
         try {
             String postId = paramsObject.getString("postId");
-            JSONObject post = ArangoInterfaceMethods.getPost(postId);
+            JSONObject post = PostMethods.getPost(postId);
 
             String comment = paramsObject.getString("text");
 
@@ -47,7 +48,7 @@ public class Comments {
 
             JSONObject commentJSON = createCommentJSON(comment, 0, loggedInUserId, postId);
             if (isAuthorizedToView(Settings.getInstance().getInstanceId(), loggedInUserId, post.getString("user_id"), loggedInUserId)) {
-                ArangoInterfaceMethods.insertCommentOnPost(postId, commentJSON);
+                PostMethods.insertCommentOnPost(postId, commentJSON);
                 JSONObject jsonValue = new JSONObject();
                 JSONObject response = new JSONObject();
                 JSONObject data = new JSONObject();
@@ -78,13 +79,13 @@ public class Comments {
         try {
             JSONObject post = PostsCache.getPostFromCache(postId);
             if (post == null) {
-                post = ArangoInterfaceMethods.getPost(postId);
+                post = PostMethods.getPost(postId);
                 PostsCache.insertPostIntoCache(post, postId);
             }
             if (isAuthorizedToView(Settings.getInstance().getInstanceId(), loggedInUserId, post.getString("user_id"), loggedInUserId)) {
                 JSONArray comments = PostsCache.getCommentsFromCache(postId);
                 if (comments == null) {
-                    comments = ArangoInterfaceMethods.getPosts(postId);
+                    comments = PostMethods.getPosts(postId);
                     PostsCache.insertCommentsIntoCache(comments, postId);
                 }
                 JSONObject jsonValue = new JSONObject();
@@ -127,8 +128,7 @@ public class Comments {
         //@TODO: @USERS_TEAM send usernames to the user service and get array of user ids back
         ArrayList<String> mentionsUserNames = getMentions(reply);
 
-        ArangoInterfaceMethods.insertCommentReply(commentId, replyJson);
-
+        PostMethods.insertCommentReply(commentId, replyJson);
 
         JSONObject jsonValue = new JSONObject();
         JSONObject response = new JSONObject();

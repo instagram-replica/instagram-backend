@@ -5,6 +5,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import persistence.cache.ChatCache;
 import persistence.nosql.ArangoInterfaceMethods;
+import persistence.nosql.GraphMethods;
+import persistence.nosql.ThreadMethods;
 import utilities.Main;
 
 import java.sql.Timestamp;
@@ -24,7 +26,7 @@ public class Messenger {
         message.put("deleted_at", "null");
         message.put("blocked_at", "null");
 
-        ArangoInterfaceMethods.insertMessageOnThread(threadId, message);
+        ThreadMethods.insertMessageOnThread(threadId, message);
 
         JSONObject res = new JSONObject();
         res.put("id", messageId);
@@ -45,12 +47,12 @@ public class Messenger {
         thread.put("blocked_at", "null");
         thread.put("messages", new ArrayList<String>());
 
-        String threadId = ArangoInterfaceMethods.insertThread(thread);
+        String threadId = ThreadMethods.insertThread(thread);
 
         //get users and join them
         JSONArray users = paramsObject.getJSONArray("threadUsers");
         for (int i = 0; i < users.length(); i++) {
-            ArangoInterfaceMethods.joinThread(users.getJSONObject(i).getString("id"), threadId);
+            GraphMethods.joinThread(users.getJSONObject(i).getString("id"), threadId);
         }
         return new JSONObject().put("threadId", threadId);
     }
@@ -60,7 +62,7 @@ public class Messenger {
         String threadId = paramsObject.getString("threadId");
         JSONObject thread = ChatCache.getThreadFromCache(threadId);
         if(thread==null) {
-            thread = ArangoInterfaceMethods.getThread(threadId);
+            thread = ThreadMethods.getThread(threadId);
             ChatCache.insertThreadIntoCache(thread,threadId);
         }
         JSONArray messages = thread.getJSONArray("messages");
@@ -83,13 +85,13 @@ public class Messenger {
     }
 
     public static JSONObject getThreads(JSONObject paramsObject, String userId) throws CustomException {
-        ArrayList<String> threadsIds = ArangoInterfaceMethods.getAllThreadsForUser(userId);
+        ArrayList<String> threadsIds = GraphMethods.getAllThreadsForUser(userId);
         ArrayList<JSONObject> threads = new ArrayList<>();
         for (int i = 0; i < threadsIds.size(); i++) {
             String id = threadsIds.get(i);
             JSONObject thread = ChatCache.getThreadFromCache(id);
             if(thread==null) {
-                thread = ArangoInterfaceMethods.getThread(id);
+                thread = ThreadMethods.getThread(id);
                 ChatCache.insertThreadIntoCache(thread,id);
             }
             String name = thread.getString("name");

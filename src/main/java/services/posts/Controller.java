@@ -1,12 +1,6 @@
 package services.posts;
 
-
-import com.arangodb.ArangoDBException;
-import exceptions.CustomException;
-import org.json.JSONException;
 import org.json.JSONObject;
-import services.stories.StoriesActions;
-import shared.Settings;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -35,10 +29,10 @@ public class Controller extends shared.mq_server.Controller{
         String methodName = jsonObject.getString("method");
         String methodSignature = props.getProperty(methodName);
         JSONObject paramsObject = jsonObject.getJSONObject("params");
-        
+
         try {
-            Method method = PostsActions.class.getMethod(methodSignature, JSONObject.class, String.class);
-            data = (JSONObject) method.invoke(null,paramsObject, userId);
+            Method method = PostsActions.class.getMethod(methodSignature, JSONObject.class, String.class, String.class);
+            data = (JSONObject) method.invoke(null,paramsObject, userId, methodName);
 
         }
         catch(org.json.JSONException e){
@@ -49,11 +43,11 @@ public class Controller extends shared.mq_server.Controller{
             e.printStackTrace();
             System.err.println(e.getMessage());
             error.put("description","Internal Server Error");
+        } finally {
+            JSONObject response = new JSONObject();
+            response.put("error", error);
+            response.put("data", data);
+            return response;
         }
-
-        JSONObject response = new JSONObject();
-        response.put("error",error);
-        response.put("data",data);
-        return response;
     }
 }
