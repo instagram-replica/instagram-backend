@@ -8,6 +8,7 @@ import json.JSONParser;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import persistence.nosql.ArangoInterfaceMethods;
+import persistence.nosql.GraphMethods;
 import persistence.sql.users.User;
 import services.posts.PostsActions;
 
@@ -249,7 +250,7 @@ public class Controller extends shared.mq_server.Controller {
 
     private static JSONObject handleUnFollowUser(JSONObject params, String viewer){
         String unfollowedUser = params.getString("userId");
-        boolean followDone = ArangoInterfaceMethods.unFollowUser(viewer, unfollowedUser);
+        boolean followDone = GraphMethods.unFollowUser(viewer, unfollowedUser);
         JSONObject data = new JSONObject();
         JSONObject error = new JSONObject();
         data.put("unfollowSuccess", followDone);
@@ -261,7 +262,7 @@ public class Controller extends shared.mq_server.Controller {
 
     private static JSONObject handleFollowUser(JSONObject params, String viewer){
         String followedUser = params.getString("userId");
-        boolean followDone = ArangoInterfaceMethods.followUser(viewer, followedUser);
+        boolean followDone = GraphMethods.followUser(viewer, followedUser);
         JSONObject data = new JSONObject();
         JSONObject error = new JSONObject();
         data.put("followSuccess", followDone);
@@ -284,8 +285,8 @@ public class Controller extends shared.mq_server.Controller {
 
     public static JSONObject handleBlockUser(JSONObject params, String viewerId){
         String blockedUser = params.getString("userId");
-        boolean blockedSuccess = ArangoInterfaceMethods.blockUser(viewerId,blockedUser);
-        boolean unfollowSuccess =ArangoInterfaceMethods.unFollowUser(blockedUser,viewerId);
+        boolean blockedSuccess = GraphMethods.blockUser(viewerId,blockedUser);
+        boolean unfollowSuccess =GraphMethods.unFollowUser(blockedUser,viewerId);
         JSONObject data = new JSONObject();
         JSONObject error = new JSONObject();
         data.put("blockSuccess", blockedSuccess&&unfollowSuccess);
@@ -297,7 +298,7 @@ public class Controller extends shared.mq_server.Controller {
 
     public static JSONObject handleUnblockUser(JSONObject params, String viewerId){
         String unblockedUser = params.getString("userId");
-        boolean unblockedSuccess = ArangoInterfaceMethods.unblockUser(viewerId,unblockedUser);
+        boolean unblockedSuccess = GraphMethods.unblockUser(viewerId,unblockedUser);
         JSONObject data = new JSONObject();
         JSONObject error = new JSONObject();
         data.put("unblockSuccess", unblockedSuccess);
@@ -309,7 +310,7 @@ public class Controller extends shared.mq_server.Controller {
 
     public static JSONObject handleReportUser(JSONObject params, String viewerId){
         String reportedUsers = params.getString("userId");
-        boolean reportedSuccess = ArangoInterfaceMethods.reportUser(viewerId,reportedUsers);
+        boolean reportedSuccess = GraphMethods.reportUser(viewerId,reportedUsers);
         JSONObject data = new JSONObject();
         JSONObject error = new JSONObject();
         data.put("reportSuccess", reportedSuccess);
