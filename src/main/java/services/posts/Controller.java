@@ -26,13 +26,14 @@ public class Controller extends shared.mq_server.Controller{
         JSONObject data = new JSONObject();
         JSONObject error = new JSONObject();
 
-        String methodName = jsonObject.getString("method");
-        String methodSignature = props.getProperty(methodName);
+        String className = jsonObject.getString("method");
+        String classSignature = "services.posts.Actions." + props.getProperty(className);
         JSONObject paramsObject = jsonObject.getJSONObject("params");
 
         try {
-            Method method = PostsActions.class.getMethod(methodSignature, JSONObject.class, String.class, String.class);
-            data = (JSONObject) method.invoke(null,paramsObject, userId, methodName);
+            Class actionClass = Class.forName(classSignature);
+            Method method = actionClass.getMethod("execute", JSONObject.class, String.class, String.class);
+            data = (JSONObject) method.invoke(null,paramsObject, userId, className);
         }
         catch(org.json.JSONException e){
             e.printStackTrace();
@@ -41,15 +42,12 @@ public class Controller extends shared.mq_server.Controller{
         catch(Exception e){
             e.printStackTrace();
             System.err.println(e.getMessage());
-            if(e.getClass() == CustomException.class)
-                error.put("description", e.getMessage());
-            else
-                error.put("description","Internal Server Error");
-        } finally {
-            JSONObject response = new JSONObject();
-            response.put("error", error);
-            response.put("data", data);
-            return response;
+            error.put("description","Internal Server Error");
         }
+
+        JSONObject response = new JSONObject();
+        response.put("error",error);
+        response.put("data",data);
+        return response;
     }
 }

@@ -29,7 +29,7 @@ public class Controller extends shared.mq_server.Controller {
     public Controller(){
         super();
         try {
-            props = readPropertiesFile("src/main/resources/posts_mapper.properties");
+            props = readPropertiesFile("src/main/resources/users_mapper.properties");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -61,7 +61,7 @@ public class Controller extends shared.mq_server.Controller {
         }
 
         try {
-            Method method = PostsActions.class.getMethod(methodSignature, JSONObject.class, String.class);
+            Method method = Controller.class.getMethod(methodSignature, JSONObject.class, String.class);
             data = (JSONObject) method.invoke(null,paramsObject, userId);
         }
         catch(org.json.JSONException e){
@@ -90,7 +90,7 @@ public class Controller extends shared.mq_server.Controller {
         closeConnection();
     }
 
-    private static JSONObject handleSignup(JSONObject params, String viewerId) {
+    public static JSONObject handleSignup(JSONObject params, String viewerId) {
         try {
             User user = Logic.signup(Helpers.mapJSONToUser(params));
 
@@ -114,7 +114,7 @@ public class Controller extends shared.mq_server.Controller {
         }
     }
 
-    private static JSONObject handleLogin(JSONObject params, String viewerId) {
+    public static JSONObject handleLogin(JSONObject params, String viewerId) {
         try {
             User user = Logic.login(
                     JSONParser.getString("email", params),
@@ -141,7 +141,7 @@ public class Controller extends shared.mq_server.Controller {
         }
     }
 
-    private static JSONObject handleGetUser(JSONObject params, String viewerId) {
+    public static JSONObject handleGetUser(JSONObject params, String viewerId) {
         try {
             User user = Logic.getUser(JSONParser.getString("id", params));
             return Helpers.constructOKResponse(Helpers.mapUserToJSON(user));
@@ -168,7 +168,7 @@ public class Controller extends shared.mq_server.Controller {
         }
     }
 
-    private static JSONObject handleSearchUsers(JSONObject params, String viewerId) {
+    public static JSONObject handleSearchUsers(JSONObject params, String viewerId) {
         try {
             List<User> users = Logic.searchUsers(
                     JSONParser.getString("term", params),
@@ -187,7 +187,7 @@ public class Controller extends shared.mq_server.Controller {
         }
     }
 
-    private static JSONObject handleGetUsersByIds(JSONObject params, String viewerId) {
+    public static JSONObject handleGetUsersByIds(JSONObject params, String viewerId) {
         try {
             String[] ids = Helpers.convertJSONArrayToList(
                     JSONParser.getJSONArray("ids", params)
@@ -206,7 +206,7 @@ public class Controller extends shared.mq_server.Controller {
         }
     }
 
-    private static JSONObject handleGetUsersIdsByUsernames(JSONObject params, String viewerId) {
+    public static JSONObject handleGetUsersIdsByUsernames(JSONObject params, String viewerId) {
         try {
             String[] usernames = Helpers.convertJSONArrayToList(
                     JSONParser.getJSONArray("usernames", params)
@@ -225,7 +225,7 @@ public class Controller extends shared.mq_server.Controller {
         }
     }
 
-    private static JSONObject handleIsAuthorizedToView(JSONObject params, String viewer) {
+    public static JSONObject handleIsAuthorizedToView(JSONObject params, String viewer) {
         try {
             String viewerId = JSONParser.getString("viewerId", params);
             String viewedId = JSONParser.getString("viewedId", params);
@@ -248,7 +248,7 @@ public class Controller extends shared.mq_server.Controller {
         }
     }
 
-    private static JSONObject handleUnFollowUser(JSONObject params, String viewer){
+    public static JSONObject handleUnFollowUser(JSONObject params, String viewer){
         String unfollowedUser = params.getString("userId");
         boolean followDone = GraphMethods.unFollowUser(viewer, unfollowedUser);
         JSONObject data = new JSONObject();
@@ -260,7 +260,7 @@ public class Controller extends shared.mq_server.Controller {
                 .put("error", error);
     }
 
-    private static JSONObject handleFollowUser(JSONObject params, String viewer){
+    public static JSONObject handleFollowUser(JSONObject params, String viewer){
         String followedUser = params.getString("userId");
         boolean followDone = GraphMethods.followUser(viewer, followedUser);
         JSONObject data = new JSONObject();
