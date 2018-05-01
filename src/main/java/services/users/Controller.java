@@ -3,18 +3,14 @@ package services.users;
 import auth.JWT;
 import auth.JWTPayload;
 import exceptions.CustomException;
-import exceptions.JSONException;
 import json.JSONParser;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import persistence.nosql.ArangoInterfaceMethods;
 import persistence.nosql.GraphMethods;
 import persistence.sql.users.User;
-import services.posts.PostsActions;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
