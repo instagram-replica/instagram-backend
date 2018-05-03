@@ -114,8 +114,6 @@ public class Database {
                  + " verified_at, created_at, updated_at, blocked_at, deleted_at)"
                  + " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-    System.out.println(user.toString());
-
     PreparedStatement statement = connection.prepareStatement(query);
     statement.setString(1, user.id);
     statement.setString(2, user.username);
