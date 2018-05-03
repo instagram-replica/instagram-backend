@@ -12,6 +12,5 @@ public class Server {
 
         Controller controller = new Controller();
         shared.mq_server.Server.run(controller);
-
     }
 }

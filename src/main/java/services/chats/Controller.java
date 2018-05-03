@@ -1,44 +1,54 @@
 package services.chats;
 
-import exceptions.CustomException;
 import org.json.JSONObject;
+
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.util.Properties;
+
+import static utilities.Main.readPropertiesFile;
 
 public class Controller extends shared.mq_server.Controller {
 
 
-    public Controller() {
+    private Properties props;
+
+    public Controller(){
         super();
+        try {
+            props = readPropertiesFile("src/main/resources/chats_mapper.properties");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public JSONObject execute(JSONObject jsonObject, String userId) {
-        JSONObject newJsonObj = new JSONObject();
-        newJsonObj.put("application", "activities");
-        String methodName = jsonObject.getString("method");
+        JSONObject data = new JSONObject();
+        JSONObject error = new JSONObject();
+
+        String className = jsonObject.getString("method");
+        String classSignature = "services.chats.Actions." + props.getProperty(className);
         JSONObject paramsObject = jsonObject.getJSONObject("params");
 
-        //interface insert method, change params of json object to match different activity
-        //types
         try {
-            switch (methodName) {
-                case "createMessage":
-                    newJsonObj = Messenger.createMessage(paramsObject, userId);
-                    break;
-                case "createThread":
-                    newJsonObj = Messenger.createThread(paramsObject, userId);
-                    break;
-                case "getMessages":
-                    newJsonObj = Messenger.getMessages(paramsObject, userId);
-                    break;
-                case "getThreads":
-                    newJsonObj = Messenger.getThreads(paramsObject, userId);
-                    break;
-                default:
-                    break;
-            }
-        } catch (CustomException e) {
-            e.printStackTrace();
+            Class actionClass = Class.forName(classSignature);
+            Method method = actionClass.getMethod("execute", JSONObject.class, String.class);
+            data = (JSONObject) method.invoke(null,paramsObject, userId);
         }
-        return newJsonObj;
+        catch(org.json.JSONException e){
+            e.printStackTrace();
+            error.put("description",utilities.Main.stringifyJSONException(e));
+        }
+        catch(Exception e){
+            e.printStackTrace();
+            System.err.println(e.getMessage());
+            error.put("description","Internal Server Error");
+        }
+
+        JSONObject response = new JSONObject();
+        response.put("error",error);
+        response.put("data",data);
+        return response;
     }
 }
