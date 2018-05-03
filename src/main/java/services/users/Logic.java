@@ -79,9 +79,7 @@ public class Logic {
         if (validationResult.type == ValidationResultType.FAILURE) {
             throw new ValidationException(validationResult.message);
         }
-
         User user = Database.getUserById(userId);
-
         if (user == null) {
             throw new DatabaseException("User ID does not exist: " + userId);
         }
@@ -117,7 +115,6 @@ public class Logic {
                 throw new ValidationException(validationResult.message);
             }
         }
-
         return Database.getUsersByIds(ids);
     }
 
@@ -136,7 +133,6 @@ public class Logic {
     public static boolean isAuthorizedToView(String viewerId, String viewedId)
             throws DatabaseException, ValidationException {
         ValidationResult validationResult = Validator.validateId(viewerId);
-
         if (validationResult.type == ValidationResultType.FAILURE) {
             throw new ValidationException(validationResult.message);
         }

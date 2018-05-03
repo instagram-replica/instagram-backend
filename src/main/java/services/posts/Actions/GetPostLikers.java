@@ -19,6 +19,7 @@ public class GetPostLikers implements Action {
 
         String ownerId = post.getString("user_id");
         JSONArray userIds = post.getJSONArray("likes");
+
         if (isAuthorizedToView(userId, "posts", userId, ownerId) && userIds.length() != 0) {
             JSONObject response = new JSONObject();
             response.put("method", methodName);
