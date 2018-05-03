@@ -7,258 +7,224 @@ import exceptions.JSONException;
 import json.JSONParser;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import persistence.sql.Database;
 import persistence.sql.users.User;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
-import static persistence.sql.Main.closeConnection;
-import static persistence.sql.Main.openConnection;
-
 public class Controller extends shared.mq_server.Controller {
-    public Controller() {
-        super();
+  public Controller() throws IOException {
+    super();
+    Database.openConnection();
+  }
+
+  @Override
+  public JSONObject execute(JSONObject payload, String viewerId) {
+    String method;
+    JSONObject params;
+    JSONObject response;
+
+    try {
+      method = JSONParser.getString("method", payload);
+      params = JSONParser.getJSONObject("params", payload);
+    } catch (JSONException e) {
+      e.printStackTrace();
+      return Helpers.constructErrorResponse(e.getMessage());
     }
 
-    @Override
-    public JSONObject execute(JSONObject payload, String viewerId) {
-        try {
-            Controller.initialize();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Helpers.constructErrorResponse();
-        }
-
-        String method;
-        JSONObject params;
-        JSONObject response;
-
-        try {
-            method = JSONParser.getString("method", payload);
-            params = JSONParser.getJSONObject("params", payload);
-        } catch (JSONException e) {
-            e.printStackTrace();
-            Controller.teardown();
-            return Helpers.constructErrorResponse(e.getMessage());
-        }
-
-        switch (method) {
-            case "signup":
-                response = Controller.handleSignup(params);
-                break;
-            case "login":
-                response = Controller.handleLogin(params);
-                break;
-            case "getUser":
-                response = Controller.handleGetUser(params);
-                break;
-            case "updateUser":
-                response = Controller.handleUpdateUser(params);
-                break;
-            case "searchUsers":
-                response = Controller.handleSearchUsers(params);
-                break;
-            case "getUsersByIds":
-                response = Controller.handleGetUsersByIds(params);
-                break;
-            case "getUsersIdsByUsernames":
-                response = Controller.handleGetUsersIdsByUsernames(params);
-                break;
-            case "isUserAuthorizedToView":
-                response = Controller.handleIsAuthorizedToView(params);
-                break;
-            case "followUser":
-                // TODO @ARANGODB
-                response = Helpers.constructErrorResponse();
-                break;
-            case "unfollowUser":
-                // TODO @ARANGODB
-                response = Helpers.constructErrorResponse();
-                break;
-            case "blockUser":
-                // TODO @ARANGODB
-                response = Helpers.constructErrorResponse();
-                break;
-            case "unblockUser":
-                // TODO @ARANGODB
-                response = Helpers.constructErrorResponse();
-                break;
-            case "reportUser":
-                // TODO @ARANGODB
-                response = Helpers.constructErrorResponse();
-                break;
-            default:
-                response = Helpers.constructErrorResponse();
-        }
-
-        Controller.teardown();
-        return response;
+    switch (method) {
+      case "signup":
+        response = Controller.handleSignup(params);
+        break;
+      case "login":
+        response = Controller.handleLogin(params);
+        break;
+      case "getUser":
+        response = Controller.handleGetUser(params);
+        break;
+      case "updateUser":
+        response = Controller.handleUpdateUser(params);
+        break;
+      case "searchUsers":
+        response = Controller.handleSearchUsers(params);
+        break;
+      case "getUsersByIds":
+        response = Controller.handleGetUsersByIds(params);
+        break;
+      case "getUsersIdsByUsernames":
+        response = Controller.handleGetUsersIdsByUsernames(params);
+        break;
+      case "isUserAuthorizedToView":
+        response = Controller.handleIsAuthorizedToView(params);
+        break;
+      case "followUser":
+        // TODO @ARANGODB
+        response = Helpers.constructErrorResponse();
+        break;
+      case "unfollowUser":
+        // TODO @ARANGODB
+        response = Helpers.constructErrorResponse();
+        break;
+      case "blockUser":
+        // TODO @ARANGODB
+        response = Helpers.constructErrorResponse();
+        break;
+      case "unblockUser":
+        // TODO @ARANGODB
+        response = Helpers.constructErrorResponse();
+        break;
+      case "reportUser":
+        // TODO @ARANGODB
+        response = Helpers.constructErrorResponse();
+        break;
+      default:
+        response = Helpers.constructErrorResponse();
     }
 
-    private static void initialize() throws IOException {
-        openConnection();
+    return response;
+  }
+
+  public static JSONObject handleSignup(JSONObject params) {
+    try {
+      User user = Logic.signup(Helpers.mapJSONToUser(params));
+      String token = JWT.signJWT(new JWTPayload.Builder().userId(user.id).build());
+
+      return Helpers.constructOKResponse(
+        new JSONObject().put("user", Helpers.mapUserToJSON(user)).put("token", token)
+      );
+    } catch (CustomException e) {
+      e.printStackTrace();
+      return Helpers.constructErrorResponse(e.getMessage());
+    } catch (Exception e) {
+      e.printStackTrace();
+      return Helpers.constructErrorResponse();
     }
+  }
 
-    private static void teardown() {
-        closeConnection();
+  public static JSONObject handleLogin(JSONObject params) {
+    try {
+      User user = Logic.login(
+        JSONParser.getString("email", params),
+        JSONParser.getString("password", params)
+      );
+
+      String token = JWT.signJWT(new JWTPayload.Builder().userId(user.id).build());
+
+      return Helpers.constructOKResponse(
+        new JSONObject().put("user", Helpers.mapUserToJSON(user)).put("token", token)
+      );
+    } catch (CustomException e) {
+      e.printStackTrace();
+      return Helpers.constructErrorResponse(e.getMessage());
+    } catch (Exception e) {
+      e.printStackTrace();
+      return Helpers.constructErrorResponse();
     }
+  }
 
-    private static JSONObject handleSignup(JSONObject params) {
-        try {
-            User user = Logic.signup(Helpers.mapJSONToUser(params));
-
-            String token = JWT.signJWT(
-                    new JWTPayload.Builder()
-                            .userId(user.id)
-                            .build()
-            );
-
-            return Helpers.constructOKResponse(
-                    new JSONObject()
-                            .put("user", Helpers.mapUserToJSON(user))
-                            .put("token", token)
-            );
-        } catch (CustomException e) {
-            e.printStackTrace();
-            return Helpers.constructErrorResponse(e.getMessage());
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Helpers.constructErrorResponse();
-        }
+  public static JSONObject handleGetUser(JSONObject params) {
+    try {
+      User user = Logic.getUser(JSONParser.getString("id", params));
+      return Helpers.constructOKResponse(Helpers.mapUserToJSON(user));
+    } catch (CustomException e) {
+      e.printStackTrace();
+      return Helpers.constructErrorResponse(e.getMessage());
+    } catch (Exception e) {
+      e.printStackTrace();
+      return Helpers.constructErrorResponse();
     }
+  }
 
-    private static JSONObject handleLogin(JSONObject params) {
-        try {
-            User user = Logic.login(
-                    JSONParser.getString("email", params),
-                    JSONParser.getString("password", params)
-            );
-
-            String token = JWT.signJWT(
-                    new JWTPayload.Builder()
-                            .userId(user.id)
-                            .build()
-            );
-
-            return Helpers.constructOKResponse(
-                    new JSONObject()
-                            .put("user", Helpers.mapUserToJSON(user))
-                            .put("token", token)
-            );
-        } catch (CustomException e) {
-            e.printStackTrace();
-            return Helpers.constructErrorResponse(e.getMessage());
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Helpers.constructErrorResponse();
-        }
+  public static JSONObject handleUpdateUser(JSONObject params) {
+    // TODO: Verify rightful ownership
+    try {
+      User user = Logic.updateUser(Helpers.mapJSONToUser(params));
+      return Helpers.constructOKResponse(Helpers.mapUserToJSON(user));
+    } catch (CustomException e) {
+      e.printStackTrace();
+      return Helpers.constructErrorResponse(e.getMessage());
+    } catch (Exception e) {
+      e.printStackTrace();
+      return Helpers.constructErrorResponse();
     }
+  }
 
-    private static JSONObject handleGetUser(JSONObject params) {
-        try {
-            User user = Logic.getUser(JSONParser.getString("id", params));
-            return Helpers.constructOKResponse(Helpers.mapUserToJSON(user));
-        } catch (CustomException e) {
-            e.printStackTrace();
-            return Helpers.constructErrorResponse(e.getMessage());
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Helpers.constructErrorResponse();
-        }
+  public static JSONObject handleSearchUsers(JSONObject params) {
+    try {
+      List<User> users = Logic.searchUsers(
+        JSONParser.getString("term", params),
+        JSONParser.getInt("offset", params),
+        JSONParser.getInt("limit", params)
+      );
+
+      JSONArray usersJSON = Helpers.convertUsersListToJSONArray(users);
+      return Helpers.constructOKResponse(usersJSON);
+    } catch (CustomException e) {
+      e.printStackTrace();
+      return Helpers.constructErrorResponse(e.getMessage());
+    } catch (Exception e) {
+      e.printStackTrace();
+      return Helpers.constructErrorResponse();
     }
+  }
 
-    private static JSONObject handleUpdateUser(JSONObject params) {
-        // TODO: Verify rightful ownership
-        try {
-            User user = Logic.updateUser(Helpers.mapJSONToUser(params));
-            return Helpers.constructOKResponse(Helpers.mapUserToJSON(user));
-        } catch (CustomException e) {
-            e.printStackTrace();
-            return Helpers.constructErrorResponse(e.getMessage());
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Helpers.constructErrorResponse();
-        }
+  public static JSONObject handleGetUsersByIds(JSONObject params) {
+    try {
+      String[] ids = Helpers
+        .convertJSONArrayToList(JSONParser.getJSONArray("ids", params))
+        .stream()
+        .toArray(String[]::new);
+
+      List<User> users = Logic.getUsersByIds(ids);
+      JSONArray usersJSON = Helpers.convertUsersListToJSONArray(users);
+
+      return Helpers.constructOKResponse(usersJSON);
+    } catch (CustomException e) {
+      e.printStackTrace();
+      return Helpers.constructErrorResponse(e.getMessage());
+    } catch (Exception e) {
+      e.printStackTrace();
+      return Helpers.constructErrorResponse();
     }
+  }
 
-    private static JSONObject handleSearchUsers(JSONObject params) {
-        try {
-            List<User> users = Logic.searchUsers(
-                    JSONParser.getString("term", params),
-                    JSONParser.getInt("offset", params),
-                    JSONParser.getInt("limit", params)
-            );
+  public static JSONObject handleGetUsersIdsByUsernames(JSONObject params) {
+    try {
+      String[] usernames = Helpers
+        .convertJSONArrayToList(JSONParser.getJSONArray("usernames", params))
+        .stream()
+        .toArray(String[]::new);
 
-            JSONArray usersJSON = Helpers.convertUsersListToJSONArray(users);
-            return Helpers.constructOKResponse(usersJSON);
-        } catch (CustomException e) {
-            e.printStackTrace();
-            return Helpers.constructErrorResponse(e.getMessage());
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Helpers.constructErrorResponse();
-        }
+      List<String> usersIds = Logic.getUsersIdsByUsernames(usernames);
+      JSONArray usersJSON = Helpers.convertStringsListToJSONArray(usersIds);
+
+      return Helpers.constructOKResponse(usersJSON);
+    } catch (CustomException e) {
+      e.printStackTrace();
+      return Helpers.constructErrorResponse(e.getMessage());
+    } catch (Exception e) {
+      e.printStackTrace();
+      return Helpers.constructErrorResponse();
     }
+  }
 
-    private static JSONObject handleGetUsersByIds(JSONObject params) {
-        try {
-            String[] ids = Helpers.convertJSONArrayToList(
-                    JSONParser.getJSONArray("ids", params)
-            ).stream().toArray(String[]::new);
+  public static JSONObject handleIsAuthorizedToView(JSONObject params) {
+    try {
+      String viewerId = JSONParser.getString("viewerId", params);
+      String viewedId = JSONParser.getString("viewedId", params);
 
-            List<User> users = Logic.getUsersByIds(ids);
-            JSONArray usersJSON = Helpers.convertUsersListToJSONArray(users);
+      boolean isAuthorizedToView = Logic.isAuthorizedToView(viewerId, viewedId);
 
-            return Helpers.constructOKResponse(usersJSON);
-        } catch (CustomException e) {
-            e.printStackTrace();
-            return Helpers.constructErrorResponse(e.getMessage());
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Helpers.constructErrorResponse();
-        }
+      return Helpers.constructOKResponse(
+        new JSONObject().put("isAuthorizedToView", isAuthorizedToView)
+      );
+    } catch (CustomException e) {
+      e.printStackTrace();
+      return Helpers.constructErrorResponse(e.getMessage());
+    } catch (Exception e) {
+      e.printStackTrace();
+      return Helpers.constructErrorResponse();
     }
-
-    private static JSONObject handleGetUsersIdsByUsernames(JSONObject params) {
-        try {
-            String[] usernames = Helpers.convertJSONArrayToList(
-                    JSONParser.getJSONArray("usernames", params)
-            ).stream().toArray(String[]::new);
-
-            List<String> usersIds = Logic.getUsersIdsByUsernames(usernames);
-            JSONArray usersJSON = Helpers.convertStringsListToJSONArray(usersIds);
-
-            return Helpers.constructOKResponse(usersJSON);
-        } catch (CustomException e) {
-            e.printStackTrace();
-            return Helpers.constructErrorResponse(e.getMessage());
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Helpers.constructErrorResponse();
-        }
-    }
-
-    private static JSONObject handleIsAuthorizedToView(JSONObject params) {
-        try {
-            String viewerId = JSONParser.getString("viewerId", params);
-            String viewedId = JSONParser.getString("viewedId", params);
-
-            boolean isAuthorizedToView = Logic.isAuthorizedToView(
-                    viewerId,
-                    viewedId
-            );
-
-            return Helpers.constructOKResponse(
-                    new JSONObject()
-                            .put("isAuthorizedToView", isAuthorizedToView)
-            );
-        } catch (CustomException e) {
-            e.printStackTrace();
-            return Helpers.constructErrorResponse(e.getMessage());
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Helpers.constructErrorResponse();
-        }
-    }
+  }
 }

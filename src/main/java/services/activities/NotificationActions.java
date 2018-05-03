@@ -7,6 +7,7 @@ import persistence.nosql.ActivityMethods;
 import persistence.nosql.ArangoInterfaceMethods;
 import persistence.sql.users.Database;
 
+import java.sql.SQLException;
 import java.sql.Timestamp;
 
 public class NotificationActions {
@@ -45,7 +46,7 @@ public class NotificationActions {
         ActivityMethods.insertActivity(notificationJSON);
     }
 
-    public static void handlePostTagNotification(JSONObject params, String userId) {
+    public static void handlePostTagNotification(JSONObject params, String userId) throws SQLException {
         JSONArray receivers = params.getJSONArray("taggedUsers");
         String postID = params.getString("postID");
 
