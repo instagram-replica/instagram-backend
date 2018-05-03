@@ -1,6 +1,7 @@
 package persistence.sql;
 
 import org.flywaydb.core.Flyway;
+import persistence.nosql.ArangoInterfaceMethods;
 
 import java.io.IOException;
 import java.util.Properties;
@@ -8,7 +9,9 @@ import java.util.Properties;
 import static utilities.Main.readPropertiesFile;
 
 public class Migrations {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, InterruptedException {
+        //TODO: Find a better solution
+        Thread.sleep(5000);
         Properties properties = readPropertiesFile("src/main/resources/postgres.properties");
 
         Flyway flyway = new Flyway();
@@ -20,6 +23,11 @@ public class Migrations {
         );
 
         flyway.migrate();
+
+
+        ArangoInterfaceMethods.initializeDB();
+        ArangoInterfaceMethods.initializeGraphCollections();
+
     }
 
 }

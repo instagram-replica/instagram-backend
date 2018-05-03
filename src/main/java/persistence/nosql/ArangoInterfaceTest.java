@@ -17,6 +17,7 @@ import java.sql.Timestamp;
 import java.util.*;
 
 import static persistence.nosql.ArangoInterfaceMethods.*;
+import static persistence.sql.Main.closeConnection;
 import static persistence.sql.Main.openConnection;
 import static persistence.sql.users.Database.getAllUsersIds;
 import static utilities.Main.readPropertiesFile;

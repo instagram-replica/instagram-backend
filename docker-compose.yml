@@ -3,26 +3,64 @@ version: '3'
 services:
   arangodb:
     image: arangodb
+    networks:
+      - backend
     environment:
       - ARANGO_NO_AUTH=1
-    ports:
-      - "32807:8529"
+    expose:
+      - "8529"
   redis:
     image: redis
-    ports:
-      - "32768:6379"
+    networks:
+      - backend
+    expose:
+      - "6379"
+
   postgres:
     image: orchardup/postgresql
+    networks:
+      - backend
     environment:
         - POSTGRESQL_DB=instagram_development
         - POSTGRESQL_USER=postgres
         - POSTGRESQL_PASS=postgres
-    ports:
-      - "32806:5432"
+    expose:
+      - "5432"
+
   rabbitmq:
     image: rabbitmq
+    networks:
+      - backend
+    expose:
+     - "5672"
+
+  http_server:
+    networks:
+      - backend
+    build:
+        context: .
+        dockerfile: Dockerfile
+    depends_on:
+          - rabbitmq
     ports:
-      - "32811:4369"
-      - "32810:5671"
-      - "32809:5672"
-      - "32808:25672"
+      - "8080:8080"
+
+  sql_migrations:
+    networks:
+      - backend
+    build:
+        context: .
+        dockerfile: Dockerfile.sql.migrations
+
+  user_server:
+      networks:
+        - backend
+      build:
+          context: .
+          dockerfile: Dockerfile.users
+      depends_on:
+            - rabbitmq
+            - sql_migrations
+
+networks:
+  backend:

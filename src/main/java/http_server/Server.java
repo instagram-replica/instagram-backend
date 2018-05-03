@@ -1,5 +1,6 @@
 package http_server;
 
+import shared.RMQConnection;
 import shared.mq_subscriptions.MQSubscriptions;
 import shared.Settings;
 

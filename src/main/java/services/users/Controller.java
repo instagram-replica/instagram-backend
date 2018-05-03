@@ -7,6 +7,8 @@ import exceptions.JSONException;
 import json.JSONParser;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import persistence.nosql.ArangoInterfaceMethods;
+import persistence.sql.Migrations;
 import persistence.sql.users.User;
 
 import java.io.IOException;

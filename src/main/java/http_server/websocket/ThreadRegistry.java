@@ -1,19 +1,15 @@
 package http_server.websocket;
 
 import com.rabbitmq.client.*;
-import http_server.RMQConnection;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelId;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import org.json.JSONObject;
-import persistence.nosql.ArangoInterfaceMethods;
-import shared.Settings;
-import shared.mq_server.Controller;
+import shared.RMQConnection;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 
 public class ThreadRegistry {
