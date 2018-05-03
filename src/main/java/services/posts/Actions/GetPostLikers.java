@@ -19,10 +19,16 @@ public class GetPostLikers implements Action {
 
         String ownerId = post.getString("user_id");
         JSONArray userIds = post.getJSONArray("likes");
+        System.out.println("hellooo");
+        System.out.println(userIds);
+        System.out.println("userid"+userId);
+        System.out.println("ownerid"+ownerId);
         if (isAuthorizedToView(userId, "posts", userId, ownerId) && userIds.length() != 0) {
             JSONObject response = new JSONObject();
             response.put("method", methodName);
+            System.out.println( "hello; "+getUsersByIds("posts", userIds, userId));
             response.put("users", getUsersByIds("posts", userIds, userId));
+            System.out.println(response);
             return response;
         }
         throw new CustomException("Not authorized to view");
