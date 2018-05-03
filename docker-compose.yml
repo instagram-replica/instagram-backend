@@ -39,28 +39,68 @@ services:
       - backend
     build:
         context: .
-        dockerfile: Dockerfile
+        dockerfile: docker-files/Dockerfile.http_server
     depends_on:
           - rabbitmq
     ports:
       - "8080:8080"
 
-  sql_migrations:
+  migrations:
     networks:
       - backend
     build:
         context: .
-        dockerfile: Dockerfile.sql.migrations
+        dockerfile: docker-files/Dockerfile.sql.migrations
 
-  user_server:
+  users_server:
       networks:
         - backend
       build:
           context: .
-          dockerfile: Dockerfile.users
+          dockerfile: docker-files/Dockerfile.users
       depends_on:
             - rabbitmq
-            - sql_migrations
+            - migrations
+
+  chats_server:
+    networks:
+      - backend
+    build:
+        context: .
+        dockerfile: docker-files/Dockerfile.chats
+    depends_on:
+          - rabbitmq
+          - migrations
+
+  posts_server:
+    networks:
+      - backend
+    build:
+        context: .
+        dockerfile: docker-files/Dockerfile.posts
+    depends_on:
+          - rabbitmq
+          - migrations
+
+  stories_server:
+    networks:
+      - backend
+    build:
+        context: .
+        dockerfile: docker-files/Dockerfile.stories
+    depends_on:
+          - rabbitmq
+          - migrations
+
+  activities_server:
+    networks:
+      - backend
+    build:
+        context: .
+        dockerfile: docker-files/Dockerfile.activities
+    depends_on:
+          - rabbitmq
+          - migrations
 
 networks:
   backend:

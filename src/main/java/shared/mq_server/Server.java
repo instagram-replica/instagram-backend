@@ -13,6 +13,7 @@ import json.JSONParser;
 
 import org.json.JSONException;
 
+import shared.RMQConnection;
 import shared.Settings;
 import com.rabbitmq.client.*;
 import org.json.JSONObject;
@@ -64,7 +65,7 @@ public class Server {
             Connection connection = RMQConnection.getSingleton();
 
             final Channel channel = connection.createChannel();
-            ExecutorService executor = Executors.newFixedThreadPool(numberOfThreads);
+           ExecutorService executor = Executors.newFixedThreadPool(numberOfThreads);
 
             channel.queueDeclare(Settings.getInstance().getApplication(), true, false, false, null);
             channel.basicQos(numberOfThreads);

@@ -20,7 +20,7 @@ public class RMQConnection {
     public synchronized static Connection getSingleton() {
         if (RMQConnection.connection == null) {
             try {
-                RMQConnection.connection = tryToConnect();
+               RMQConnection.connection = tryToConnect();
             } catch (Exception e) {
                 e.printStackTrace();
             }
