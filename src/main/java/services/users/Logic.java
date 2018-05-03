@@ -108,7 +108,6 @@ public class Logic {
     }
 
     public static List<User> getUsersByIds(String[] ids) throws ValidationException {
-        System.out.println("gwa method");
         for (String id : ids) {
             ValidationResult validationResult = Validator.validateId(id);
 
@@ -116,7 +115,6 @@ public class Logic {
                 throw new ValidationException(validationResult.message);
             }
         }
-        System.out.println("abl return");
         return Database.getUsersByIds(ids);
     }
 
@@ -134,9 +132,7 @@ public class Logic {
 
     public static boolean isAuthorizedToView(String viewerId, String viewedId)
             throws DatabaseException, ValidationException {
-        System.out.println("abl validation");
         ValidationResult validationResult = Validator.validateId(viewerId);
-        System.out.println("b3d validation");
         if (validationResult.type == ValidationResultType.FAILURE) {
             throw new ValidationException(validationResult.message);
         }
