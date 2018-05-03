@@ -32,7 +32,7 @@ public class PostMethods {
         //TODO: @MAGDY location gets inserted in a wrong way (with key "map")
 //            myObject.addAttribute("location", postJSON.getJSONObject("location"));
         myObject.put("comments", new ArrayList<>());
-        myObject.put("likes", postJSON.get("likes"));
+        myObject.put("likes", new ArrayList<>());
         myObject.put("created_at", new Timestamp(System.currentTimeMillis()));
         myObject.put("updated_at", JSONObject.NULL);
         myObject.put("blocked_at", JSONObject.NULL);

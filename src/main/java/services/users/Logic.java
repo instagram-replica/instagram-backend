@@ -73,7 +73,8 @@ public class Logic {
     }
 
     public static User getUser(String userId) throws ValidationException, DatabaseException {
-        ValidationResult validationResult = Validator.validateId(userId);
+        ValidationResult
+                validationResult = Validator.validateId(userId);
 
         if (validationResult.type == ValidationResultType.FAILURE) {
             throw new ValidationException(validationResult.message);

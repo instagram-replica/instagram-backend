@@ -129,7 +129,7 @@ public class ActivityMethods {
 
     public static JSONArray getActivities(ArrayList<String> followings, int start, int limit) {
 
-        String dbQuery = "For activity in " + activitiesCollectionName
+        String dbQuery = "For activity in " + notificationsCollectionName
                 + " FILTER activity.sender_id IN " + new JSONArray(followings)
                 + " SORT activity.created_at"
                 + " Limit "+ start + ", " + limit
