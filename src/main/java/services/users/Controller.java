@@ -13,9 +13,13 @@ import persistence.sql.users.User;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Properties;
 
 public class Controller extends shared.mq_server.Controller {
-    public Controller() throws IOException {
+
+    public static Properties props;
+
+    public Controller() throws IOException{
         super();
         Database.openConnection();
     }

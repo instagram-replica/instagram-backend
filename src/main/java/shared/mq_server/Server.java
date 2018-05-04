@@ -28,6 +28,8 @@ import static com.sun.webkit.graphics.WCRenderQueue.MAX_QUEUE_SIZE;
 import static shared.Helpers.getResponseQueue;
 
 public class Server {
+    public static ThreadPoolExecutor executor;
+    public static Channel channel;
     public static void run(Controller controller) {
         _run(controller, Settings.getInstance().getNumberOfThreads());
         initHTTPServer();
@@ -65,7 +67,7 @@ public class Server {
             Connection connection = RMQConnection.getSingleton();
 
             final Channel channel = connection.createChannel();
-            ThreadPoolExecutor executor = new ThreadPoolExecutor(10, 100,
+            ThreadPoolExecutor executor = new ThreadPoolExecutor(numberOfThreads, 100,
                     60, TimeUnit.SECONDS, new LinkedBlockingQueue<>(MAX_QUEUE_SIZE));
 
 

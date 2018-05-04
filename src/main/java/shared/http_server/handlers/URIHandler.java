@@ -15,7 +15,7 @@ public class URIHandler extends SimpleChannelInboundHandler<HTTPRequest> {
         if (methodName.equals("") || methodName.equals("/")) {
             ctx.fireChannelRead(msg);
         } else {
-            sendJSON(ctx, Controller.execute(methodName));
+            sendJSON(ctx, Controller.execute(methodName, msg.content));
         }
     }
 }
