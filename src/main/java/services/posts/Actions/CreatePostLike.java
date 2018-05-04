@@ -19,6 +19,12 @@ public class CreatePostLike implements Action {
             if (likes.get(i).equals(userId))
                 throw new CustomException("You already liked this post");
         }
+        JSONObject activities = new JSONObject();
+        activities.put("method", methodName);
+        jsonObject.put("receiverId", post.getString("user_id"));
+        jsonObject.put("postID", post.getString("id"));
+        activities.put("params", jsonObject);
+        shared.mq_server.Controller.send("posts", "activities", activities, userId);
 
         PostMethods.likePost(postId, userId);
         JSONObject res = new JSONObject();
