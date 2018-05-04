@@ -27,6 +27,8 @@ import java.util.concurrent.*;
 import static shared.Helpers.getResponseQueue;
 
 public class Server {
+    public static ThreadPoolExecutor executor;
+    public static Channel channel;
     public static void run(Controller controller) {
         _run(controller, Settings.getInstance().getNumberOfThreads());
         initHTTPServer();
@@ -63,8 +65,8 @@ public class Server {
         try {
             Connection connection = RMQConnection.getSingleton();
 
-            final Channel channel = connection.createChannel();
-            ExecutorService executor = Executors.newFixedThreadPool(numberOfThreads);
+            channel = connection.createChannel();
+            executor = new ThreadPoolExecutor(numberOfThreads, numberOfThreads, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
 
             channel.queueDeclare(Settings.getInstance().getApplication(), true, false, false, null);
             channel.basicQos(numberOfThreads);
