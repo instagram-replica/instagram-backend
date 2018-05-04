@@ -8,7 +8,6 @@ public class SetMaxPoolSize  implements Action {
     public static JSONObject execute(JSONObject jsonObject, String userId, String methodName) {
         try {
             int maxThreadCount = Integer.parseInt(jsonObject.getString("maxThreadCount"));
-            System.out.println(Server.executor);
             Server.executor.setMaximumPoolSize(maxThreadCount);
             Server.channel.basicQos(maxThreadCount);
             return new JSONObject().put("status", maxThreadCount + "");
