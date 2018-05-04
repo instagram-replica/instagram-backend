@@ -92,7 +92,16 @@ public class Helpers {
         JSONObject jsonObject = new JSONObject()
                 .put("params", usersJsonObject)
                 .put("method", "getUsersByIds");
-        return Controller.send(serviceName, "users", jsonObject, userId).getJSONObject("data").getJSONArray("users");
+        JSONArray response= new JSONArray();
+        JSONArray users =  Controller.send(serviceName, "users", jsonObject, userId).getJSONObject("data").getJSONArray("data");
+        for (int i = 0; i <users.length() ; i++) {
+            JSONObject temp = new JSONObject();
+            temp.put("username",users.getJSONObject(i).get("username"));
+            temp.put("userid",users.getJSONObject(i).getString("id"));
+            response.put(temp);
+        }
+
+        return response;
     }
 
     public static JSONArray getUsersIdsByUsernames(String serviceName, ArrayList<String> usernames, String userId) throws IOException, InterruptedException {

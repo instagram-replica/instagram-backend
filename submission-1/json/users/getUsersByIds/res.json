@@ -1,22 +1,22 @@
 {
-  "data": [
+  "method": "getUsersByIds",
+  "data": {
+    "users": [
       {
-          "profilePictureUrl": null,
-          "gender": "male",
-          "verifiedAt": null,
-          "fullName": "John Doe",
-          "bio": "Got a thing for knowing a thing about everything",
-          "isPrivate": false,
-          "createdAt": "2018-03-20T22:50:36.034+02:00",
-          "deletedAt": null,
-          "phoneNumber": null,
-          "websiteUrl": null,
-          "blockedAt": null,
-          "id": "cb3d7169-1ae1-4d7b-9fc0-4030bd194e51",
-          "email": "john.doe@user.com",
-          "username": "john_doe",
-          "updatedAt": "2018-03-20T23:06:59.804+02:00"
+        "id": 1,
+        "username": "omartag",
+        "name": "Omar Tag",
+        "avatar": "https://...",
+        "bio": "Hi, salamo 3aleko. Khod gazara",
+        "website": "https:///...",
+        "noOfPosts": 160,
+        "noOfFollowers": 200,
+        "noOfFollowing": 400,
+        "following": true,
+        "follower": true,
+        "privacy": "public",
+        "updatedAt": "2012-04-23T18:25:43.511Z"
       }
-  ],
-  "error": null
+    ]
+  }
 }
