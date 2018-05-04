@@ -1,6 +1,6 @@
 {
   "instanceId": "instagram_backend",
   "port": 8080,
-  "numberOfThreads": 10,
+  "numberOfThreads": 100,
   "version": "0.1.0"
 }

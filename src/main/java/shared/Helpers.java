@@ -14,14 +14,15 @@ import shared.mq_subscriptions.MQSubscriptions;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class Helpers {
+    private static final long TIMEOUT = 4000;
+
     public static void sendJSON(ChannelHandlerContext channelHandlerContext, JSONObject jsonObject) {
         ByteBuf content = Unpooled.copiedBuffer(jsonObject.toString(), CharsetUtil.UTF_8);
         HttpResponseStatus httpResponseStatus;
         try {
-            httpResponseStatus = jsonObject.get("error") == JSONObject.NULL
+            httpResponseStatus = jsonObject.get("error") == JSONObject.NULL || jsonObject.getJSONObject("error").keySet().size() == 0
                     ? HttpResponseStatus.OK
                     : HttpResponseStatus.INTERNAL_SERVER_ERROR;
         } catch (JSONException e) {
@@ -55,7 +56,7 @@ public class Helpers {
         jsonObject.put("params", paramsObj);
 
         JSONObject authorizationJSONObj = Controller.send(serviceName, "users", jsonObject, userId);
-        System.out.println("authObj: "+authorizationJSONObj);
+
         return authorizationJSONObj.getJSONObject("data").getBoolean("isAuthorizedToView");
     }
 
@@ -64,12 +65,14 @@ public class Helpers {
     }
 
     public static synchronized JSONObject blockAndSubscribe(MQSubscriptions mqSubscriptions, String uuid, String serviceName, String receiverName) throws IOException, InterruptedException {
+        // SUPER DUPER UGLY CODE 🤮
+
         String queueName = getResponseQueue(serviceName, receiverName);
 
-        final AtomicReference<JSONObject> resJson = new AtomicReference<>();
+        final JSONObject[] resJson = {null};
 
         ExecutionPair pair = new ExecutionPair(uuid, jsonObject -> {
-            resJson.set(jsonObject);
+            resJson[0] = jsonObject;
             synchronized (resJson) {
                 resJson.notify();
             }
@@ -79,20 +82,30 @@ public class Helpers {
         mqSubscriptions.addListener(queueName, pair);
 
         synchronized (resJson) {
-            while (resJson.get() == null) {
-                resJson.wait();
+            while (resJson[0] == null) {
+                resJson.wait(TIMEOUT);
                 break;
             }
         }
-        return resJson.get();
+        return resJson[0] != null ? resJson[0] : new JSONObject().put("error", "timeout");
     }
+
 
     public static JSONArray getUsersByIds(String serviceName, JSONArray jsonArray, String userId) throws IOException, InterruptedException {
         JSONObject usersJsonObject = new JSONObject().put("ids", jsonArray);
         JSONObject jsonObject = new JSONObject()
                 .put("params", usersJsonObject)
                 .put("method", "getUsersByIds");
-        return Controller.send(serviceName, "users", jsonObject, userId).getJSONObject("data").getJSONArray("users");
+        JSONArray response= new JSONArray();
+        JSONArray users =  Controller.send(serviceName, "users", jsonObject, userId).getJSONObject("data").getJSONArray("data");
+        for (int i = 0; i <users.length() ; i++) {
+            JSONObject temp = new JSONObject();
+            temp.put("username",users.getJSONObject(i).get("username"));
+            temp.put("userid",users.getJSONObject(i).getString("id"));
+            response.put(temp);
+        }
+
+        return response;
     }
 
     public static JSONArray getUsersIdsByUsernames(String serviceName, ArrayList<String> usernames, String userId) throws IOException, InterruptedException {
