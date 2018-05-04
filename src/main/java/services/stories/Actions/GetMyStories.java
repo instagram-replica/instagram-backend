@@ -11,6 +11,7 @@ public class GetMyStories implements Action {
         //TODO: validate expiry time
         JSONObject myStory = new JSONObject();
         JSONArray stories = StoriesCache.getMyStoriesFromCache(userId);
+        System.out.println("USERID:  "+userId);
         if(stories==null) {
             stories = StoriesMethods.getStoriesForUser(userId);
             StoriesCache.insertUserStoriesIntoCache(stories,userId);

@@ -16,7 +16,7 @@ public class StoriesMethods {
 
     static final String storiesCollectionName = ArangoInterfaceMethods.storiesCollectionName;
     //STORY CRUD
-    public static String insertStory(JSONObject storyJSON) {
+    public static String insertStory(JSONObject storyJSON, String userId) {
         BaseDocument myObject = new BaseDocument();
         myObject.addAttribute("user_id", storyJSON.getString("user_id").toString());
         myObject.addAttribute("is_featured", storyJSON.get("is_featured").toString());
@@ -27,6 +27,7 @@ public class StoriesMethods {
         myObject.addAttribute("deleted_at", storyJSON.get("deleted_at").toString());
         myObject.addAttribute("expired_at", storyJSON.get("expired_at").toString());
         myObject.addAttribute("blocked_at", storyJSON.get("blocked_at").toString());
+        storyJSON.put("user_id",userId);
         String id = arangoDB.db(dbName).collection(storiesCollectionName).insertDocument(storyJSON.toString()).getKey();
         System.out.println("Story inserted");
         return id;
