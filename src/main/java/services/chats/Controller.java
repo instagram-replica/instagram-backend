@@ -11,7 +11,7 @@ import static utilities.Main.readPropertiesFile;
 public class Controller extends shared.mq_server.Controller {
 
 
-    private Properties props;
+    public static Properties props;
 
     public Controller(){
         super();
