@@ -28,18 +28,6 @@ public class HTTPHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
         ctx.fireChannelRead(httpRequest);
     }
 
-    @Override
-    public void channelReadComplete(ChannelHandlerContext ctx) {
-        ctx.flush();
-        ctx.close();
-    }
-
-    @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        cause.printStackTrace();
-        ctx.close();
-    }
-
     private static String decodeHTTPMethod(FullHttpRequest fullHttpRequest) {
         return fullHttpRequest.method().name();
     }

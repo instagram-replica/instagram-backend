@@ -1,6 +1,7 @@
 package shared.mq_server;
 
 import com.rabbitmq.client.*;
+import io.netty.channel.ChannelHandlerContext;
 import org.json.JSONObject;
 import shared.mq_subscriptions.MQSubscriptions;
 
@@ -29,8 +30,7 @@ public abstract class Controller {
         channel.basicPublish("", receiverName, null,
                 jsonObject.toString().getBytes("UTF-8"));
 
-
-        return blockAndSubscribe(mqSubscriptions, uuid, serviceName, receiverName);
+        return blockAndSubscribe(null, mqSubscriptions, uuid, serviceName, receiverName);
     }
 
 }

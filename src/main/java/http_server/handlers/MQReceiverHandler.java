@@ -11,7 +11,7 @@ import static shared.Helpers.blockAndSubscribe;
 public class MQReceiverHandler extends SimpleChannelInboundHandler<MQHandlerPair> {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, MQHandlerPair mqPair) throws Exception {
-        JSONObject resJSON = blockAndSubscribe(Server.mqSubscriptions, mqPair.uuid, Settings.getInstance().getInstanceId(), mqPair.serviceName);
+        JSONObject resJSON = blockAndSubscribe(ctx, Server.mqSubscriptions, mqPair.uuid, Settings.getInstance().getInstanceId(), mqPair.serviceName);
         ctx.fireChannelRead(resJSON);
     }
 }
