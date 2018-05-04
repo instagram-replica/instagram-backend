@@ -18,7 +18,6 @@ public class Controller {
             ClassLoader classLoader = ServerController.class.getClassLoader();
             Class controllerClass = classLoader.loadClass("shared.http_server.routes.ServerController");
 
-
             Properties props = readPropertiesFile("src/main/resources/http_routes.properties");
 
             Method method = controllerClass.getMethod(props.getProperty(methodName), JSONObject.class);
