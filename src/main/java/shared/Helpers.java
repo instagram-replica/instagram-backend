@@ -8,23 +8,21 @@ import io.netty.util.CharsetUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.omg.CORBA.TIMEOUT;
 import shared.mq_server.Controller;
 import shared.mq_subscriptions.ExecutionPair;
 import shared.mq_subscriptions.MQSubscriptions;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class Helpers {
-    private static final long TIMEOUT = 500;
+    private static final long TIMEOUT = 4000;
 
     public static void sendJSON(ChannelHandlerContext channelHandlerContext, JSONObject jsonObject) {
         ByteBuf content = Unpooled.copiedBuffer(jsonObject.toString(), CharsetUtil.UTF_8);
         HttpResponseStatus httpResponseStatus;
         try {
-            httpResponseStatus = jsonObject.get("error") == JSONObject.NULL
+            httpResponseStatus = jsonObject.get("error") == JSONObject.NULL || jsonObject.getJSONObject("error").keySet().size() == 0
                     ? HttpResponseStatus.OK
                     : HttpResponseStatus.INTERNAL_SERVER_ERROR;
         } catch (JSONException e) {
