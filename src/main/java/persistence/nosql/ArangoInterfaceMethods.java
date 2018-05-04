@@ -13,8 +13,10 @@ import exceptions.CustomException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import persistence.sql.users.Database;
 
 import java.sql.Array;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Map;
@@ -22,8 +24,7 @@ import java.util.Map;
 import java.io.IOException;
 import java.util.*;
 
-import static persistence.sql.Main.closeConnection;
-import static persistence.sql.Main.openConnection;
+import static persistence.sql.Database.openConnection;
 import static persistence.sql.users.Database.getAllUsersIds;
 import static utilities.Main.readPropertiesFile;
 
@@ -109,17 +110,15 @@ public class ArangoInterfaceMethods {
     }
 
 
-    public static void initializeGraphCollections() throws IOException {
+    public static void initializeGraphCollections() throws IOException, SQLException {
         for (GraphEntity graphEntity : arangoDB.db(dbName).getGraphs()) {
             if (graphEntity.getName().equals(graphName)) {
 
                 return;
             }
         }
-
-        openConnection();
-        List<String> user_ids = getAllUsersIds();
-        closeConnection();
+        
+        List<String> user_ids = Database.getAllUsersIds();
         try {
 
             Collection<EdgeDefinition> edgeDefinitions = new ArrayList<>();
