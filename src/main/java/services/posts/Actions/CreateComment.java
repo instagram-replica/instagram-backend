@@ -25,7 +25,6 @@ public class CreateComment implements Action {
         //TODO mentions
         //ArrayList<String> mentionsUserNames = getMentions(comment);
         //JSONArray mentionedUserIds = getUsersIdsByUsernames("posts", mentionsUserNames, loggedInUserId);
-
         JSONObject commentJSON = createCommentJSON(comment, 0, userId, postId);
         if (isAuthorizedToView(Settings.getInstance().getInstanceId(), userId, post.getString("user_id"), userId)) {
             PostMethods.insertCommentOnPost(postId, commentJSON);

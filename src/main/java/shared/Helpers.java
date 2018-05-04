@@ -58,15 +58,15 @@ public class Helpers {
         jsonObject.put("params", paramsObj);
 
         JSONObject authorizationJSONObj = Controller.send(serviceName, "users", jsonObject, userId);
-        System.out.println("authObj: " + authorizationJSONObj);
-        return authorizationJSONObj.getJSONObject("data").getJSONObject("data").getBoolean("authorized");
+
+        return authorizationJSONObj.getJSONObject("data").getBoolean("isAuthorizedToView");
     }
 
     public static String getResponseQueue(String senderServiceName, String receiverServiceName) {
         return senderServiceName + "_" + receiverServiceName;
     }
 
-    public static synchronized JSONObject blockAndSubscribe(ChannelHandlerContext ctx, MQSubscriptions mqSubscriptions, String uuid, String serviceName, String receiverName) throws IOException, InterruptedException {
+    public static synchronized JSONObject blockAndSubscribe(MQSubscriptions mqSubscriptions, String uuid, String serviceName, String receiverName) throws IOException, InterruptedException {
         // SUPER DUPER UGLY CODE 🤮
 
         String queueName = getResponseQueue(serviceName, receiverName);

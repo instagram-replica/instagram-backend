@@ -30,7 +30,7 @@ public abstract class Controller {
         channel.basicPublish("", receiverName, null,
                 jsonObject.toString().getBytes("UTF-8"));
 
-        return blockAndSubscribe(null, mqSubscriptions, uuid, serviceName, receiverName);
+        return blockAndSubscribe(mqSubscriptions, uuid, serviceName, receiverName);
     }
 
 }
