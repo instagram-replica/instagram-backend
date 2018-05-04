@@ -1,5 +1,6 @@
 package services.users;
 
+import persistence.sql.Migrations;
 import shared.Settings;
 
 import java.io.IOException;

@@ -1,0 +1,6 @@
+FROM java:8
+EXPOSE 8080
+ADD /target/http_server.jar app.jar
+ADD /src/main/resources /src/main/resources
+ADD /src/main/configs /src/main/configs
+ENTRYPOINT ["java","-jar","app.jar"]

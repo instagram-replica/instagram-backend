@@ -1,12 +1,12 @@
 package http_server.handlers;
 
 import http_server.HTTPRequest;
-import http_server.RMQConnection;
 import com.rabbitmq.client.*;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.json.JSONObject;
+import shared.RMQConnection;
 import shared.Settings;
 
 import java.util.Properties;

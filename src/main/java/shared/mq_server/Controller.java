@@ -3,6 +3,7 @@ package shared.mq_server;
 import com.rabbitmq.client.*;
 import io.netty.channel.ChannelHandlerContext;
 import org.json.JSONObject;
+import shared.RMQConnection;
 import shared.mq_subscriptions.MQSubscriptions;
 
 import java.io.IOException;

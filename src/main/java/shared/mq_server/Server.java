@@ -13,6 +13,7 @@ import json.JSONParser;
 
 import org.json.JSONException;
 
+import shared.RMQConnection;
 import shared.Settings;
 import com.rabbitmq.client.*;
 import org.json.JSONObject;

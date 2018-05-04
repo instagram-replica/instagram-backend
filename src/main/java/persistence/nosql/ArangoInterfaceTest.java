@@ -99,7 +99,6 @@ public class ArangoInterfaceTest {
         }
 
         List<String> user_ids = Database.getAllUsersIds();
-        closeConnection();
         try{
 
             Collection<EdgeDefinition> edgeDefinitions = new ArrayList<>();

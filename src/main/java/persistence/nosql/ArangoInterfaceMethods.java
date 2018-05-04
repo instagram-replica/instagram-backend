@@ -24,6 +24,7 @@ import java.util.Map;
 import java.io.IOException;
 import java.util.*;
 
+import static persistence.sql.Database.openConnection;
 import static persistence.sql.users.Database.getAllUsersIds;
 import static utilities.Main.readPropertiesFile;
 
@@ -69,8 +70,7 @@ public class ArangoInterfaceMethods {
         //  arangoDB.db(dbName).drop();
         initializeDB();
         initializeGraphCollections();
-        closeConnection();
-
+        arangoDB.shutdown();
     }
 
 
@@ -109,9 +109,6 @@ public class ArangoInterfaceMethods {
 
     }
 
-    public static void closeConnection() {
-        arangoDB.shutdown();
-    }
 
     public static void initializeGraphCollections() throws IOException, SQLException {
         for (GraphEntity graphEntity : arangoDB.db(dbName).getGraphs()) {
@@ -120,9 +117,8 @@ public class ArangoInterfaceMethods {
                 return;
             }
         }
-
+        
         List<String> user_ids = Database.getAllUsersIds();
-        closeConnection();
         try {
 
             Collection<EdgeDefinition> edgeDefinitions = new ArrayList<>();
