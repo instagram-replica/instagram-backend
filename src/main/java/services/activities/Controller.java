@@ -25,7 +25,7 @@ public class Controller extends shared.mq_server.Controller {
     public JSONObject execute(JSONObject jsonObject, String userId) {
         JSONObject data = new JSONObject();
         JSONObject error = new JSONObject();
-
+        System.out.println("JJ: "+jsonObject);
         String className = jsonObject.getString("method");
         String classSignature = "services.activities.Actions." + props.getProperty(className);
         JSONObject paramsObject = jsonObject.getJSONObject("params");
