@@ -24,6 +24,7 @@ import shared.http_server.handlers.URIHandler;
 import java.io.IOException;
 import java.util.concurrent.*;
 
+import static com.sun.webkit.graphics.WCRenderQueue.MAX_QUEUE_SIZE;
 import static shared.Helpers.getResponseQueue;
 
 public class Server {
@@ -65,8 +66,10 @@ public class Server {
         try {
             Connection connection = RMQConnection.getSingleton();
 
-            channel = connection.createChannel();
-            executor = new ThreadPoolExecutor(numberOfThreads, numberOfThreads, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
+            final Channel channel = connection.createChannel();
+            ThreadPoolExecutor executor = new ThreadPoolExecutor(numberOfThreads, 100,
+                    60, TimeUnit.SECONDS, new LinkedBlockingQueue<>(MAX_QUEUE_SIZE));
+
 
             channel.queueDeclare(Settings.getInstance().getApplication(), true, false, false, null);
             channel.basicQos(numberOfThreads);
@@ -135,7 +138,7 @@ public class Server {
                     }
                 };
 
-                executor.execute(task);
+                executor.submit(task);
 
             }
         };

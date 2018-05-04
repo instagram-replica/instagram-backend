@@ -7,7 +7,8 @@ public class CreateStory implements Action{
 
     public static JSONObject execute(JSONObject jsonObject, String userId) {
         JSONObject createStory = new JSONObject();
-        createStory.put("story_id", StoriesMethods.insertStory(jsonObject));
+        System.out.println("USERIDCREATE:  "+userId);
+        createStory.put("story_id", StoriesMethods.insertStory(jsonObject, userId));
         return createStory;
     }
 }

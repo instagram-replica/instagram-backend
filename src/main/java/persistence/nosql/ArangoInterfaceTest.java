@@ -368,7 +368,7 @@ public class ArangoInterfaceTest {
         obj.put("expired_at", new Timestamp(System.currentTimeMillis()));
         obj.put("blocked_at", new Timestamp(System.currentTimeMillis()));
 
-        String id = StoriesMethods.insertStory(obj);
+        String id = StoriesMethods.insertStory(obj, UUID);
         JSONObject readObj = StoriesMethods.getStory(id);
         Iterator iterator = Objects.requireNonNull(readObj).keys();
         while (iterator.hasNext()) {
@@ -406,7 +406,7 @@ public class ArangoInterfaceTest {
         updatedObj.put("blocked_at", new Timestamp(System.currentTimeMillis()));
 
 
-        String id = StoriesMethods.insertStory(obj);
+        String id = StoriesMethods.insertStory(obj,UUID);
         StoriesMethods.updateStory(id, updatedObj);
         JSONObject jsonNotification = StoriesMethods.getStory(id);
 
@@ -899,16 +899,16 @@ public class ArangoInterfaceTest {
         obj.put("expired_at", new Timestamp(System.currentTimeMillis()+86400000));
         obj.put("blocked_at", new Timestamp(System.currentTimeMillis()));
 
-        String id1 = StoriesMethods.insertStory(obj);
+        String id1 = StoriesMethods.insertStory(obj,"11650791-defe-49fe-b2ca-fdfd86e614bf");
 
         obj.put("user_id","42686b65-3ed2-4082-990a-fb4cc3573f73");
-        String id2 = StoriesMethods.insertStory(obj);
+        String id2 = StoriesMethods.insertStory(obj,"42686b65-3ed2-4082-990a-fb4cc3573f73");
 
         obj.put("user_id","cd3d4b90-1834-49a3-afcb-39360a6bdaeb");
-        String id3 = StoriesMethods.insertStory(obj);
+        String id3 = StoriesMethods.insertStory(obj,"cd3d4b90-1834-49a3-afcb-39360a6bdaeb");
 
         obj.put("user_id","70b8ebdf-7b70-4534-addc-5fe05a2c6112");
-        String id4 = StoriesMethods.insertStory(obj);
+        String id4 = StoriesMethods.insertStory(obj,"70b8ebdf-7b70-4534-addc-5fe05a2c6112");
 
         JSONArray friendsStories = StoriesMethods.getFriendsStories("3a1eeb08-db5c-4a85-8e44-655165a916d4");
         Assert.assertEquals(4,friendsStories.length());
@@ -993,16 +993,16 @@ public class ArangoInterfaceTest {
         obj.put("expired_at", new Timestamp(System.currentTimeMillis()+86400000));
         obj.put("blocked_at", new Timestamp(System.currentTimeMillis()));
 
-        String id1 = StoriesMethods.insertStory(obj);
+        String id1 = StoriesMethods.insertStory(obj,"4c22c88e-69b3-46a3-b159-c394856a5355");
 
         obj.put("user_id","9235f108-fc46-4308-870d-bb0b1542bdab");
-        String id2 = StoriesMethods.insertStory(obj);
+        String id2 = StoriesMethods.insertStory(obj,"9235f108-fc46-4308-870d-bb0b1542bdab");
 
         obj.put("user_id","da1f5e4a-98bf-4873-8327-aadaf3d73ad4");
-        String id3 = StoriesMethods.insertStory(obj);
+        String id3 = StoriesMethods.insertStory(obj,"da1f5e4a-98bf-4873-8327-aadaf3d73ad4");
 
         obj.put("user_id","1c139068-1ffe-4c5c-896c-09bba1e8ce90");
-        String id4 = StoriesMethods.insertStory(obj);
+        String id4 = StoriesMethods.insertStory(obj,"1c139068-1ffe-4c5c-896c-09bba1e8ce90");
 
         JSONArray friendsStories = StoriesMethods.getDiscoverStories("e03168b3-226a-415d-9838-524f104f6348");
         Assert.assertEquals(4,friendsStories.length());

@@ -1,0 +1,22 @@
+config:
+  target: "http://localhost:8080"
+  phases:
+    - duration: 10
+      arrivalRate: 60
+  defaults:
+    headers:
+      x-access-token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOiJlOWU0MTNmYy04Yjc2LTRlOGUtYWRlNS00YmM5MTE3MjM4NGYifQ.5cF_wl7cbwDBQoTRuP6G5DgrYvevLjVTHVHfh5JTrnk"
+scenarios:
+  - flow:
+      - post:
+          url: "/"
+          json:
+            method: "createPost"
+            params: 
+              post: 
+                caption: "caption"
+                location:  
+                  longitiude: "122.3.12.33"
+                  latitude: "122.3.12.33"
+                media: []
+                likes: []
