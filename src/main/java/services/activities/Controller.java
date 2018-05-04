@@ -6,6 +6,8 @@ import java.lang.reflect.Method;
 import java.util.Properties;
 import static utilities.Main.readPropertiesFile;
 
+import java.sql.SQLException;
+
 public class Controller extends shared.mq_server.Controller {
 
     private Properties props;

@@ -11,13 +11,14 @@ import exceptions.CustomException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.*;
+import persistence.sql.users.Database;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.*;
 
 import static persistence.nosql.ArangoInterfaceMethods.*;
-import static persistence.sql.Main.openConnection;
 import static persistence.sql.users.Database.getAllUsersIds;
 import static utilities.Main.readPropertiesFile;
 
@@ -47,7 +48,7 @@ public class ArangoInterfaceTest {
 
 
     @BeforeClass
-    public static void setUp() throws IOException {
+    public static void setUp() throws IOException, SQLException {
         ArangoInterfaceMethods.dbName = ArangoInterfaceTest.dbName;
         Properties properties = readPropertiesFile("src/main/resources/arango.properties");
         arangoDB = new ArangoDB.Builder().host(properties.getProperty("host"), Integer.parseInt(properties.getProperty("port"))).build();
@@ -97,8 +98,7 @@ public class ArangoInterfaceTest {
             }
         }
 
-        openConnection();
-        List<String> user_ids = getAllUsersIds();
+        List<String> user_ids = Database.getAllUsersIds();
         closeConnection();
         try{
 

@@ -5,11 +5,12 @@ import org.json.JSONObject;
 import persistence.nosql.ActivityMethods;
 import persistence.sql.users.Database;
 
+import java.sql.SQLException;
 import java.sql.Timestamp;
 
 public class HandlePostTagNotification implements Action{
 
-    public static JSONObject execute(JSONObject jsonObject, String userId) {
+    public static JSONObject execute(JSONObject jsonObject, String userId) throws SQLException {
         JSONArray receivers = jsonObject.getJSONArray("taggedUsers");
         String postID = jsonObject.getString("postID");
 

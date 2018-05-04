@@ -1,102 +1,49 @@
 package persistence.sql.users;
 
-import org.joda.time.DateTime;
-import persistence.sql.users.Models.UserModel;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
-import java.sql.Timestamp;
-import java.util.Date;
+import static persistence.sql.Helpers.toJodaDateTime;
 
 public class Helpers {
-    public static UserModel mapUserToModel(User user) {
-        UserModel model = new UserModel();
+  public static List<User> mapResultSetToUsers(ResultSet resultSet) throws SQLException {
+    List<User> users = new ArrayList<>();
 
-        model.set("id", user.id);
+    while (resultSet.next()) {
+      User user = new User.Builder()
+        .id(resultSet.getString("id"))
+        .username(resultSet.getString("username"))
+        .email(resultSet.getString("email"))
+        .passwordHash(resultSet.getString("password_hash"))
+        .isPrivate(resultSet.getBoolean("is_private"))
+        .fullName(resultSet.getString("full_name"))
+        .bio(resultSet.getString("bio"))
+        .gender(resultSet.getString("gender"))
+        .phoneNumber(resultSet.getString("phone_number"))
+        .profilePictureUrl(resultSet.getString("profile_picture_url"))
+        .websiteUrl(resultSet.getString("website_url"))
+        .verifiedAt(toJodaDateTime(resultSet.getDate("verified_at")))
+        .createdAt(toJodaDateTime(resultSet.getDate("created_at")))
+        .updatedAt(toJodaDateTime(resultSet.getDate("updated_at")))
+        .blockedAt(toJodaDateTime(resultSet.getDate("blocked_at")))
+        .deletedAt(toJodaDateTime(resultSet.getDate("deleted_at")))
+        .build();
 
-        if (user.username != null) {
-            model.set("username", user.username);
-        }
-
-        if (user.email != null) {
-            model.set("email", user.email);
-        }
-
-        if (user.passwordHash != null) {
-            model.set("password_hash", user.passwordHash);
-        }
-
-        if (user.isPrivate != null) {
-            model.set("is_private", user.isPrivate);
-        }
-
-        if (user.fullName != null) {
-            model.set("full_name", user.fullName);
-        }
-
-        if (user.gender != null) {
-            model.set("gender", user.gender);
-        }
-
-        if (user.bio != null) {
-            model.set("bio", user.bio);
-        }
-
-        if (user.phoneNumber != null) {
-            model.set("phone_number", user.phoneNumber);
-        }
-
-        if (user.profilePictureUrl != null) {
-            model.set("profile_picture_url", user.profilePictureUrl);
-        }
-
-        if (user.websiteUrl != null) {
-            model.set("website_url", user.websiteUrl);
-        }
-
-        if (user.verifiedAt != null) {
-            model.set("verified_at", new Timestamp(user.verifiedAt.toInstant().getMillis()));
-        }
-
-        if (user.updatedAt != null) {
-            model.set("updated_at", new Timestamp(user.updatedAt.toInstant().getMillis()));
-        }
-
-        if (user.blockedAt != null) {
-            model.set("blocked_at", new Timestamp(user.blockedAt.toInstant().getMillis()));
-        }
-
-        if (user.deletedAt != null) {
-            model.set("deleted_at", new Timestamp(user.deletedAt.toInstant().getMillis()));
-        }
-
-        return model;
+      users.add(user);
     }
 
-    public static User mapModelToUser(UserModel model) {
-        if (model == null) {
-            return null;
-        }
+    return users;
+  }
 
-        return new User.Builder()
-                .id(model.getString("id"))
-                .username(model.getString("username"))
-                .email(model.getString("email"))
-                .passwordHash(model.getString("password_hash"))
-                .isPrivate(model.getBoolean("is_private"))
-                .fullName(model.getString("full_name"))
-                .bio(model.getString("bio"))
-                .gender(model.getString("gender"))
-                .phoneNumber(model.getString("phone_number"))
-                .profilePictureUrl(model.getString("profile_picture_url"))
-                .websiteUrl(model.getString("website_url"))
-                .verifiedAt(mapJavaDateToJodaDateTime(model.getDate("verified_at")))
-                .createdAt(mapJavaDateToJodaDateTime(model.getDate("created_at")))
-                .updatedAt(mapJavaDateToJodaDateTime(model.getDate("updated_at")))
-                .blockedAt(mapJavaDateToJodaDateTime(model.getDate("blocked_at")))
-                .deletedAt(mapJavaDateToJodaDateTime(model.getDate("deleted_at")))
-                .build();
+  public static List<String> mapResultSetToIds(ResultSet resultSet) throws SQLException {
+    List<String> ids = new ArrayList<>();
+
+    while (resultSet.next()) {
+      ids.add(resultSet.getString("id"));
     }
 
-    private static DateTime mapJavaDateToJodaDateTime(Date date) {
-        return date == null? null : new DateTime(date);
-    }
+    return ids;
+  }
 }
