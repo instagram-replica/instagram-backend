@@ -15,7 +15,7 @@ import static utilities.Main.readPropertiesFile;
 public class CacheInstance {
     private static Properties properties;
     public static JedisPool pool;
-    public static final int EXPIRY_TIME = 0;
+    public static final int EXPIRY_TIME = 3600;
 
     static {
         try {
