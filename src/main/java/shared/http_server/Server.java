@@ -17,7 +17,7 @@ public class Server {
 
     public static void start(ChannelInitializer channelInitializer) {
         bossGroup = new NioEventLoopGroup(Settings.getInstance().getNumberOfThreads());
-        workerGroup = new NioEventLoopGroup();
+        workerGroup = new NioEventLoopGroup(Settings.getInstance().getNumberOfThreads());
 
         try {
             ServerBootstrap b = new ServerBootstrap();
