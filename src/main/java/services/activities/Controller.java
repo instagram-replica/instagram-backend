@@ -6,6 +6,8 @@ import java.lang.reflect.Method;
 import java.util.Properties;
 import static utilities.Main.readPropertiesFile;
 
+import java.sql.SQLException;
+
 public class Controller extends shared.mq_server.Controller {
 
     public static Properties props;
@@ -23,7 +25,6 @@ public class Controller extends shared.mq_server.Controller {
     public JSONObject execute(JSONObject jsonObject, String userId) {
         JSONObject data = new JSONObject();
         JSONObject error = new JSONObject();
-
         String className = jsonObject.getString("method");
         String classSignature = "services.activities.Actions." + props.getProperty(className);
         JSONObject paramsObject = jsonObject.getJSONObject("params");

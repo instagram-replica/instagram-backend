@@ -3,103 +3,129 @@ package services.users;
 import auth.JWT;
 import auth.JWTPayload;
 import exceptions.CustomException;
+import exceptions.JSONException;
 import json.JSONParser;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import persistence.nosql.GraphMethods;
+import persistence.sql.Database;
 import persistence.sql.users.User;
 
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.util.List;
-import java.util.Properties;
-
-import static persistence.sql.Main.closeConnection;
-import static persistence.sql.Main.openConnection;
-import static utilities.Main.readPropertiesFile;
 
 public class Controller extends shared.mq_server.Controller {
 
     public static Properties props;
 
-    public Controller(){
+    public Controller() throws IOException{
         super();
-        try {
-            props = readPropertiesFile("src/main/resources/users_mapper.properties");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        Database.openConnection();
     }
 
     @Override
-    public JSONObject execute(JSONObject jsonObject, String userId) {
-        try {
-            Controller.initialize();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Helpers.constructErrorResponse();
-        }
-
-        JSONObject data = new JSONObject();
-        JSONObject error = new JSONObject();
-        String methodName;
-        String methodSignature;
-        JSONObject paramsObject;
+    public JSONObject execute(JSONObject payload, String viewerId) {
+        String method;
+        JSONObject params;
+        JSONObject response;
 
         try {
-            methodName = jsonObject.getString("method");
-            methodSignature = props.getProperty(methodName);
-            paramsObject = jsonObject.getJSONObject("params");
-        } catch (Exception e) {
+            method = JSONParser.getString("method", payload);
+            params = JSONParser.getJSONObject("params", payload);
+        } catch (JSONException e) {
             e.printStackTrace();
-            Controller.teardown();
             return Helpers.constructErrorResponse(e.getMessage());
         }
 
-        try {
-            Method method = Controller.class.getMethod(methodSignature, JSONObject.class, String.class);
-            data = (JSONObject) method.invoke(null,paramsObject, userId);
-        }
-        catch(org.json.JSONException e){
-            e.printStackTrace();
-            error.put("description",utilities.Main.stringifyJSONException(e));
-        }
-        catch(Exception e){
-            e.printStackTrace();
-            System.err.println(e.getMessage());
-            error.put("description", Helpers.constructErrorResponse());
+        switch (method) {
+            case "signup":
+                response = Controller.handleSignup(params);
+                break;
+            case "login":
+                response = Controller.handleLogin(params);
+                break;
+            case "getUser":
+                response = Controller.handleGetUser(params);
+                break;
+            case "updateUser":
+                response = Controller.handleUpdateUser(params);
+                break;
+            case "searchUsers":
+                response = Controller.handleSearchUsers(params);
+                break;
+            case "getUsersByIds":
+                response = Controller.handleGetUsersByIds(params);
+                break;
+            case "getUsersIdsByUsernames":
+                response = Controller.handleGetUsersIdsByUsernames(params);
+                break;
+            case "isUserAuthorizedToView":
+                response = Controller.handleIsAuthorizedToView(params);
+                break;
+            case "followUser":
+                response = Controller.handleFollowUser(params, viewerId);
+                break;
+            case "unfollowUser":
+                response = Controller.handleUnfollowUser(params, viewerId);
+                break;
+            case "blockUser":
+                response = Controller.handleBlockUser(params, viewerId);
+                break;
+            case "unblockUser":
+                response = Controller.handleUnblockUser(params, viewerId);
+                break;
+            case "reportUser":
+                response = Controller.handleReportUser(params, viewerId);
+                break;
+            default:
+                response = Helpers.constructErrorResponse();
         }
 
-        JSONObject response = new JSONObject();
-        response.put("error",error);
-        response.put("data",data);
-
-        Controller.teardown();
         return response;
     }
 
-    private static void initialize() throws IOException {
-        openConnection();
+    public static JSONObject handleFollowUser(JSONObject params, String userId) {
+        boolean followed = GraphMethods.followUser(userId, params.getString("userId"));
+        JSONObject jsonForActivities = new JSONObject();
+        jsonForActivities.put("method", "createFollow");
+        jsonForActivities.put("params", params);
+        JSONObject response = new JSONObject();
+        try {
+            shared.mq_server.Controller.send("users", "activities", jsonForActivities, userId);
+        } catch (IOException e) {
+            response.put("notification", "exception occurred");
+        } catch (InterruptedException e) {
+            response.put("notification", "exception occurred");
+        }
+        return response.put("followed", followed);
     }
 
-    private static void teardown() {
-        closeConnection();
+    public static JSONObject handleUnfollowUser(JSONObject params, String userId) {
+        boolean unfollowed = GraphMethods.unFollowUser(userId, params.getString("userId"));
+        return new JSONObject().put("unfollowed", unfollowed);
     }
 
-    public static JSONObject handleSignup(JSONObject params, String viewerId) {
+    public static JSONObject handleBlockUser(JSONObject params, String userId) {
+        boolean blocked = GraphMethods.blockUser(userId, params.getString("userId"));
+        return new JSONObject().put("blocked", blocked);
+    }
+
+    public static JSONObject handleUnblockUser(JSONObject params, String userId) {
+        boolean unblocked = GraphMethods.unblockUser(userId, params.getString("userId"));
+        return new JSONObject().put("unblocked", unblocked);
+    }
+
+    public static JSONObject handleReportUser(JSONObject params, String userId) {
+        boolean reported = GraphMethods.reportUser(userId, params.getString("userId"));
+        return new JSONObject().put("reported", reported);
+    }
+    public static JSONObject handleSignup(JSONObject params) {
         try {
             User user = Logic.signup(Helpers.mapJSONToUser(params));
-
-            String token = JWT.signJWT(
-                    new JWTPayload.Builder()
-                            .userId(user.id)
-                            .build()
-            );
+            String token = JWT.signJWT(new JWTPayload.Builder().userId(user.id).build());
 
             return Helpers.constructOKResponse(
-                    new JSONObject()
-                            .put("user", Helpers.mapUserToJSON(user))
-                            .put("token", token)
+                    new JSONObject().put("user", Helpers.mapUserToJSON(user)).put("token", token)
             );
         } catch (CustomException e) {
             e.printStackTrace();
@@ -110,23 +136,17 @@ public class Controller extends shared.mq_server.Controller {
         }
     }
 
-    public static JSONObject handleLogin(JSONObject params, String viewerId) {
+    public static JSONObject handleLogin(JSONObject params) {
         try {
             User user = Logic.login(
                     JSONParser.getString("email", params),
                     JSONParser.getString("password", params)
             );
 
-            String token = JWT.signJWT(
-                    new JWTPayload.Builder()
-                            .userId(user.id)
-                            .build()
-            );
+            String token = JWT.signJWT(new JWTPayload.Builder().userId(user.id).build());
 
             return Helpers.constructOKResponse(
-                    new JSONObject()
-                            .put("user", Helpers.mapUserToJSON(user))
-                            .put("token", token)
+                    new JSONObject().put("user", Helpers.mapUserToJSON(user)).put("token", token)
             );
         } catch (CustomException e) {
             e.printStackTrace();
@@ -137,7 +157,7 @@ public class Controller extends shared.mq_server.Controller {
         }
     }
 
-    public static JSONObject handleGetUser(JSONObject params, String viewerId) {
+    public static JSONObject handleGetUser(JSONObject params) {
         try {
             User user = Logic.getUser(JSONParser.getString("id", params));
             return Helpers.constructOKResponse(Helpers.mapUserToJSON(user));
@@ -150,7 +170,7 @@ public class Controller extends shared.mq_server.Controller {
         }
     }
 
-    private static JSONObject handleUpdateUser(JSONObject params, String viewerId) {
+    public static JSONObject handleUpdateUser(JSONObject params) {
         // TODO: Verify rightful ownership
         try {
             User user = Logic.updateUser(Helpers.mapJSONToUser(params));
@@ -164,7 +184,7 @@ public class Controller extends shared.mq_server.Controller {
         }
     }
 
-    public static JSONObject handleSearchUsers(JSONObject params, String viewerId) {
+    public static JSONObject handleSearchUsers(JSONObject params) {
         try {
             List<User> users = Logic.searchUsers(
                     JSONParser.getString("term", params),
@@ -183,11 +203,12 @@ public class Controller extends shared.mq_server.Controller {
         }
     }
 
-    public static JSONObject handleGetUsersByIds(JSONObject params, String viewerId) {
+    public static JSONObject handleGetUsersByIds(JSONObject params) {
         try {
-            String[] ids = Helpers.convertJSONArrayToList(
-                    JSONParser.getJSONArray("ids", params)
-            ).stream().toArray(String[]::new);
+            String[] ids = Helpers
+                    .convertJSONArrayToList(JSONParser.getJSONArray("ids", params))
+                    .stream()
+                    .toArray(String[]::new);
 
             List<User> users = Logic.getUsersByIds(ids);
             JSONArray usersJSON = Helpers.convertUsersListToJSONArray(users);
@@ -202,11 +223,12 @@ public class Controller extends shared.mq_server.Controller {
         }
     }
 
-    public static JSONObject handleGetUsersIdsByUsernames(JSONObject params, String viewerId) {
+    public static JSONObject handleGetUsersIdsByUsernames(JSONObject params) {
         try {
-            String[] usernames = Helpers.convertJSONArrayToList(
-                    JSONParser.getJSONArray("usernames", params)
-            ).stream().toArray(String[]::new);
+            String[] usernames = Helpers
+                    .convertJSONArrayToList(JSONParser.getJSONArray("usernames", params))
+                    .stream()
+                    .toArray(String[]::new);
 
             List<String> usersIds = Logic.getUsersIdsByUsernames(usernames);
             JSONArray usersJSON = Helpers.convertStringsListToJSONArray(usersIds);
@@ -221,19 +243,15 @@ public class Controller extends shared.mq_server.Controller {
         }
     }
 
-    public static JSONObject handleIsAuthorizedToView(JSONObject params, String viewer) {
+    public static JSONObject handleIsAuthorizedToView(JSONObject params) {
         try {
             String viewerId = JSONParser.getString("viewerId", params);
             String viewedId = JSONParser.getString("viewedId", params);
 
-            boolean isAuthorizedToView = Logic.isAuthorizedToView(
-                    viewerId,
-                    viewedId
-            );
+            boolean isAuthorizedToView = Logic.isAuthorizedToView(viewerId, viewedId);
 
             return Helpers.constructOKResponse(
-                    new JSONObject()
-                            .put("authorized", isAuthorizedToView)
+                    new JSONObject().put("isAuthorizedToView", isAuthorizedToView)
             );
         } catch (CustomException e) {
             e.printStackTrace();
@@ -243,77 +261,4 @@ public class Controller extends shared.mq_server.Controller {
             return Helpers.constructErrorResponse();
         }
     }
-
-    public static JSONObject handleUnFollowUser(JSONObject params, String viewer){
-        String unfollowedUser = params.getString("userId");
-        boolean followDone = GraphMethods.unFollowUser(viewer, unfollowedUser);
-        JSONObject data = new JSONObject();
-        JSONObject error = new JSONObject();
-        data.put("unfollowSuccess", followDone);
-
-        return new JSONObject()
-                .put("data", data)
-                .put("error", error);
-    }
-
-    public static JSONObject handleFollowUser(JSONObject params, String viewer){
-        String followedUser = params.getString("userId");
-        boolean followDone = GraphMethods.followUser(viewer, followedUser);
-        JSONObject data = new JSONObject();
-        JSONObject error = new JSONObject();
-        data.put("followSuccess", followDone);
-
-        JSONObject jsonForActivities = new JSONObject();
-        JSONObject paramsForActivities = new JSONObject();
-        paramsForActivities.put("userId", followedUser);
-        jsonForActivities.put("method", "createFollow");
-        jsonForActivities.put("params", paramsForActivities);
-
-        try {
-            Controller.send("users", "activities", jsonForActivities, viewer);
-        } catch (Exception e) {
-            error = Helpers.constructErrorResponse();
-        }
-        return new JSONObject()
-                .put("data", data)
-                .put("error", error);
-    }
-
-    public static JSONObject handleBlockUser(JSONObject params, String viewerId){
-        String blockedUser = params.getString("userId");
-        boolean blockedSuccess = GraphMethods.blockUser(viewerId,blockedUser);
-        boolean unfollowSuccess =GraphMethods.unFollowUser(blockedUser,viewerId);
-        JSONObject data = new JSONObject();
-        JSONObject error = new JSONObject();
-        data.put("blockSuccess", blockedSuccess&&unfollowSuccess);
-        return new JSONObject()
-                .put("data", data)
-                .put("error", error);
-
-    }
-
-    public static JSONObject handleUnblockUser(JSONObject params, String viewerId){
-        String unblockedUser = params.getString("userId");
-        boolean unblockedSuccess = GraphMethods.unblockUser(viewerId,unblockedUser);
-        JSONObject data = new JSONObject();
-        JSONObject error = new JSONObject();
-        data.put("unblockSuccess", unblockedSuccess);
-        return new JSONObject()
-                .put("data", data)
-                .put("error", error);
-
-    }
-
-    public static JSONObject handleReportUser(JSONObject params, String viewerId){
-        String reportedUsers = params.getString("userId");
-        boolean reportedSuccess = GraphMethods.reportUser(viewerId,reportedUsers);
-        JSONObject data = new JSONObject();
-        JSONObject error = new JSONObject();
-        data.put("reportSuccess", reportedSuccess);
-        return new JSONObject()
-                .put("data", data)
-                .put("error", error);
-
-    }
-
 }

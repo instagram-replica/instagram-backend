@@ -17,7 +17,6 @@ public class StoriesMethods {
     static final String storiesCollectionName = ArangoInterfaceMethods.storiesCollectionName;
     //STORY CRUD
     public static String insertStory(JSONObject storyJSON) {
-
         BaseDocument myObject = new BaseDocument();
         myObject.addAttribute("user_id", storyJSON.getString("user_id").toString());
         myObject.addAttribute("is_featured", storyJSON.get("is_featured").toString());

@@ -40,9 +40,12 @@ public class GraphMethods {
         edge.setTo(followedID);
 
         ArangoEdgeCollection edgecollection = arangoDB.db(dbName).graph(graphName).edgeCollection(graphUserFollowsCollectionName);
-        edgecollection.insertEdge(edge, null);
-        return true;
-
+        try {
+            edgecollection.insertEdge(edge, null);
+            return true;
+        }catch (Exception e){
+            return false;
+        }
     }
 
     public static boolean blockUser(String blockerKey, String blockedKey) {
