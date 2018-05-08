@@ -1,0 +1,106 @@
+version: '3'
+
+services:
+  arangodb:
+    image: arangodb
+    networks:
+      - backend
+    environment:
+      - ARANGO_NO_AUTH=1
+    expose:
+      - "8529"
+  redis:
+    image: redis
+    networks:
+      - backend
+    expose:
+      - "6379"
+
+  postgres:
+    image: orchardup/postgresql
+    networks:
+      - backend
+    environment:
+        - POSTGRESQL_DB=instagram_development
+        - POSTGRESQL_USER=postgres
+        - POSTGRESQL_PASS=postgres
+    expose:
+      - "5432"
+
+  rabbitmq:
+    image: rabbitmq
+    networks:
+      - backend
+    expose:
+     - "5672"
+
+  http_server:
+    networks:
+      - backend
+    build:
+        context: .
+        dockerfile: docker-files/Dockerfile.http_server
+    depends_on:
+          - rabbitmq
+    ports:
+      - "8080:8080"
+
+  migrations:
+    networks:
+      - backend
+    build:
+        context: .
+        dockerfile: docker-files/Dockerfile.sql.migrations
+
+  users_server:
+      networks:
+        - backend
+      build:
+          context: .
+          dockerfile: docker-files/Dockerfile.users
+      depends_on:
+            - rabbitmq
+            - migrations
+
+  chats_server:
+    networks:
+      - backend
+    build:
+        context: .
+        dockerfile: docker-files/Dockerfile.chats
+    depends_on:
+          - rabbitmq
+          - migrations
+
+  posts_server:
+    networks:
+      - backend
+    build:
+        context: .
+        dockerfile: docker-files/Dockerfile.posts
+    depends_on:
+          - rabbitmq
+          - migrations
+
+  stories_server:
+    networks:
+      - backend
+    build:
+        context: .
+        dockerfile: docker-files/Dockerfile.stories
+    depends_on:
+          - rabbitmq
+          - migrations
+
+  activities_server:
+    networks:
+      - backend
+    build:
+        context: .
+        dockerfile: docker-files/Dockerfile.activities
+    depends_on:
+          - rabbitmq
+          - migrations
+
+networks:
+  backend:
