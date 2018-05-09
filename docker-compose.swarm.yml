@@ -35,72 +35,67 @@ services:
      - "5672"
 
   http_server:
+    image: ahmedmagdy/http_server:1.0
     networks:
       - backend
-    build:
-        context: .
-        dockerfile: docker-files/Dockerfile.http_server
     depends_on:
           - rabbitmq
     ports:
       - "8080:8080"
 
   migrations:
+    image: ahmedmagdy/db_migrations:1.0
     networks:
       - backend
-    build:
-        context: .
-        dockerfile: docker-files/Dockerfile.sql.migrations
+
 
   users_server:
-      networks:
-        - backend
-      build:
-          context: .
-          dockerfile: docker-files/Dockerfile.users
-      depends_on:
-            - rabbitmq
-            - migrations
-
-  chats_server:
+    image: ahmedmagdy/users_service:1.0
     networks:
       - backend
-    build:
-        context: .
-        dockerfile: docker-files/Dockerfile.chats
     depends_on:
-          - rabbitmq
-          - migrations
-
-  posts_server:
-    networks:
-      - backend
-    build:
-        context: .
-        dockerfile: docker-files/Dockerfile.posts
-    depends_on:
-          - rabbitmq
-          - migrations
-
-  stories_server:
-    networks:
-      - backend
-    build:
-        context: .
-        dockerfile: docker-files/Dockerfile.stories
-    depends_on:
-          - rabbitmq
-          - migrations
-
-  activities_server:
-    networks:
-      - backend
-    build:
-        context: .
-        dockerfile: docker-files/Dockerfile.activities
-    depends_on:
-          - rabbitmq
-          - migrations
+      - rabbitmq
+      - migrations
+#
+#  chats_server:
+#    networks:
+#      - backend
+#    build:
+#        context: .
+#        dockerfile: docker-files/Dockerfile.chats
+#    depends_on:
+#          - rabbitmq
+#          - migrations
+#
+#  posts_server:
+#    networks:
+#      - backend
+#    build:
+#        context: .
+#        dockerfile: docker-files/Dockerfile.posts
+#    depends_on:
+#          - rabbitmq
+#          - migrations
+#
+#  stories_server:
+#    networks:
+#      - backend
+#    build:
+#        context: .
+#        dockerfile: docker-files/Dockerfile.stories
+#    depends_on:
+#          - rabbitmq
+#          - migrations
+#
+#  activities_server:
+#    networks:
+#      - backend
+#    build:
+#        context: .
+#        dockerfile: docker-files/Dockerfile.activities
+#    depends_on:
+#          - rabbitmq
+#          - migrations
 
 networks:
   backend:

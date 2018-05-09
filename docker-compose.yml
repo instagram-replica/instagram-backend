@@ -4,7 +4,7 @@ services:
   arangodb:
     image: arangodb
     environment:
-      - ARANGO_NO_AUTH=1
+    - ARANGO_NO_AUTH=1
     ports:
       - "32807:8529"
   redis:
