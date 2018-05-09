@@ -47,7 +47,8 @@ services:
     image: ahmedmagdy/db_migrations:1.0
     networks:
       - backend
-
+    depends_on:
+      - rabbitmq
 
   users_server:
     image: ahmedmagdy/users_service:1.0
@@ -56,6 +57,14 @@ services:
     depends_on:
       - rabbitmq
       - migrations
+
+  posts_server:
+    image: ahmedmagdy/posts_service:1.0
+    networks:
+      - backend
+    depends_on:
+          - rabbitmq
+          - migrations
 #
 #  chats_server:
 #    networks:
@@ -67,15 +76,7 @@ services:
 #          - rabbitmq
 #          - migrations
 #
-#  posts_server:
-#    networks:
-#      - backend
-#    build:
-#        context: .
-#        dockerfile: docker-files/Dockerfile.posts
-#    depends_on:
-#          - rabbitmq
-#          - migrations
+
 #
 #  stories_server:
 #    networks:
