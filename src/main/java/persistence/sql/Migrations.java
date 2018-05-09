@@ -12,7 +12,8 @@ import static utilities.Main.readPropertiesFile;
 public class Migrations {
     public static void main(String[] args) throws IOException, InterruptedException, SQLException {
         //TODO: Find a better solution
-        Thread.sleep(5000);
+        Thread.sleep(30000);
+        System.out.println("Running migrations");
         Properties properties = readPropertiesFile("src/main/resources/postgres.properties");
 
         Flyway flyway = new Flyway();
@@ -28,7 +29,7 @@ public class Migrations {
 
         ArangoInterfaceMethods.initializeDB();
         ArangoInterfaceMethods.initializeGraphCollections();
-
+        System.out.println("Migrations done successfully");
 
   }
 }

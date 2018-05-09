@@ -118,7 +118,7 @@ public class ArangoInterfaceMethods {
             }
         }
         
-        List<String> user_ids = Database.getAllUsersIds();
+        List<String> user_ids = new ArrayList<>();
         try {
 
             Collection<EdgeDefinition> edgeDefinitions = new ArrayList<>();
