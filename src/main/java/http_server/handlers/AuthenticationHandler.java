@@ -44,18 +44,6 @@ public class AuthenticationHandler extends SimpleChannelInboundHandler<HTTPReque
         ctx.fireChannelRead(authenticatedHTTPRequest);
     }
 
-    @Override
-    public void channelReadComplete(ChannelHandlerContext ctx) {
-        ctx.flush();
-        ctx.close();
-    }
-
-    @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        cause.printStackTrace();
-        ctx.close();
-    }
-
     private static JSONObject constructMissingTokenErrorResponse() {
         JSONObject error = new JSONObject()
                 .put("message", "Unauthenticated request")

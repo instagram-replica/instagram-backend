@@ -37,6 +37,7 @@ public class Helpers {
         response.headers().set(HttpHeaders.Names.CONTENT_TYPE, "application/json");
         response.headers().set(HttpHeaders.Names.CONTENT_LENGTH, content.readableBytes());
         channelHandlerContext.writeAndFlush(response);
+        channelHandlerContext.close();
     }
 
     public static JSONObject createJSONError(String message) {
